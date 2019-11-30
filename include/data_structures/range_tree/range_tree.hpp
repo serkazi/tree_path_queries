@@ -1,0 +1,484 @@
+//
+// Created by sj on 01/11/19.
+//
+#ifndef SPQ_RANGE_TREE_HPP
+#define SPQ_RANGE_TREE_HPP
+#include <vector>
+#include <queue>
+#include <tuple>
+#include <limits>
+#include <algorithm>
+#include <cassert>
+#include <memory>
+#include <optional>
+#include "simple_bitset.hpp"
+#include <cmath>
+#include <iostream>
+#include "pq_types.hpp"
+
+/**
+ * the interface must be such that we accept a vector of ints only,
+ * rather than 2d points. I.e. we assume that the first coordinates
+ * correspond to indices to the array
+ * When using range tree with the heavy paths, we thus going to return
+ * positions in the concatenated input array,
+ * which is sufficient to recover the ids
+ * This means we can actually return only an array of positions,
+ * as the 2d-query result. This does not matter much though,
+ * as we explicitly store the points anyway
+ */
+/**
+ * For ease of copy/move constructors, we concatenate
+ * all the levels into a single backbone
+ * @tparam size_type
+ * @tparam value_type
+ */
+template<typename size_type= int, typename value_type= int>
+class range_tree {
+public:
+    using point2d= std::pair<size_type,value_type>;
+    using result_type= std::vector<std::pair<value_type,size_type>>;
+private:
+    static const int _left= 0, _right= 1;
+    static const int _pred= 0, _succ= 1;
+    /**
+     * offset records the various
+     * regions of the backbone, saying where each section of the concatenated
+     * range tree starts
+     */
+    point2d ****bridge= nullptr, *sorted_list= nullptr;
+    std::unique_ptr<size_type[]> offset= nullptr;
+    size_type n, num_nodes, len;
+    std::unique_ptr<simple_bitset> valid_nodes= nullptr;
+
+    void burn_bridges() ;
+    /**
+     * simulates the construction of range tree over [0,n-1]
+     * and calculates how many nodes and cells there will be
+     * will be needed when optimizing for space
+     * @param n
+     * @return
+     */
+    static std::pair<size_type,size_type> get_config( size_type n ) {
+        auto max_node_id= std::numeric_limits<size_type>::min();
+        size_type span= 0;
+        std::queue<std::tuple<size_type,size_type,size_type>> q;
+        for ( q.push(std::make_tuple(0,0,n-1)); not q.empty(); ) {
+            auto tpl= q.front(); q.pop();
+            auto l= std::get<1>(tpl), r= std::get<2>(tpl), idx= std::get<0>(tpl);
+            assert( l <= r );
+            max_node_id= std::max(max_node_id,idx), span+= (r-l+1);
+            if ( l < r ) {
+                auto mid= (l+r)/2;
+                q.push(std::make_tuple(2*idx+1,l,mid)), q.push(std::make_tuple(2*idx+2,mid+1,r));
+            }
+        }
+        return {max_node_id,span};
+    }
+
+    void mark_valid_nodes() ;
+
+    /**
+     * assumes that sorted_list[l]..sorted_list[r] is a range sorted by y-coordinate
+     * @param l
+     * @param r
+     * @param x
+     * @return : the position t, l <= t <= r, such that backbone[t].second is the successor of "x"
+     */
+    std::optional<size_type> successor_of( size_type l, size_type r, value_type x ) const {
+        if ( l > r ) return std::nullopt;
+        if ( sorted_list[l].second >= x ) return std::optional<size_type>(l);
+        assert( sorted_list[l].second < x );
+        if ( sorted_list[r].second < x )
+            return std::nullopt;
+        assert( sorted_list[r].second >= x );
+        for ( auto m= l; l+1 < r; sorted_list[m= (l+r)/2].second < x? (l= m):(r= m) );
+        return std::optional<size_type>(r);
+    }
+
+    std::optional<size_type> predecessor_of( size_type l, size_type r, value_type x ) const {
+        if ( l > r ) return std::nullopt;
+        if ( sorted_list[l].second > x )
+            return std::nullopt;
+        assert( sorted_list[l].second <= x );
+        if ( sorted_list[r].second <= x ) return std::optional<size_type>(r);
+        assert( sorted_list[r].second > x );
+        for ( auto m= l; l+1 < r; sorted_list[m= (l+r)/2].second <= x? (l= m):(r= m) );
+        return std::optional<size_type>(l);
+    }
+
+    void search_along_left_ridge(
+            bool report,
+            size_type idx, size_type l, size_type r, size_type trg,
+            std::optional<size_type> sc, std::optional<size_type> pr,
+            result_type &result,
+            size_type &cnt ) const ;
+    void search_along_right_ridge(
+            bool report,
+            size_type idx, size_type l, size_type r, size_type trg,
+            std::optional<size_type> sc, std::optional<size_type> pr,
+            result_type &result,
+            size_type &cnt ) const ;
+    void search_2d_range( bool report,
+                          size_type qi, size_type qj,
+                          value_type a, value_type b,
+                          result_type *result,
+                          size_type &cnt
+                          ) const ;
+    void establish_fractional_cascading_links() ;
+    void construct_im( const std::vector<point2d> &pts ) ;
+    void presort_lists() ;
+public:
+
+    // remove copy-assignment
+    range_tree& operator = ( const range_tree& other ) = delete;
+    // remove copy-constructor
+    range_tree( const range_tree &other ) = delete;
+
+    // move-assignment
+    range_tree &operator = ( range_tree &&other ) noexcept;
+    // move-constructor
+    range_tree( range_tree &&other ) noexcept;
+
+    virtual size_t size() const { return n; }
+    virtual size_type range_2d_counting_query( size_type qi, size_type qj, value_type a, value_type b ) const ;
+    virtual void range_2d_reporting_query( size_type qi, size_type qj,
+                         value_type a, value_type b,
+                         result_type &result ) const ;
+    virtual double size_in_bytes() const ;
+    explicit range_tree( const std::vector<typename range_tree<size_type,value_type>::point2d> &points, bool make_power_of_two= false ) ;
+    virtual ~range_tree() ;
+};
+
+template<typename size_type, typename value_type>
+void
+range_tree<size_type, value_type>::search_2d_range(
+        bool report,
+        size_type qi, size_type qj,
+        value_type a, value_type b,
+        range_tree::result_type *result,
+        size_type &cnt) const
+{
+    /**
+     * find the splitting point first
+     */
+    cnt= 0;
+    std::tuple<size_type,size_type,size_type> lca_segment= [qi,qj,n=this->n](){
+        size_type cur_node= 0, l= 0, r= n-1, mid;
+        assert( l <= qi and qj <= r );
+        for ( ;l < r; ) {
+            assert( l <= qi and qj <= r );
+            if ( qj <= (mid= (l+r)/2) ) {
+                r= mid, cur_node= 2*cur_node+1;
+                continue ;
+            }
+            if ( mid+1 <= qi ) {
+                l= mid+1, cur_node= 2*cur_node+2;
+                continue ;
+            }
+            assert( qi <= mid and mid+1 <= qj );
+            break ;
+        }
+        return std::make_tuple(cur_node,l,r);
+    }();
+    auto idx= std::get<0>(lca_segment),
+            l= std::get<1>(lca_segment),
+            r= std::get<2>(lca_segment);
+    assert( l <= qi and qj <= r );
+    assert( l == r or (qi <= (l+r)/2 and (l+r)/2 < qj) );
+    if ( l == r ) {
+        if ( a <= sorted_list[offset[idx]].second and sorted_list[offset[idx]].second <= b ) {
+            ++cnt;
+            if ( report ) result->push_back(sorted_list[offset[idx]]);
+        }
+        return ;
+    }
+    auto sc= successor_of(offset[idx],idx+1==num_nodes?len-1:offset[idx+1]-1,a),
+            pr= predecessor_of(offset[idx],idx+1==num_nodes?len-1:offset[idx+1]-1,b);
+    if ( (not pr) or (not sc) or *sc > *pr ) { // there can be no points with a <= xxx <= b
+        return ;
+    }
+    assert( offset[idx] <= *sc and *pr <= (idx+1==num_nodes?len-1:offset[idx+1]-1) );
+    std::optional<size_type> lsc= bridge[*sc][_left][_succ] ==nullptr?
+                                  std::nullopt:std::optional<size_type>(bridge[*sc][_left][_succ] -sorted_list);
+    std::optional<size_type> lpr= bridge[*pr][_left][_pred] ==nullptr?
+                                  std::nullopt:std::optional<size_type>(bridge[*pr][_left][_pred] -sorted_list);
+    std::optional<size_type> rsc= bridge[*sc][_right][_succ]==nullptr?
+                                  std::nullopt:std::optional<size_type>(bridge[*sc][_right][_succ]-sorted_list);
+    std::optional<size_type> rpr= bridge[*pr][_right][_pred]==nullptr?
+                                  std::nullopt:std::optional<size_type>(bridge[*pr][_right][_pred]-sorted_list);
+    search_along_left_ridge(report,2*idx+1,l,(l+r)/2,qi,lsc,lpr,*result,cnt);
+    search_along_right_ridge(report,2*idx+2,(l+r)/2+1,r,qj,rsc,rpr,*result,cnt);
+}
+
+template<typename size_type, typename value_type>
+size_type range_tree<size_type, value_type>
+::range_2d_counting_query(size_type qi, size_type qj,
+                          value_type a, value_type b)
+const {
+    size_type cnt= 0;
+    search_2d_range(false,qi,qj,a,b,nullptr,cnt);
+    return cnt;
+}
+
+template<typename size_type, typename value_type>
+void range_tree<size_type, value_type>
+::range_2d_reporting_query(size_type qi, size_type qj,
+                           value_type a, value_type b,
+                           range_tree::result_type &result)
+const {
+    size_type cnt= 0;
+    search_2d_range(true,qi,qj,a,b,&result,cnt);
+}
+
+// destructor
+template<typename size_type, typename value_type>
+range_tree<size_type, value_type>::~range_tree() {
+    delete[] sorted_list, burn_bridges();
+}
+
+// constructor
+template<typename size_type, typename value_type>
+range_tree<size_type, value_type>
+::range_tree( const std::vector<typename range_tree<size_type,value_type>::point2d> &input, bool make_power_of_two )
+{
+    for ( this->n= input.size(); make_power_of_two and (this->n & (this->n-1)); ++this->n ) ;
+    std::vector<point2d> points(input);
+    for ( size_type idx= input.size(); points.size() < this->n; points.emplace_back(idx++,0) ) ;
+    auto pr= get_config(this->n);
+    num_nodes= pr.first+1, len= pr.second;
+    offset= std::make_unique<size_type[]>(num_nodes);
+    sorted_list= new point2d[len];
+    bridge= new point2d***[len];
+    for ( size_type idx= 0; idx < len; ++idx ) {
+        bridge[idx]= new point2d**[2];
+        for (auto t = _left; t <= _right; ++t)
+            bridge[idx][t] = new point2d *[2];
+    }
+    mark_valid_nodes();
+    construct_im(points);
+    presort_lists();
+    establish_fractional_cascading_links();
+}
+
+template<typename size_type, typename value_type>
+void range_tree<size_type, value_type>
+::construct_im( const std::vector<range_tree::point2d> &pts ) {
+    std::queue<std::tuple<size_type,size_type,size_type>> q;
+    auto *length= new size_type[num_nodes+1];
+    for ( auto it= 0; it < num_nodes; offset[it++]= std::numeric_limits<size_type>::max() ) ;
+    for ( offset[0]= 0, length[0]= n, q.push(std::make_tuple(0,0,n-1)); not q.empty(); ) {
+        auto tpl= q.front(); q.pop();
+        auto l= std::get<1>(tpl), r= std::get<2>(tpl), idx= std::get<0>(tpl);
+        for ( auto iit= l; iit <= r; ++iit ) {
+            assert( offset[idx]+iit-l < len );
+            assert( iit < pts.size() );
+            sorted_list[offset[idx]+iit-l]= pts[iit];
+        }
+        if ( l < r ) {
+            auto mid= (l+r)/2;
+            assert( 2*idx+1 < num_nodes );
+            assert( offset[2*idx] != std::numeric_limits<size_type>::max() );
+            offset[2*idx+1]= offset[2*idx]+length[2*idx], length[2*idx+1]= mid-l+1;
+            q.push(std::make_tuple(2*idx+1,l,mid));
+            assert( mid+1 <= r );
+            if ( 2*idx+2 < num_nodes ) {
+                offset[2 * idx + 2] = offset[2 * idx + 1] + length[2 * idx + 1], length[2 * idx + 2] = r - mid;
+                q.push(std::make_tuple(2 * idx + 2, mid + 1, r));
+            }
+        }
+        else {
+            // in an un-balanced tree, left and right children may be non-existent
+            // we however still need to define their offsets
+            if ( 2*idx+1 < num_nodes )
+                offset[2*idx+1]= offset[2*idx]+length[2*idx], length[2*idx+1]= 0;
+            if ( 2*idx+2 < num_nodes )
+                offset[2*idx+2]= offset[2*idx+1]+length[2*idx+1], length[2*idx+2]= 0;
+        }
+    }
+    delete[] length;
+}
+
+template<typename size_type, typename value_type>
+void range_tree<size_type, value_type>
+::establish_fractional_cascading_links() {
+    for ( size_type idx= 0; idx < num_nodes; ++idx ) {
+        if ( not valid_nodes->test(idx) ) continue ;
+        size_type sons[2]= {2*idx+1,2*idx+2};
+        for ( auto t= _left; t <= _right; ++t ) {
+            if ( sons[t] < num_nodes ) {
+                for (size_type i= offset[idx]; i < (idx+1==num_nodes?len:offset[idx+1]); ++i) {
+                    bridge[i][t][_pred]= [&]() -> point2d * {
+                        auto position = predecessor_of(
+                                offset[sons[t]], sons[t]+1==num_nodes?len-1:offset[sons[t]+1]-1,
+                                sorted_list[i].second);
+                        return not position.has_value()?nullptr:sorted_list+position.value();
+                    }();
+                    bridge[i][t][_succ]= [&]() -> point2d * {
+                        auto position = successor_of(
+                                offset[sons[t]], sons[t]+1==num_nodes?len-1:offset[sons[t]+1]-1,
+                                sorted_list[i].second);
+                        return not position.has_value()?nullptr:sorted_list+position.value();
+                    }();
+                }
+            }
+        }
+    }
+}
+
+template<typename size_type, typename value_type>
+void range_tree<size_type, value_type>
+::search_along_left_ridge(bool report, size_type idx, size_type l, size_type r,
+                          size_type trg,
+                          std::optional<size_type> sc, std::optional<size_type> pr,
+                          range_tree::result_type &result, size_type &cnt)
+const {
+    if ( not(pr.has_value() and sc.has_value()) or *sc > *pr )
+        return ;
+    assert( offset[idx] <= *sc and *sc <= *pr and *pr <= (idx+1==num_nodes?len-1:offset[idx+1]-1) );
+    for ( auto ll= offset[idx]; ll < (idx+1==num_nodes?len:offset[idx+1]); ++ll )
+        assert( l <= sorted_list[ll].first and sorted_list[ll].first <= r );
+    assert( l <= trg and trg <= r );
+    for (;idx < num_nodes;) {
+        assert( valid_nodes->test(idx) );
+        if ( l == r ) {
+            auto it = sorted_list+offset[idx], jt = sorted_list+offset[idx];
+            for ( cnt+= (jt-it+1); it <= jt and report; result.push_back(*it++));
+            return ;
+        }
+        auto mid= (l+r)/2;
+        size_type where_to_descend_next= _left;
+        if ( l <= trg and trg <= mid ) {
+            // explore the right subtree
+            auto it = bridge[*sc][_right][_succ], jt = bridge[*pr][_right][_pred];
+            if (it != nullptr and jt != nullptr ) {
+                for ( cnt+= (jt-it+1); it <= jt and report; result.push_back(*it++) ) ;
+            }
+        }
+        else where_to_descend_next= _right;
+        l= where_to_descend_next==_left?l:mid+1, r= where_to_descend_next==_left?mid:r;
+        idx= 2*idx+(where_to_descend_next==_left?1:2);
+        auto it= bridge[*sc][where_to_descend_next][_succ], jt= bridge[*pr][where_to_descend_next][_pred];
+        if ( it == nullptr or jt == nullptr )
+            return ;
+        sc= std::optional<size_type>(it-sorted_list), pr= std::optional<size_type>(jt-sorted_list);
+    }
+}
+
+template<typename size_type, typename value_type>
+void range_tree<size_type, value_type>
+::search_along_right_ridge(bool report, size_type idx, size_type l, size_type r,
+                           size_type trg,
+                           std::optional<size_type> sc, std::optional<size_type> pr,
+                           range_tree::result_type &result, size_type &cnt)
+const {
+    //std::cerr << "Entering" << std::endl;
+    if ( not(pr.has_value() and sc.has_value()) or *sc > *pr )
+        return ;
+    assert( l <= trg and trg <= r );
+    for (;idx < num_nodes;) {
+        assert( valid_nodes->test(idx) );
+        if ( l == r ) {
+            auto it = sorted_list+offset[idx], jt = sorted_list+offset[idx];
+            for ( cnt += (jt - it + 1); it <= jt and report; result.push_back(*it++) ) ;
+            return ;
+        }
+        auto mid= (l+r)/2;
+        size_type where_to_descend_next= _right;
+        if ( mid+1 <= trg and trg <= r ) {
+            // explore the left subtree
+            auto it = bridge[*sc][_left][_succ], jt = bridge[*pr][_left][_pred];
+            if (it != nullptr and jt != nullptr ) {
+                for ( cnt += (jt - it + 1); it <= jt and report; result.push_back(*it++) );
+            }
+        }
+        else where_to_descend_next= _left;
+        l= where_to_descend_next==_left?l:mid+1, r= where_to_descend_next==_left?mid:r;
+        idx= 2*idx+(where_to_descend_next==_left?1:2);
+        auto it= bridge[*sc][where_to_descend_next][_succ], jt= bridge[*pr][where_to_descend_next][_pred];
+        if ( it == nullptr or jt == nullptr )
+            return ;
+        sc= std::optional<size_type>(it-sorted_list), pr= std::optional<size_type>(jt-sorted_list);
+    }
+}
+
+template<typename size_type, typename value_type>
+void range_tree<size_type, value_type>::presort_lists() {
+    for ( size_type idx= 0; idx < num_nodes; ++idx )
+        if ( valid_nodes->test(idx) )
+            std::sort(
+                    sorted_list+offset[idx],sorted_list+(idx+1==num_nodes?len:offset[idx+1]),
+                    [](const auto &a, const auto &b){return a.second < b.second;}
+            );
+}
+
+template<typename size_type, typename value_type>
+range_tree<size_type,value_type>
+&range_tree<size_type, value_type>::operator=(range_tree &&other) noexcept {
+    if ( this != &other ) {
+        offset = nullptr, offset = std::move(other.offset), other.offset = nullptr;
+        delete[] sorted_list, sorted_list = other.sorted_list, other.sorted_list = nullptr;
+        n = other.n, num_nodes = other.num_nodes, len = other.len;
+        burn_bridges(), bridge = other.bridge, other.bridge = nullptr;
+        valid_nodes= nullptr, valid_nodes= std::move(other.valid_nodes), other.valid_nodes= nullptr;
+    }
+    return *this;
+}
+
+template<typename size_type, typename value_type>
+void range_tree<size_type, value_type>::burn_bridges() {
+    for ( size_type idx= 0; idx < num_nodes; ++idx ) {
+        for (auto t = _left; t <= _right; ++t)
+            delete[] bridge[idx][t];
+        delete[] bridge[idx];
+    }
+    delete[] bridge;
+}
+
+template<typename size_type, typename value_type>
+range_tree<size_type, value_type>::range_tree(range_tree &&other) noexcept {
+    offset= std::move(other.offset), other.offset= nullptr;
+    sorted_list= other.sorted_list, other.sorted_list= nullptr;
+    n= other.n, num_nodes= other.num_nodes, len= other.len;
+    bridge= other.bridge, other.bridge= nullptr;
+    valid_nodes= std::move(other.valid_nodes), other.valid_nodes= nullptr;
+}
+
+template<typename size_type, typename value_type>
+double range_tree<size_type, value_type>::size_in_bytes() const {
+    double ans= sizeof(n)+sizeof(num_nodes)+sizeof(len)+\
+                sizeof(offset)+sizeof(bridge)+sizeof(sorted_list);
+    if ( offset )
+        ans+= num_nodes*sizeof (offset[0]);
+    if ( bridge )
+        ans+= 4*num_nodes* sizeof ****bridge;
+    if ( sorted_list )
+        ans+= len*sizeof *sorted_list;
+    if ( valid_nodes )
+        ans+= valid_nodes->size_in_bytes();
+    return ans;
+}
+
+template<typename size_type, typename value_type>
+void range_tree<size_type, value_type>::mark_valid_nodes() {
+    valid_nodes= std::make_unique<simple_bitset>(num_nodes);
+    std::queue<std::tuple<size_t,size_t,size_t>> q;
+    for ( q.push({0,0,n-1}); not q.empty(); ) {
+        auto tpl= q.front(); q.pop();
+        auto idx= std::get<0>(tpl), l= std::get<1>(tpl), r= std::get<2>(tpl);
+        assert( l <= r );
+        valid_nodes->set(idx);
+        if ( l == r and 2*idx+1 < num_nodes ) {
+            valid_nodes->clr(2*idx+1);
+        }
+        if ( l == r and 2*idx+2 < num_nodes ) {
+            valid_nodes->clr(2*idx+2);
+        }
+        auto mid= (l+r)/2;
+        if ( l < r ) {
+            q.push({2*idx+1,l,mid}), q.push({2*idx+2,mid+1,r});
+        }
+    }
+}
+
+#endif //SPQ_RANGE_TREE_HPP
