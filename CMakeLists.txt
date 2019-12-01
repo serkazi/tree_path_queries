@@ -306,6 +306,12 @@ target_include_directories(
         ${PROJECT_SOURCE_DIR}/src/misc
 )
 
+add_library(fixed_processor_manager ${PROJECT_SOURCE_DIR}/experiments/managers/fixed_processor_manager.hpp)
+set_target_properties(fixed_processor_manager PROPERTIES LINKER_LANGUAGE CXX)
+target_include_directories(fixed_processor_manager
+        PUBLIC
+        ${PROJECT_SOURCE_DIR}/experiments/managers/fixed_processor_manager.hpp)
+
 # adding the tests
 add_subdirectory(${PROJECT_SOURCE_DIR}/src/misc)
 add_subdirectory(${PROJECT_SOURCE_DIR}/src/tests/data_structures/simple_tree)

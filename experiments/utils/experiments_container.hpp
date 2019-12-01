@@ -31,7 +31,8 @@ private:
     using pq_request= path_queries::pq_request<node_type ,size_type ,value_type >;
     using request_stream= path_queries::request_stream<node_type,size_type,value_type>;
 
-    std::unique_ptr<path_query_processor<node_type,size_type,value_type>> p;
+    //std::unique_ptr<path_query_processor<node_type,size_type,value_type>> p;
+    const path_query_processor<node_type,size_type,value_type> *p;
     /**
      * @see https://stackoverflow.com/questions/22387586/measuring-execution-time-of-a-function-in-c
      * @see https://github.com/google/benchmark
@@ -45,7 +46,8 @@ private:
     };
     struct visitor_ {
         const experiments_container &enclosing;
-        std::map<path_queries::QUERY_TYPE,experimental_run> aggregates;
+        std::map<path_queries::QUERY_TYPE,double> aggregates;
+        std::map<path_queries::QUERY_TYPE,int64_t> counts;
         std::map<path_queries::QUERY_TYPE,std::string> to_be_hashed;
         void operator () ( const counting_query &q ) ;
         void operator () ( const reporting_query &q ) ;
@@ -57,13 +59,20 @@ private:
     //C++17 is needed for std::variant<>
     request_stream requests;
     request_stream read_requests( std::istream &is ) ;
+
+    [[nodiscard]] double get_avg( path_queries::QUERY_TYPE type ) const {
+        auto total_count_for_type= vis->counts.find(type)->second;
+        return vis->aggregates.find(type)->second.total_time/total_count_for_type;
+    }
+
 public:
     /**
      * @brief: constructor; the container is associated with a path query processor
+     * @details it should not even know about the underlying weighted tree for which the processor is built
      * @param p
      */
     explicit experiments_container(
-            std::unique_ptr<path_query_processor<node_type,size_type,value_type>> p ) ;
+            const path_query_processor<node_type,size_type,value_type> *p ) ;
     nlohmann::json submit_jobs( std::istream &is ) ;
 };
 
@@ -82,6 +91,7 @@ void experiments_container<node_type,size_type,value_type>
     auto &v= to_be_hashed[path_queries::QUERY_TYPE::COUNTING];
     v+= " ", v+= std::to_string(cnt);
     aggregates[path_queries::QUERY_TYPE::COUNTING]+= acc;
+    ++counts[path_queries::QUERY_TYPE::COUNTING];
 }
 
 template<typename node_type, typename size_type, typename value_type>
@@ -103,6 +113,7 @@ void experiments_container<node_type,size_type,value_type>
         return acc;
     });
     aggregates[path_queries::QUERY_TYPE::REPORTING]+= acc;
+    ++counts[path_queries::QUERY_TYPE::REPORTING];
 }
 
 template<typename node_type, typename size_type, typename value_type>
@@ -120,6 +131,7 @@ void experiments_container<node_type,size_type,value_type>
     auto &v= to_be_hashed[path_queries::QUERY_TYPE::SELECTION];
     v+= " ", v+= std::to_string(res);
     aggregates[path_queries::QUERY_TYPE::SELECTION]+= acc;
+    ++counts[path_queries::QUERY_TYPE::SELECTION];
 }
 
 template<typename node_type, typename size_type, typename value_type>
@@ -137,6 +149,7 @@ void experiments_container<node_type,size_type,value_type>
     auto &v= to_be_hashed[path_queries::QUERY_TYPE::MEDIAN];
     v+= " ", v+= std::to_string(res);
     aggregates[path_queries::QUERY_TYPE::MEDIAN]+= acc;
+    ++counts[path_queries::QUERY_TYPE::MEDIAN];
 }
 
 template<typename node_type, typename size_type, typename value_type>
@@ -158,8 +171,8 @@ experiments_container<node_type,size_type,value_type>
 
 template<typename node_type, typename size_type, typename value_type>
 experiments_container<node_type,size_type,value_type>
-::experiments_container( std::unique_ptr<path_query_processor<node_type,size_type,value_type>> p ) {
-    this->p= std::move(p);
+::experiments_container( const path_query_processor<node_type,size_type,value_type> *p ) {
+    this->p= p;
 }
 
 template<typename node_type, typename size_type, typename value_type>
@@ -171,11 +184,28 @@ experiments_container<node_type,size_type,value_type>
     return std::move(vec);
 }
 
+/**
+ * @details returns a JSON object, so that a caller can augment it with other info,
+ * such as e.g. the dataset for which the processor is built etc.
+ * @tparam node_type
+ * @tparam size_type
+ * @tparam value_type
+ * @param is
+ * @return
+ */
 template<typename node_type, typename size_type, typename value_type>
 nlohmann::json experiments_container<node_type,size_type,value_type>
 ::submit_jobs(std::istream &is) {
+    // read the requests
     requests= read_requests(is);
+    // answer the queries
     std::for_each( begin(requests),end(requests),[&](pq_request &r) {vis_(r);} );
-    return nlohmann::json(); //FIXME: return some sort of summary
+    // JSON-ify the summary
+    nlohmann::json obj;
+    obj["counting"]= get_avg(path_queries::QUERY_TYPE::COUNTING);
+    obj["reporting"]= get_avg(path_queries::QUERY_TYPE::REPORTING);
+    obj["median"]= get_avg(path_queries::QUERY_TYPE::MEDIAN);
+    obj["selection"]= get_avg(path_queries::QUERY_TYPE::SELECTION);
+    return std::move(obj);
 }
 #endif //PROJECT_EXPERIMENTS_CONTAINER_HPP

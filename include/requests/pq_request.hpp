@@ -93,12 +93,29 @@ namespace path_queries {
         assert( false );
     }
 
+    /**
+     * @brief outputs a query object in JSON format
+     * @tparam node_type
+     * @tparam size_type
+     * @tparam value_type
+     * @param os
+     * @param r
+     * @return the @code std::ostream & @endcode object
+     */
     template<typename node_type, typename size_type, typename value_type>
     std::ostream &operator << ( std::ostream &os, const pq_request<node_type,size_type,value_type> &r ) {
-        auto js= to_json(r);
-        return os << js;
+        return os << to_json(r);
     }
 
+    /**
+     * @brief we assume that a query is given in JSON format
+     * @tparam node_type
+     * @tparam size_type
+     * @tparam value_type
+     * @param is
+     * @param r
+     * @return the @code std::istream & @endcode object
+     */
     template<typename node_type, typename size_type, typename value_type>
     std::istream &operator >> ( std::istream &is, pq_request<node_type,size_type,value_type> &r ) {
         nlohmann::json obj;
