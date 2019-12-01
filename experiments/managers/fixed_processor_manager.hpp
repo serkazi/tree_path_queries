@@ -28,21 +28,13 @@ template <
 class fixed_processor_manager {
 private:
     std::unique_ptr<P> processor;
-    std::string descr;
 public:
-    explicit fixed_processor_manager( std::istream &is, const std::string& description= "" ) {
-        std::string s; is >> s;
-        std::vector<value_type> w(s.size()/2);
-        for ( auto &x: w ) is >> x;
+    explicit fixed_processor_manager( const std::string &s, const std::vector<value_type> &w ) {
         processor= std::make_unique<P>(s,w);
-        descr= description;
     }
     nlohmann::json invoke_with( std::istream &queries ) {
         experiments_container<node_type,size_type,value_type> container(processor.get());
-        auto obj= container.submit_jobs(queries);
-        if ( not descr.empty() )
-            obj["dataset"]= descr;
-        return std::move(obj);
+        return container.submit_jobs(queries);
     }
 };
 #endif //TREE_PATH_QUERIES_FIXED_PROCESSOR_MANAGER_HPP

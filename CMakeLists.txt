@@ -306,11 +306,16 @@ target_include_directories(
         ${PROJECT_SOURCE_DIR}/src/misc
 )
 
-add_library(fixed_processor_manager ${PROJECT_SOURCE_DIR}/experiments/managers/fixed_processor_manager.hpp)
-set_target_properties(fixed_processor_manager PROPERTIES LINKER_LANGUAGE CXX)
-target_include_directories(fixed_processor_manager
+add_library(experiment_managers
+        ${PROJECT_SOURCE_DIR}/experiments/managers/fixed_processor_manager.hpp
+        ${PROJECT_SOURCE_DIR}/experiments/managers/fixed_dataset_manager.hpp)
+set_target_properties(experiment_managers PROPERTIES LINKER_LANGUAGE CXX)
+target_link_libraries(experiment_managers PRIVATE sdsl)
+target_include_directories(
+        experiment_managers
         PUBLIC
-        ${PROJECT_SOURCE_DIR}/experiments/managers/fixed_processor_manager.hpp)
+        ${PROJECT_SOURCE_DIR}/experiments/managers
+        ${PROJECT_SOURCE_DIR}/experiments/utils)
 
 # adding the tests
 add_subdirectory(${PROJECT_SOURCE_DIR}/src/misc)
