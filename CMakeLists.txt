@@ -216,6 +216,7 @@ target_include_directories(
         wt_hpd
         PUBLIC
         ${SDSL_INCLUDE_DIR}
+        ${PROJECT_SOURCE_DIR}/include/data_structures/succinct
         ${PROJECT_SOURCE_DIR}/include/wrappers
         ${PROJECT_SOURCE_DIR}/include/interfaces
 )
@@ -296,28 +297,24 @@ add_library(
         ${PROJECT_SOURCE_DIR}/experiments/utils/experiments_container.hpp
         ${PROJECT_SOURCE_DIR}/experiments/utils/query_stream_builder.hpp
         ${PROJECT_SOURCE_DIR}/src/misc/random1d_interval_generator.hpp
+        ${PROJECT_SOURCE_DIR}/experiments/managers/fixed_processor_manager.hpp
+        ${PROJECT_SOURCE_DIR}/experiments/managers/fixed_dataset_manager.hpp
         )
 set_target_properties(experiment_utils PROPERTIES LINKER_LANGUAGE CXX)
 target_link_libraries(experiment_utils PUBLIC nlohmann_json::nlohmann_json pq_requests)
 target_include_directories(
         experiment_utils PUBLIC
         ${PROJECT_SOURCE_DIR}/experiments/utils
+        ${PROJECT_SOURCE_DIR}/experiments/managers
         ${PROJECT_SOURCE_DIR}/include/interfaces
         ${PROJECT_SOURCE_DIR}/src/misc
+        ${PROJECT_SOURCE_DIR}/include/wrappers
+        ${PROJECT_SOURCE_DIR}/include/data_structures/plain
+        ${PROJECT_SOURCE_DIR}/include/data_structures/hybrid
+        ${PROJECT_SOURCE_DIR}/include/data_structures/succinct
 )
 
-add_library(experiment_managers
-        ${PROJECT_SOURCE_DIR}/experiments/managers/fixed_processor_manager.hpp
-        ${PROJECT_SOURCE_DIR}/experiments/managers/fixed_dataset_manager.hpp)
-set_target_properties(experiment_managers PROPERTIES LINKER_LANGUAGE CXX)
-target_link_libraries(experiment_managers PRIVATE sdsl)
-target_include_directories(
-        experiment_managers
-        PUBLIC
-        ${PROJECT_SOURCE_DIR}/experiments/managers
-        ${PROJECT_SOURCE_DIR}/experiments/utils)
-
-# adding the tests
+# adding the test
 add_subdirectory(${PROJECT_SOURCE_DIR}/src/misc)
 add_subdirectory(${PROJECT_SOURCE_DIR}/src/tests/data_structures/simple_tree)
 add_subdirectory(${PROJECT_SOURCE_DIR}/src/tests/data_structures/range_tree)

@@ -2,7 +2,7 @@
 // Created by sj on 18/11/19.
 //
 #include "gtest/gtest.h"
-#include "../experimental_run.hpp"
+#include "experimental_run.hpp"
 #include <sstream>
 #include <nlohmann/json.hpp>
 
@@ -17,7 +17,7 @@ TEST(obj_test,CorrectlyReadsFromStream) {
     ASSERT_EQ(e.ds_name, obj["name"]);
     ASSERT_EQ(e.total_space, obj["space"]);
     ASSERT_EQ(e.total_time, obj["time"]);
-    ASSERT_EQ(e.type, static_cast<experimental_run::QUERY_TYPE>(obj["type"]));
+    ASSERT_EQ(e.type, static_cast<path_queries::QUERY_TYPE>(obj["type"]));
     ASSERT_EQ(e.sha512hash, obj["hash"]);
 }
 
@@ -28,7 +28,7 @@ TEST(obj_test,CorrectlyOutputsToStream) {
                 .set_name("xyz")
                 .set_total_space(12.53)
                 .set_total_time(0.07)
-                .set_type(experimental_run::QUERY_TYPE::MEDIAN)
+                .set_type(path_queries::QUERY_TYPE::MEDIAN)
                 .build();
 
     std::stringstream str;
@@ -39,7 +39,7 @@ TEST(obj_test,CorrectlyOutputsToStream) {
     ASSERT_EQ(e.ds_name, obj["name"]);
     ASSERT_EQ(e.total_space, obj["space"]);
     ASSERT_EQ(e.total_time, obj["time"]);
-    ASSERT_EQ(e.type, static_cast<experimental_run::QUERY_TYPE>(obj["type"]));
+    ASSERT_EQ(e.type, static_cast<path_queries::QUERY_TYPE>(obj["type"]));
     ASSERT_EQ(e.sha512hash, obj["hash"]);
 }
 
@@ -49,7 +49,7 @@ TEST(obj_test,DoesNotBuildPartialObject) {
                     .set_name("xyz")
                     .set_total_space(12.53)
                     /*.set_total_time(0.07)*/
-                    .set_type(experimental_run::QUERY_TYPE::MEDIAN);
+                    .set_type(path_queries::QUERY_TYPE::MEDIAN);
     ASSERT_FALSE(builder.object_is_sane());
 }
 
@@ -60,7 +60,7 @@ TEST(obj_test,QueryTypeCastsWork) {
                     .set_name("xyz")
                     .set_total_space(12.53)
                     .set_total_time(0.07)
-                    .set_type(experimental_run::QUERY_TYPE::SELECTION)
+                    .set_type(path_queries::QUERY_TYPE::SELECTION)
                     .build();
     std::stringstream str;
     str << e;
@@ -71,7 +71,7 @@ TEST(obj_test,QueryTypeCastsWork) {
     ASSERT_EQ(e.ds_name, obj["name"]);
     ASSERT_EQ(e.total_space, obj["space"]);
     ASSERT_EQ(e.total_time, obj["time"]);
-    ASSERT_NE(e.type, static_cast<experimental_run::QUERY_TYPE>(obj["type"]));
+    ASSERT_NE(e.type, static_cast<path_queries::QUERY_TYPE>(obj["type"]));
     ASSERT_EQ(e.sha512hash, obj["hash"]);
 }
 
