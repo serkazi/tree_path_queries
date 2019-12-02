@@ -55,7 +55,7 @@ namespace path_queries {
             obj["type"]= "reporting", obj["x"]= q.x_, obj["y"]= q.y_, obj["a"]= q.a_, obj["b"]= q.b_;
         }
         void operator () ( const selection_query<node_type,size_type,value_type> &q ) const {
-            obj["type"]= "selection", obj["x"]= q.x_, obj["y"]= q.y_, obj["quantile"]= q.quantile_ ;
+            obj["type"]= "selection", obj["x"]= q.x_, obj["y"]= q.y_, obj["quantile"]= q.quantile;
         }
         void operator () ( const median_query<node_type,size_type,value_type> &q ) const {
             obj["type"]= "median", obj["x"]= q.x_, obj["y"]= q.y_;
@@ -82,13 +82,13 @@ namespace path_queries {
 
     template<typename node_type, typename size_type, typename value_type>
     pq_request<node_type,size_type,value_type> from_json( nlohmann::json obj ) {
-        if ( obj.count("counting") )
+        if ( obj["type"] == "counting" )
             return counting_query<node_type,size_type,value_type>(obj);
-        if ( obj.count("reporting") )
+        if ( obj["type"] == "reporting" )
             return reporting_query<node_type,size_type,value_type>(obj);
-        if ( obj.count("median") )
+        if ( obj["type"] == "median" )
             return median_query<node_type,size_type,value_type>(obj);
-        if ( obj.count("selection") )
+        if ( obj["type"] == "selection" )
             return selection_query<node_type,size_type,value_type>(obj);
         assert( false );
     }
@@ -119,7 +119,11 @@ namespace path_queries {
     template<typename node_type, typename size_type, typename value_type>
     std::istream &operator >> ( std::istream &is, pq_request<node_type,size_type,value_type> &r ) {
         nlohmann::json obj;
-        is >> obj, r= path_queries::from_json<node_type,size_type,value_type>(obj);
+        for ( ;not is.eof() and (std::isspace(is.peek()) or is.peek() == '\n'); is.get() ) ;
+        if ( is.eof() ) return is;
+        if ( is >> obj ) {
+            r= path_queries::from_json<node_type,size_type,value_type>(obj);
+        }
         return is;
     }
 

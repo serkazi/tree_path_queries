@@ -160,6 +160,7 @@ set(DEPS_DIRS "wavelet_tree;range_tree;hpd;misc")
 foreach(dir in ${DEPS_DIRS})
     target_include_directories(hybrid PUBLIC ${PROJECT_SOURCE_DIR}/include/${dir})
 endforeach(dir)
+target_include_directories(hybrid PUBLIC ${PROJECT_SOURCE_DIR}/src/misc)
 target_include_directories(hybrid PUBLIC ${PROJECT_SOURCE_DIR}/include/interfaces)
 set(BENCHMARK_MAIN_LIBRARY ~/local/benchmark/build/src/libbenchmark_main.a)
 

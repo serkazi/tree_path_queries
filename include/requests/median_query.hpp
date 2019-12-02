@@ -18,7 +18,7 @@ namespace path_queries {
 
     template<typename node_type, typename size_type, typename value_type>
     median_query<node_type, size_type, value_type>::median_query(nlohmann::json obj)
-    :abstract_query<node_type,size_type,value_type>(obj) {}
+    :selection_query<node_type,size_type,value_type>(obj) {}
 }
 
 #endif //PQ_REQUESTS_MEDIAN_QUERY_HPP

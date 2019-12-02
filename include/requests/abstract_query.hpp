@@ -18,6 +18,7 @@ namespace path_queries {
     >
     struct abstract_query {
         node_type x_, y_;
+        abstract_query() = default;
         abstract_query(node_type x, node_type y);
         virtual ~abstract_query() = default;
         explicit abstract_query( nlohmann::json obj ) ;

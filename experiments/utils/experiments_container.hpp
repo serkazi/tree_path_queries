@@ -62,7 +62,7 @@ private:
 
     [[nodiscard]] double get_avg( path_queries::QUERY_TYPE type ) const {
         auto total_count_for_type= vis->counts.find(type)->second;
-        return vis->aggregates.find(type)->second.total_time/total_count_for_type;
+        return vis->aggregates.find(type)->second/total_count_for_type;
     }
 
 public:
@@ -108,7 +108,7 @@ void experiments_container<node_type,size_type,value_type>
     }
     auto &v= to_be_hashed[path_queries::QUERY_TYPE::REPORTING];
     v+= std::accumulate(std::make_move_iterator(res.begin()),std::make_move_iterator(res.end()),
-            "",[&]( std::string acc, auto pr ) {
+            std::string(""),[&]( std::string acc, auto pr ) {
         acc+= " ", acc+= std::to_string(pr.second);
         return acc;
     });
@@ -124,7 +124,7 @@ void experiments_container<node_type,size_type,value_type>
     {
         // we create a duration_timer here, and it captures "acc" by reference
         duration_timer timer(acc);
-        res= enclosing.p->selection(q.x_, q.y_, q.quantile_);
+        res= enclosing.p->selection(q.x_, q.y_, q.quantile);
         // at this point, the duration_timer is destroyed, and "acc" field is populated
         // with the time of "count"'s execution
     }
@@ -166,12 +166,13 @@ template<typename node_type, typename size_type, typename value_type>
 experiments_container<node_type,size_type,value_type>
 ::duration_timer::~duration_timer() {
     auto finish = std::chrono::high_resolution_clock::now();
-    acc= std::chrono::duration_cast<std::chrono::nanoseconds>(finish-start);
+    acc= std::chrono::duration_cast<std::chrono::nanoseconds>(finish-start).count();
 };
 
 template<typename node_type, typename size_type, typename value_type>
 experiments_container<node_type,size_type,value_type>
 ::experiments_container( const path_query_processor<node_type,size_type,value_type> *p ) {
+    vis= std::make_unique<visitor_>(*this);
     this->p= p;
 }
 
@@ -180,7 +181,7 @@ path_queries::request_stream<node_type,size_type,value_type>
 experiments_container<node_type,size_type,value_type>
 ::read_requests( std::istream &is ) {
     path_queries::request_stream<node_type,size_type,value_type> vec;
-    for ( path_queries::pq_request<node_type,size_type,value_type> r; is >> r; vec.push_back(r) ) ;
+    for ( path_queries::pq_request<node_type,size_type,value_type> r; is >> r; vec.push_back(std::move(r)) ) ;
     return std::move(vec);
 }
 
@@ -199,7 +200,7 @@ nlohmann::json experiments_container<node_type,size_type,value_type>
     // read the requests
     requests= read_requests(is);
     // answer the queries
-    std::for_each( begin(requests),end(requests),[&](pq_request &r) {vis_(r);} );
+    std::for_each( begin(requests),end(requests),[&]( const pq_request &r ) {std::visit(*vis,r);} );
     // JSON-ify the summary
     nlohmann::json obj;
     obj["counting"]= get_avg(path_queries::QUERY_TYPE::COUNTING);

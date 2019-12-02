@@ -26,9 +26,9 @@ template<
         typename value_type= pq_types::value_type>
 class query_stream_builder {
 private:
-    size_type K_; // for counting and reporting, the parameter
-    value_type a_,b_;
-    node_type n_;
+    size_type K_{1}; // for counting and reporting, the parameter
+    value_type a_{0},b_{0};
+    node_type n_{0};
     std::map<path_queries::QUERY_TYPE,uint64_t> how_many_of;
 
     std::vector<path_queries::pq_request<node_type,size_type,value_type>> requests;

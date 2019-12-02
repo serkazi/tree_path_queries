@@ -45,7 +45,7 @@ class fixed_dataset_manager {
 private:
 
     template<typename P>
-    using processor_holder= std::unique_ptr<fixed_processor_manager<node_type,size_type,value_type,P>>;
+    using processor_holder= fixed_processor_manager<node_type,size_type,value_type,P>;
 
     using nv                 = naive_processor<node_type,size_type,value_type>;
     using nv_lca             = naive_processor_lca<node_type,size_type,value_type>;
@@ -77,14 +77,6 @@ private:
                                         sdsl::bp_support_sada<>,2,
                                         sdsl::rrr_vector<>
                                         >;
-    std::tuple<
-                processor_holder<nv>,processor_holder<nv_lca>,processor_holder<nv_succ>,
-                processor_holder<hybrid>,processor_holder<tree_ext_ptr>,
-                processor_holder<wt_hpd_uncompressed>,processor_holder<wt_hpd_rrr>,
-                processor_holder<tree_ext_sct_un>,processor_holder<tree_ext_sct_rrr>
-              >
-              processor_managers;
-
     std::string description;
     value_type a,b;
     size_type n;
@@ -97,11 +89,11 @@ public:
 
     explicit fixed_dataset_manager( std::istream &is, uint16_t mask, const std::string &descr= "N/A" ) {
         this->mask= mask;
-        std::string s; is >> topology;
+        is >> topology;
         w.resize(topology.size()/2);
         for ( auto &x: w )
             is >> x;
-        n= s.size()/2, a= *(std::min_element(begin(w),end(w))), b= *(std::max_element(begin(w),end(w)));
+        n= topology.size()/2, a= *(std::min_element(begin(w),end(w))), b= *(std::max_element(begin(w),end(w)));
         description= descr;
     }
 
@@ -113,11 +105,16 @@ public:
      */
     nlohmann::json run_config( nlohmann::json configs ) {
         query_stream_builder<node_type,size_type,value_type> builder;
-        builder.set_node_range(n).set(path_queries::QUERY_TYPE::MEDIAN,configs["median"]);
-        builder.set_weight_range(a,b).set(path_queries::QUERY_TYPE::COUNTING,configs["counting"]);
-        builder.set(path_queries::QUERY_TYPE::REPORTING,configs["reporting"]);
-        builder.set(path_queries::QUERY_TYPE::SELECTION,configs["selection"]);
-        builder.set_scaling_param(configs["K"]);
+        if ( configs.count("median"))
+            builder.set_node_range(n).set(path_queries::QUERY_TYPE::MEDIAN,configs["median"]);
+        if ( configs.count("counting"))
+            builder.set_weight_range(a,b).set(path_queries::QUERY_TYPE::COUNTING,configs["counting"]);
+        if ( configs.count("reporting"))
+            builder.set(path_queries::QUERY_TYPE::REPORTING,configs["reporting"]);
+        if ( configs.count("selection"))
+            builder.set(path_queries::QUERY_TYPE::SELECTION,configs["selection"]);
+        if ( configs.count("K"))
+            builder.set_scaling_param(configs["K"]);
         /**
          * create some temporary file, feed the queries into it
          * TODO: look how Gog uses this id() in his own code
@@ -126,47 +123,74 @@ public:
                  "_on_"+std::to_string(sdsl::util::pid())+".json";
          std::ofstream os(filename);
          builder.build();
-         for ( const auto &q: builder )
+         for ( const auto &q: builder ) {
+             // std::cerr << q << std::endl;
              os << q << '\n';
+         }
          os.close();
          nlohmann::json res, per_datastructure;
+
          for ( int i= 0; i < 9; ++i ) {
              if ( not (mask & (1u<<i)) ) continue ;
              switch ( 1 << i ) {
-                 case static_cast<int>(experiments::IMPLS::NV):
-                     std::get<i>(processor_managers)= std::make_unique<processor_holder<nv>>(topology,w);
-                     break ;
-                 case static_cast<int>(experiments::IMPLS::NV_LCA):
-                     std::get<i>(processor_managers)= std::make_unique<processor_holder<nv_lca>>(topology,w);
-                     break ;
-                 case static_cast<int>(experiments::IMPLS::NV_SUCC):
-                     std::get<i>(processor_managers)= std::make_unique<processor_holder<nv_succ>>(topology,w);
-                     break ;
-                 case static_cast<int>(experiments::IMPLS::HYBRID):
-                     std::get<i>(processor_managers)= std::make_unique<processor_holder<hybrid>>(topology,w);
-                     break ;
-                 case static_cast<int>(experiments::IMPLS::TREE_EXT_PTR):
-                     std::get<i>(processor_managers)= std::make_unique<processor_holder<tree_ext_ptr>>(topology,w);
-                     break ;
-                 case static_cast<int>(experiments::IMPLS::WT_HPD_UN):
-                     std::get<i>(processor_managers)= std::make_unique<processor_holder<wt_hpd_uncompressed>>(topology,w);
-                     break ;
-                 case static_cast<int>(experiments::IMPLS::WT_HPD_RRR):
-                     std::get<i>(processor_managers)= std::make_unique<processor_holder<wt_hpd_rrr>>(topology,w);
-                     break ;
-                 case static_cast<int>(experiments::IMPLS::TREE_EXT_SCT_UN):
-                     std::get<i>(processor_managers)= std::make_unique<processor_holder<tree_ext_sct_un>>(topology,w);
-                     break ;
-                 case static_cast<int>(experiments::IMPLS::TREE_EXT_SCT_RRR):
-                     std::get<i>(processor_managers)= std::make_unique<processor_holder<tree_ext_sct_rrr>>(topology,w);
-                     break ;
+                 case static_cast<int>(experiments::IMPLS::NV): {
+                     auto pm = std::make_unique<processor_holder<nv>>(topology, w);
+                     std::ifstream is(filename);
+                     per_datastructure[experiments::hrnames[i]] = pm->invoke_with(is);
+                     break;
+                 }
+                 case static_cast<int>(experiments::IMPLS::NV_LCA): {
+                     auto pm = std::make_unique<processor_holder<nv_lca>>(topology, w);
+                     std::ifstream is(filename);
+                     per_datastructure[experiments::hrnames[i]] = pm->invoke_with(is);
+                     break;
+                 }
+                 case static_cast<int>(experiments::IMPLS::NV_SUCC): {
+                     auto pm = std::make_unique<processor_holder<nv_succ>>(topology, w);
+                     std::ifstream is(filename);
+                     per_datastructure[experiments::hrnames[i]] = pm->invoke_with(is);
+                     break;
+                 }
+                 case static_cast<int>(experiments::IMPLS::HYBRID): {
+                     auto pm = std::make_unique<processor_holder<hybrid>>(topology, w);
+                     std::ifstream is(filename);
+                     per_datastructure[experiments::hrnames[i]] = pm->invoke_with(is);
+                     break;
+                 }
+                 case static_cast<int>(experiments::IMPLS::TREE_EXT_PTR): {
+                     auto pm = std::make_unique<processor_holder<tree_ext_ptr>>(topology, w);
+                     std::ifstream is(filename);
+                     per_datastructure[experiments::hrnames[i]] = pm->invoke_with(is);
+                     break;
+                 }
+                 case static_cast<int>(experiments::IMPLS::WT_HPD_UN): {
+                     auto pm = std::make_unique<processor_holder<wt_hpd_uncompressed>>(topology, w);
+                     std::ifstream is(filename);
+                     per_datastructure[experiments::hrnames[i]] = pm->invoke_with(is);
+                     break;
+                 }
+                 case static_cast<int>(experiments::IMPLS::WT_HPD_RRR): {
+                     auto pm = std::make_unique<processor_holder<wt_hpd_rrr>>(topology, w);
+                     std::ifstream is(filename);
+                     per_datastructure[experiments::hrnames[i]] = pm->invoke_with(is);
+                     break;
+                 }
+                 case static_cast<int>(experiments::IMPLS::TREE_EXT_SCT_UN): {
+                     auto pm = std::make_unique<processor_holder<tree_ext_sct_un>>(topology, w);
+                     std::ifstream is(filename);
+                     per_datastructure[experiments::hrnames[i]] = pm->invoke_with(is);
+                     break;
+                 }
+                 case static_cast<int>(experiments::IMPLS::TREE_EXT_SCT_RRR): {
+                     auto pm = std::make_unique<processor_holder<tree_ext_sct_rrr>>(topology, w);
+                     std::ifstream is(filename);
+                     per_datastructure[experiments::hrnames[i]] = pm->invoke_with(is);
+                     break;
+                 }
              }
-             std::ifstream is(filename);
-             per_datastructure[experiments::hrnames[i]]= std::get<i>(processor_managers)->invoke_with(is);
          }
-         res["dataset"]= description;
-         res["config"]= configs;
-         res["results"]= per_datastructure;
+         res["dataset"]= description, res["config"]= configs, res["results"]= per_datastructure;
+         std::remove(filename.c_str());
          return res;
     }
 };
