@@ -12,6 +12,16 @@ namespace path_queries {
         value_type a_,b_;
         reporting_query(node_type x, node_type y, value_type a, value_type b);
         explicit reporting_query( nlohmann::json obj ) ;
+        void to_json(nlohmann::json& j, const reporting_query& p) {
+            j = nlohmann::json{{"a", p.a_}, {"b", p.b_}, {"x", p.x_}, {"y",p.y_}};
+        }
+
+        void from_json(const nlohmann::json& j, reporting_query& p) {
+            j.at("a").get_to(p.a_);
+            j.at("b").get_to(p.b_);
+            j.at("x").get_to(p.x_);
+            j.at("y").get_to(p.y_);
+        }
     };
     template<typename node_type, typename size_type, typename value_type>
     reporting_query<node_type, size_type, value_type>::reporting_query(node_type x, node_type y, value_type a,

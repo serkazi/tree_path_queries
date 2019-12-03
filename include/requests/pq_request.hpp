@@ -23,6 +23,13 @@ namespace path_queries {
         REPORTING //3
     };
 
+    NLOHMANN_JSON_SERIALIZE_ENUM( QUERY_TYPE, {
+        {QUERY_TYPE::SELECTION, "selection"},
+        {QUERY_TYPE::MEDIAN, "median"},
+        {QUERY_TYPE::COUNTING, "counting"},
+        {QUERY_TYPE::REPORTING, "reporting"},
+    })
+
     /**
      * @brief acts as a wrapper for a query, uses @code std::variant<> @endcode
      * @tparam node_type

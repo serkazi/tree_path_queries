@@ -12,6 +12,13 @@ namespace path_queries {
         size_type quantile;
         selection_query( node_type x, node_type y, size_type qntl ) ;
         explicit selection_query( nlohmann::json obj ) ;
+        void to_json(nlohmann::json& j, const selection_query& p) {
+            j = nlohmann::json{{"x", p.x_}, {"y",p.y_},{"quantile",p.quantile}};
+        }
+        void from_json(const nlohmann::json& j, selection_query& p) {
+            j.at("x").get_to(p.x_);
+            j.at("y").get_to(p.y_);
+        }
     };
     template<typename node_type, typename size_type, typename value_type>
     selection_query<node_type, size_type, value_type>
