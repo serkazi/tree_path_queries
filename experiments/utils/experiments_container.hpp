@@ -16,6 +16,29 @@
 #include <memory>
 #include <chrono>
 
+// we expose this since it is useful in general
+/**
+ * a simple struct that records the time of its creation,
+ * and writes back the time of its destruction
+ */
+template<typename time_units= std::chrono::microseconds>
+struct duration_timer{
+    double &acc;
+    long double total_elapsed_time= 0.00;
+    std::chrono::time_point<std::chrono::high_resolution_clock,std::chrono::nanoseconds> start;
+    explicit duration_timer( double &a ) ; //initializing "start" in the constructor
+    ~duration_timer() ; // populating "acc" in the destructor
+};
+template<typename time_units>
+duration_timer<time_units>::duration_timer(double &a) : acc(a) {
+    start= std::chrono::high_resolution_clock::now();
+}
+template<typename time_units>
+duration_timer<time_units>::~duration_timer() {
+    auto finish = std::chrono::high_resolution_clock::now();
+    acc= std::chrono::duration_cast<time_units>(finish-start).count();
+};
+
 template<
     typename node_type= pq_types::node_type,
     typename size_type= pq_types::size_type,
@@ -37,13 +60,7 @@ private:
      * @see https://stackoverflow.com/questions/22387586/measuring-execution-time-of-a-function-in-c
      * @see https://github.com/google/benchmark
      */
-    struct duration_timer{
-        double &acc;
-        long double total_elapsed_time= 0.00;
-        std::chrono::time_point<std::chrono::high_resolution_clock,std::chrono::nanoseconds> start;
-        explicit duration_timer( double &a ) ; //initializing "start" in the constructor
-        ~duration_timer() ; // populating "acc" in the destructor
-    };
+
     struct visitor_ {
         const experiments_container &enclosing;
         std::map<path_queries::QUERY_TYPE,double> aggregates;
@@ -66,6 +83,9 @@ private:
     }
 
 public:
+
+
+
     /**
      * @brief: constructor; the container is associated with a path query processor
      * @details it should not even know about the underlying weighted tree for which the processor is built
@@ -83,7 +103,7 @@ void experiments_container<node_type,size_type,value_type>
     size_type cnt;
     {
         // we create a duration_timer here, and it captures "acc" by reference
-        duration_timer timer(acc);
+        duration_timer<std::chrono::microseconds> timer(acc);
         cnt= enclosing.p->count(q.x_,q.y_,q.a_,q.b_);
         // at this point, the duration_timer is destroyed, and "acc" field is populated
         // with the time of "count"'s execution
@@ -101,7 +121,7 @@ void experiments_container<node_type,size_type,value_type>
     double acc= 0.00;
     {
         // we create a duration_timer here, and it captures "acc" by reference
-        duration_timer timer(acc);
+        duration_timer<std::chrono::microseconds> timer(acc);
         enclosing.p->report(q.x_, q.y_, q.a_, q.b_,res);
         // at this point, the duration_timer is destroyed, and "acc" field is populated
         // with the time of "count"'s execution
@@ -123,7 +143,7 @@ void experiments_container<node_type,size_type,value_type>
     value_type res;
     {
         // we create a duration_timer here, and it captures "acc" by reference
-        duration_timer timer(acc);
+        duration_timer<std::chrono::microseconds> timer(acc);
         res= enclosing.p->selection(q.x_, q.y_, q.quantile);
         // at this point, the duration_timer is destroyed, and "acc" field is populated
         // with the time of "count"'s execution
@@ -141,7 +161,7 @@ void experiments_container<node_type,size_type,value_type>
     value_type res;
     {
         // we create a duration_timer here, and it captures "acc" by reference
-        duration_timer timer(acc);
+        duration_timer<std::chrono::microseconds> timer(acc);
         res= enclosing.p->query(q.x_,q.y_);
         // at this point, the duration_timer is destroyed, and "acc" field is populated
         // with the time of "count"'s execution
@@ -156,18 +176,7 @@ template<typename node_type, typename size_type, typename value_type>
 experiments_container<node_type,size_type,value_type>
 ::visitor_::visitor_(const experiments_container &e) : enclosing(e) {}
 
-template<typename node_type, typename size_type, typename value_type>
-experiments_container<node_type,size_type,value_type>
-::duration_timer::duration_timer(double &a) : acc(a) {
-    start= std::chrono::high_resolution_clock::now();
-}
 
-template<typename node_type, typename size_type, typename value_type>
-experiments_container<node_type,size_type,value_type>
-::duration_timer::~duration_timer() {
-    auto finish = std::chrono::high_resolution_clock::now();
-    acc= std::chrono::duration_cast<std::chrono::nanoseconds>(finish-start).count();
-};
 
 template<typename node_type, typename size_type, typename value_type>
 experiments_container<node_type,size_type,value_type>

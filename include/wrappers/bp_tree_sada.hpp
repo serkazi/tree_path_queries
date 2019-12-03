@@ -87,9 +87,11 @@ public:
 
 	// size_in_bytes(bp_sada) does not take into consideration the backbone bitvector
 	// now I fixed it
+	/*
 	[[nodiscard]] double size_in_bytes() const {
 		return sdsl::size_in_bytes(bp_sada)+sdsl::size_in_bytes(*m_bv);
 	}
+	*/
 
 	// navigation
 	std::optional<node_type> parent( node_type x ) const override {
@@ -100,7 +102,9 @@ public:
 		return position2node( bp_sada.enclose( node2position(x) ) );
 	}
 
-	// FIXME: we never call this level ancestor; probably remove?
+	// FIXME: we never call this level ancestor; probably remove? we keep it around since
+	//  it can be supported out of the box
+	// besides, not all other succinct_tree implementations support this at no additional cost as here
 	std::optional<node_type> ancestor( node_type x, size_type i ) const override {
 		if ( x == 0 ) return i == 0 ? std::optional<node_type>(x) : std::nullopt;
 		return position2node(bp_sada.enclose(node2position(x),i));

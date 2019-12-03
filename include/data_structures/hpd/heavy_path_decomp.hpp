@@ -55,7 +55,7 @@ public:
     heavy_path_decomp( std::shared_ptr<tree<node_type,size_type,value_type>> T ) ;
     size_type node2pos( node_type x ) const ;
     virtual const std::vector<value_type> &get_chain() const ;
-    virtual double size_in_bytes() const ;
+    // virtual double size_in_bytes() const ;
     virtual ~heavy_path_decomp() ;
 };
 
@@ -175,6 +175,7 @@ heavy_path_decomp<node_type, size_type, value_type>::heavy_path_decomp(heavy_pat
     T= move(other.T);
 }
 
+/*
 template<typename node_type, typename size_type, typename value_type>
 double heavy_path_decomp<node_type, size_type, value_type>::size_in_bytes() const {
     double ans= size_of_vector_in_bytes(permuted_weights)+
@@ -182,6 +183,7 @@ double heavy_path_decomp<node_type, size_type, value_type>::size_in_bytes() cons
                 size_of_vector_in_bytes(global_position)+T->size_in_bytes();
     return ans;
 }
+*/
 
 template<typename node_type, typename size_type, typename value_type>
 std::vector<std::pair<size_type, size_type>> heavy_path_decomp<node_type, size_type, value_type>

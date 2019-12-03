@@ -57,7 +57,7 @@ struct tree {
     mutable double sz{};
     mutable bool flag{};
 
-    virtual double size_in_bytes() const ;
+    // virtual double size_in_bytes() const ;
 
     // delete the copy constructor
     tree<node_type,size_type,value_type>( const tree<node_type,size_type,value_type> &other ) = delete;
@@ -187,6 +187,7 @@ const std::vector<node_type> &tree<node_type, size_type, value_type>::kinder(nod
     return adj[x];
 }
 
+/*
 template<typename node_type, typename size_type, typename value_type>
 double tree<node_type, size_type, value_type>::size_in_bytes() const {
     if ( not flag ) {
@@ -205,6 +206,7 @@ double tree<node_type, size_type, value_type>::size_in_bytes() const {
     }
     return sz;
 }
+*/
 
 template<typename node_type, typename size_type, typename value_type>
 tree<node_type, size_type, value_type> &

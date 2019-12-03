@@ -33,11 +33,13 @@ public:
 	node_type lca( node_type cx, node_type cy ) const override {
 		return (*prc)(cx,cy);
 	}
+	/*
 	[[nodiscard]] double size_in_bytes() const override {
 		auto ans= naive_processor<node_type,size_type,value_type>::size_in_bytes();
 		ans+= prc->size_in_bytes();
 		return ans;
 	}
+	*/
 	~naive_processor_lca() override = default;
 };
 #endif

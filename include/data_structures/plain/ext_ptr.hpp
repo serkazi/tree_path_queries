@@ -258,10 +258,11 @@ public:
     value_type weight_of(node_type x) const override { return wgt[x]; }
     value_type weight(node_type x) const override { return wgt[x]; }
 
-    // TODO
+    /*
     [[nodiscard]] double size_in_bytes() const override {
         return 0;
     }
+    */
 
     ext_ptr( const std::string &s, const std::vector<value_type> &w ) {
         //TODO: add a constructor for weighted tree

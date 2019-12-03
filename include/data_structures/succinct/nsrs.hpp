@@ -65,11 +65,11 @@ public:
 		return T->is_leaf(x);
 	}
 
-	// TODO
+	/*
 	[[nodiscard]] double size_in_bytes() const override {
 		return sizeof(t_succinct_tree *) + T->size_in_bytes()+sdsl::size_in_bytes(*weights);
 	}
-
+    */
 	value_type weight_of(node_type x) const override { return (*weights)[x]; }
 	value_type weight(node_type x) const override { return weight_of(x); }
 

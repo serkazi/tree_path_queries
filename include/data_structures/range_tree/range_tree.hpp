@@ -145,7 +145,9 @@ public:
     virtual void range_2d_reporting_query( size_type qi, size_type qj,
                          value_type a, value_type b,
                          result_type &result ) const ;
+    /*
     virtual double size_in_bytes() const ;
+    */
     explicit range_tree( const std::vector<typename range_tree<size_type,value_type>::point2d> &points, bool make_power_of_two= false ) ;
     virtual ~range_tree() ;
 };
@@ -444,6 +446,7 @@ range_tree<size_type, value_type>::range_tree(range_tree &&other) noexcept {
     valid_nodes= std::move(other.valid_nodes), other.valid_nodes= nullptr;
 }
 
+/*
 template<typename size_type, typename value_type>
 double range_tree<size_type, value_type>::size_in_bytes() const {
     double ans= sizeof(n)+sizeof(num_nodes)+sizeof(len)+\
@@ -458,6 +461,7 @@ double range_tree<size_type, value_type>::size_in_bytes() const {
         ans+= valid_nodes->size_in_bytes();
     return ans;
 }
+*/
 
 template<typename size_type, typename value_type>
 void range_tree<size_type, value_type>::mark_valid_nodes() {

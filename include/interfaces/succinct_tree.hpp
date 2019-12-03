@@ -32,10 +32,8 @@ template<typename node_type= pq_types::node_type ,typename size_type= pq_types::
 class succinct_tree {
 public:
 
-	// tree info
+	// tree info: number of nodes
 	virtual size_type size() const = 0;
-	[[nodiscard]] virtual double size_in_bytes() const = 0;
-
 	// navigation
 	virtual std::optional<node_type> parent( node_type x ) const = 0;
 	virtual std::optional<node_type> ancestor( node_type x, size_type i ) const = 0;

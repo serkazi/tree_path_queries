@@ -608,6 +608,7 @@ public:
 		});
 	}
 
+	/*
 	double size_in_bytes() const override {
         auto a= B->size_in_bytes()+sdsl::size_in_bytes(*m_path_off);
         auto b= sdsl::size_in_bytes((*mb_path_rank_off[0]))+sdsl::size_in_bytes((*mb_path_rank_off[1]));
@@ -616,12 +617,10 @@ public:
         auto e= sizeof backbone + sizeof m_path_off + sizeof B + sizeof mb_path_rank_off;
         return a+b+c+d+e;
 	}
-
-	/*
 	double bits_per_node() const override {
 		return 8.00*size_in_bytes()/size();
 	}
-	 */
+    */
 
 	size_type size() const override {
 		return (*m_path_off)[1] >> 1;

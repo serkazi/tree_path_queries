@@ -202,18 +202,16 @@ public:
 		return path[k];
 	}
 
-	// TODO
+	/*
 	[[nodiscard]] double size_in_bytes() const override {
-	    /*
 		double ans = size() * (sizeof 0[p] + sizeof 0[d]) + \
                 sizeof(std::vector<value_type>) + (sizeof(value_type) * weights.size());
 		ans+= sizeof(std::vector<value_type> *);
 		for ( auto i= 0; i < n; ++i )
 			ans+= sizeof(std::vector<value_type>) + adj[i].size()*sizeof(value_type);
 		return ans;
-	     */
-	    return 0;
 	}
+	*/
 
 	value_type weight_of(const node_type x) const override { return weights[x]; }
 	value_type weight(const node_type x) const override { return weight_of(x); }

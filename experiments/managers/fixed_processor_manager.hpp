@@ -19,18 +19,14 @@
  * @tparam value_type
  * @tparam P
  */
-template <
-        typename node_type,
-        typename size_type,
-        typename value_type,
-        typename P
-        >
+template <typename node_type,typename size_type,typename value_type>
 class fixed_processor_manager {
 private:
-    std::unique_ptr<P> processor;
+    using processor_type = path_query_processor<node_type,size_type,value_type>;
+    std::unique_ptr<processor_type> processor;
 public:
-    explicit fixed_processor_manager( const std::string &s, const std::vector<value_type> &w ) {
-        processor= std::make_unique<P>(s,w);
+    explicit fixed_processor_manager( std::unique_ptr<processor_type> proc ) {
+        processor= std::move(proc);
     }
     nlohmann::json invoke_with( std::istream &queries ) {
         experiments_container<node_type,size_type,value_type> container(processor.get());

@@ -30,6 +30,77 @@ namespace experiments {
     const std::string hrnames[]= {"nv","nvlca","nvsucc","hybrid","treeextptr","wthpdun","wthpdrrr",
                                   "treeextsctun","treeextsctrrr"};
 
+    template<
+            typename node_type,
+            typename size_type,
+            typename value_type
+            >
+    std::unique_ptr<path_query_processor<node_type,size_type,value_type>>
+    instantiate( const std::string &topology, const std::vector<value_type> &w, uint8_t i ) {
+
+        // some shorthands for further use
+        using nv                 = naive_processor<node_type,size_type,value_type>;
+        using nv_lca             = naive_processor_lca<node_type,size_type,value_type>;
+        using nv_succ            = nsrs<node_type,size_type,value_type>;
+        using hybrid             = hybrid_processor<node_type,size_type,value_type>;
+        using tree_ext_ptr       = ext_ptr<node_type,size_type,value_type>;
+        using wt_hpd_uncompressed= wt_hpd<
+                node_type,size_type,value_type,
+                bp_tree_sada<node_type,size_type>,
+                sdsl::bit_vector,sdsl::rank_support_v5<>,
+                sdsl::select_support_mcl<1,1>,
+                sdsl::select_support_mcl<0,1>
+        >;
+        using wt_hpd_rrr         = wt_hpd<
+                node_type,size_type,value_type,
+                bp_tree_sada<node_type,size_type>,
+                sdsl::rrr_vector<>
+        >;
+        using tree_ext_sct_un    = tree_ext_sct<
+                node_type,size_type,value_type,
+                sdsl::bp_support_sada<>,2,
+                sdsl::bit_vector ,
+                sdsl::rank_support_v5<>,
+                sdsl::select_support_mcl<1,1>,
+                sdsl::select_support_mcl<0,1>
+        >;
+        using tree_ext_sct_rrr  = tree_ext_sct<
+                node_type,size_type,value_type,
+                sdsl::bp_support_sada<>,2,
+                sdsl::rrr_vector<>
+        >;
+
+        switch ( 1 << i ) {
+            case static_cast<int>(experiments::IMPLS::NV): {
+                return std::move(std::make_unique<nv>(topology, w));
+            }
+            case static_cast<int>(experiments::IMPLS::NV_LCA): {
+                return std::move(std::make_unique<nv_lca>(topology, w));
+            }
+            case static_cast<int>(experiments::IMPLS::NV_SUCC): {
+                return std::move(std::make_unique<nv_succ>(topology, w));
+            }
+            case static_cast<int>(experiments::IMPLS::HYBRID): {
+                return std::move(std::make_unique<hybrid>(topology, w));
+            }
+            case static_cast<int>(experiments::IMPLS::TREE_EXT_PTR): {
+                return std::move(std::make_unique<tree_ext_ptr>(topology, w));
+            }
+            case static_cast<int>(experiments::IMPLS::WT_HPD_UN): {
+                return std::move(std::make_unique<wt_hpd_uncompressed>(topology, w));
+            }
+            case static_cast<int>(experiments::IMPLS::WT_HPD_RRR): {
+                return std::move(std::make_unique<wt_hpd_rrr>(topology, w));
+            }
+            case static_cast<int>(experiments::IMPLS::TREE_EXT_SCT_UN): {
+                return std::move(std::make_unique<tree_ext_sct_un>(topology, w));
+            }
+            case static_cast<int>(experiments::IMPLS::TREE_EXT_SCT_RRR): {
+                return std::move(std::make_unique<tree_ext_sct_rrr>(topology, w));
+            }
+            default: return nullptr;
+        }
+    }
 }
 
 /**
@@ -43,9 +114,6 @@ template<typename node_type,typename size_type,typename value_type>
 class fixed_dataset_manager {
 
 private:
-
-    template<typename P>
-    using processor_holder= fixed_processor_manager<node_type,size_type,value_type,P>;
 
     using nv                 = naive_processor<node_type,size_type,value_type>;
     using nv_lca             = naive_processor_lca<node_type,size_type,value_type>;
@@ -132,62 +200,19 @@ public:
 
          for ( int i= 0; i < 9; ++i ) {
              if ( not (mask & (1u<<i)) ) continue ;
-             switch ( 1 << i ) {
-                 case static_cast<int>(experiments::IMPLS::NV): {
-                     auto pm = std::make_unique<processor_holder<nv>>(topology, w);
-                     std::ifstream is(filename);
-                     per_datastructure[experiments::hrnames[i]] = pm->invoke_with(is);
-                     break;
-                 }
-                 case static_cast<int>(experiments::IMPLS::NV_LCA): {
-                     auto pm = std::make_unique<processor_holder<nv_lca>>(topology, w);
-                     std::ifstream is(filename);
-                     per_datastructure[experiments::hrnames[i]] = pm->invoke_with(is);
-                     break;
-                 }
-                 case static_cast<int>(experiments::IMPLS::NV_SUCC): {
-                     auto pm = std::make_unique<processor_holder<nv_succ>>(topology, w);
-                     std::ifstream is(filename);
-                     per_datastructure[experiments::hrnames[i]] = pm->invoke_with(is);
-                     break;
-                 }
-                 case static_cast<int>(experiments::IMPLS::HYBRID): {
-                     auto pm = std::make_unique<processor_holder<hybrid>>(topology, w);
-                     std::ifstream is(filename);
-                     per_datastructure[experiments::hrnames[i]] = pm->invoke_with(is);
-                     break;
-                 }
-                 case static_cast<int>(experiments::IMPLS::TREE_EXT_PTR): {
-                     auto pm = std::make_unique<processor_holder<tree_ext_ptr>>(topology, w);
-                     std::ifstream is(filename);
-                     per_datastructure[experiments::hrnames[i]] = pm->invoke_with(is);
-                     break;
-                 }
-                 case static_cast<int>(experiments::IMPLS::WT_HPD_UN): {
-                     auto pm = std::make_unique<processor_holder<wt_hpd_uncompressed>>(topology, w);
-                     std::ifstream is(filename);
-                     per_datastructure[experiments::hrnames[i]] = pm->invoke_with(is);
-                     break;
-                 }
-                 case static_cast<int>(experiments::IMPLS::WT_HPD_RRR): {
-                     auto pm = std::make_unique<processor_holder<wt_hpd_rrr>>(topology, w);
-                     std::ifstream is(filename);
-                     per_datastructure[experiments::hrnames[i]] = pm->invoke_with(is);
-                     break;
-                 }
-                 case static_cast<int>(experiments::IMPLS::TREE_EXT_SCT_UN): {
-                     auto pm = std::make_unique<processor_holder<tree_ext_sct_un>>(topology, w);
-                     std::ifstream is(filename);
-                     per_datastructure[experiments::hrnames[i]] = pm->invoke_with(is);
-                     break;
-                 }
-                 case static_cast<int>(experiments::IMPLS::TREE_EXT_SCT_RRR): {
-                     auto pm = std::make_unique<processor_holder<tree_ext_sct_rrr>>(topology, w);
-                     std::ifstream is(filename);
-                     per_datastructure[experiments::hrnames[i]] = pm->invoke_with(is);
-                     break;
-                 }
-             }
+             nlohmann::json obj;
+             double construction_time= 0.00;
+             // using I.I.L.E. in order to measure construction time
+             std::unique_ptr<fixed_processor_manager<node_type,size_type,value_type>> pm= [&](){
+                 duration_timer<std::chrono::seconds> dt(construction_time);
+                 return
+                         std::make_unique<fixed_processor_manager<node_type,size_type,value_type>>(
+                                         experiments::instantiate<node_type,size_type,value_type>(topology,w,i));
+             }();
+             obj["constructionTimeInSeconds"]= construction_time;
+             std::ifstream is(filename);
+             obj["breakdownInMicroseconds"]= pm->invoke_with(is);
+             per_datastructure[experiments::hrnames[i]] = obj;
          }
          res["dataset"]= description, res["config"]= configs, res["results"]= per_datastructure;
          std::remove(filename.c_str());

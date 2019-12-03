@@ -228,11 +228,13 @@ public:
 	}
 
 	//succinct_tree implementation
+	/*
 	[[nodiscard]] double size_in_bytes() const override {
 	    return original->size_in_bytes()+condensed->size_in_bytes()+\
 				  sdsl::size_in_bytes(*B)+sdsl::size_in_bytes(*BS)+sdsl::size_in_bytes(*wavelet_tree)+\
 				  sizeof original + sizeof condensed + sizeof wavelet_tree + sizeof B;
 	}
+	*/
 
 	[[nodiscard]] std::optional<node_type> parent(node_type x) const override {
 		return original->parent(x);

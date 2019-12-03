@@ -48,6 +48,7 @@ public:
 
 	virtual ~ff_bitvector() = default;
 
+	/*
 	// FIXME: compute space correctly (i.e. unique_ptr)
 	double size_in_bytes() const {
 		return  sdsl::size_in_bytes(*bv)+\
@@ -55,5 +56,6 @@ public:
 				sdsl::size_in_bytes(*sel1)+\
 				sdsl::size_in_bytes(*rank1);
 	}
+	*/
 };
 #endif //SPQ_FF_BITVECTOR_HPP
