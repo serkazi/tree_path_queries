@@ -23,6 +23,6 @@ int main() {
     nlohmann::json config;
     config["counting"]= 3, config["reporting"]= 5, config["median"]= 7, config["selection"]= 11, config["K"]= 2;
     auto res= fmd->run_config(config);
-    std::cout << res.dump(2) << std::endl;
+    std::cout << std::fixed << std::setprecision(2) << res.dump(2) << std::endl;
     return 0;
 }

@@ -23,3 +23,22 @@ target_include_directories(
         ${PROJECT_SOURCE_DIR}/src/tests/experiments
         ${PROJECT_SOURCE_DIR}/experiments/managers
 )
+
+add_executable(observe_memusage test_memusage.cpp)
+target_link_libraries(
+        observe_memusage
+        PUBLIC
+        sdsl
+        tree_ext_sct
+        wt_hpd
+        hybrid
+        naive
+        experiment_utils
+)
+target_include_directories(
+        observe_memusage
+        PUBLIC
+        ${PROJECT_SOURCE_DIR}/src/tests/experiments
+        ${PROJECT_SOURCE_DIR}/experiments/managers
+)
+

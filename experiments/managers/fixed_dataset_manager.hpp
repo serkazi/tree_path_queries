@@ -27,16 +27,29 @@ namespace experiments {
         TREE_EXT_SCT_UN=    1 << 7,
         TREE_EXT_SCT_RRR=   1 << 8
     };
-    const std::string hrnames[]= {"nv","nvlca","nvsucc","hybrid","treeextptr","wthpdun","wthpdrrr",
-                                  "treeextsctun","treeextsctrrr"};
+
+    unsigned operator | ( const IMPLS &a, const IMPLS &b ) {
+        return static_cast<unsigned>(a)|static_cast<unsigned>(b);
+    }
+    unsigned operator | ( unsigned int a, const IMPLS &b ) {
+        return static_cast<unsigned>(a)|static_cast<unsigned>(b);
+    }
+    unsigned operator | ( const IMPLS &a, unsigned b ) {
+        return static_cast<unsigned>(a)|static_cast<unsigned>(b);
+    }
+
+    // human-readable names
+    const std::string hrnames[]= {"nv","nvLca","nvSucc","hybrid",
+                                  "treeExtPtr","wtHpdUn","wtHpdRrr",
+                                  "treeExtSctUn","treeExtSctRrr"};
 
     template<
             typename node_type,
             typename size_type,
             typename value_type
-            >
+    >
     std::unique_ptr<path_query_processor<node_type,size_type,value_type>>
-    instantiate( const std::string &topology, const std::vector<value_type> &w, uint8_t i ) {
+    instantiate( const std::string &topology, const std::vector<value_type> &w, uint16_t i ) {
 
         // some shorthands for further use
         using nv                 = naive_processor<node_type,size_type,value_type>;
@@ -70,7 +83,7 @@ namespace experiments {
                 sdsl::rrr_vector<>
         >;
 
-        switch ( 1 << i ) {
+        switch ( i ) {
             case static_cast<int>(experiments::IMPLS::NV): {
                 return std::move(std::make_unique<nv>(topology, w));
             }
@@ -98,7 +111,6 @@ namespace experiments {
             case static_cast<int>(experiments::IMPLS::TREE_EXT_SCT_RRR): {
                 return std::move(std::make_unique<tree_ext_sct_rrr>(topology, w));
             }
-            default: return nullptr;
         }
     }
 }
@@ -205,9 +217,8 @@ public:
              // using I.I.L.E. in order to measure construction time
              std::unique_ptr<fixed_processor_manager<node_type,size_type,value_type>> pm= [&](){
                  duration_timer<std::chrono::seconds> dt(construction_time);
-                 return
-                         std::make_unique<fixed_processor_manager<node_type,size_type,value_type>>(
-                                         experiments::instantiate<node_type,size_type,value_type>(topology,w,i));
+                 return std::make_unique<fixed_processor_manager<node_type,size_type,value_type>>(
+                                         experiments::instantiate<node_type,size_type,value_type>(topology,w,1<<i));
              }();
              obj["constructionTimeInSeconds"]= construction_time;
              std::ifstream is(filename);
