@@ -1,6 +1,8 @@
 #include "experiments_container.hpp"
 #include "fixed_dataset_manager.hpp"
 
+#define run_some_random_queries {for( auto it= 0; it < ITERATIONS; ++it ) { arr[it]= processor->query(distribution(engine),distribution(engine));}};
+
 int main( int argc, char **argv ) {
 
     using node_type= pq_types::node_type;
@@ -16,53 +18,69 @@ int main( int argc, char **argv ) {
     is >> topology;
     std::vector<value_type> w(topology.size()/2);
     for ( auto &x: w ) is >> x;
+    auto n= topology.size()/2;
+
+    std::default_random_engine engine;
+    std::uniform_int_distribution<node_type> distribution(0,n-1);
+
     is.close();
+    const int ITERATIONS= 0x400;
+    std::array<value_type,ITERATIONS> arr{};
     // here we need memory usage as base level, as that needed for topology and weights
 
     // at the following points, we need to measure memory usage
     {
         auto processor= experiments::instantiate<node_type,size_type,value_type>(topology,w, static_cast<uint16_t>(experiments::IMPLS::NV));
-        std::cerr << processor->query(0,0) << ' ';
+        run_some_random_queries;
+        processor.reset();
         processor= nullptr;
     }
     {
         auto processor= experiments::instantiate<node_type,size_type,value_type>(topology,w, static_cast<uint16_t>(experiments::IMPLS::NV_LCA));
-        std::cerr << processor->query(0,0) << ' ';
+        run_some_random_queries;
+        processor.reset();
         processor= nullptr;
     }
     {
         auto processor= experiments::instantiate<node_type,size_type,value_type>(topology,w, static_cast<uint16_t>(experiments::IMPLS::NV_SUCC));
-        std::cerr << processor->query(0,0) << ' ';
+        run_some_random_queries;
+        processor.reset();
         processor= nullptr;
     }
     {
         auto processor= experiments::instantiate<node_type,size_type,value_type>(topology,w, static_cast<uint16_t>(experiments::IMPLS::HYBRID));
-        std::cerr << processor->query(0,0) << ' ';
+        run_some_random_queries;
+        processor.reset();
         processor= nullptr;
     }
     {
         auto processor= experiments::instantiate<node_type,size_type,value_type>(topology,w, static_cast<uint16_t>(experiments::IMPLS::TREE_EXT_PTR));
-        std::cerr << processor->query(0,0) << ' ';
+        run_some_random_queries;
+        processor.reset();
         processor= nullptr;
     }
     {
         auto processor= experiments::instantiate<node_type,size_type,value_type>(topology,w, static_cast<uint16_t>(experiments::IMPLS::WT_HPD_UN));
-        std::cerr << processor->query(0,0) << ' ';
+        run_some_random_queries;
+        processor.reset();
         processor= nullptr;
     }
     {
         auto processor= experiments::instantiate<node_type,size_type,value_type>(topology,w, static_cast<uint16_t>(experiments::IMPLS::WT_HPD_RRR));
-        std::cerr << processor->query(0,0) << ' ';
+        run_some_random_queries;
+        processor.reset();
         processor= nullptr;
     }
     {
         auto processor= experiments::instantiate<node_type,size_type,value_type>(topology,w, static_cast<uint16_t>(experiments::IMPLS::TREE_EXT_SCT_UN));
-        std::cerr << processor->query(0,0) << ' ';
+        run_some_random_queries;
+        processor.reset();
         processor= nullptr;
     }
     {
         auto processor= experiments::instantiate<node_type,size_type,value_type>(topology,w, static_cast<uint16_t>(experiments::IMPLS::TREE_EXT_SCT_RRR));
-        std::cerr << processor->query(0,0) << ' ';
+        run_some_random_queries;
+        processor.reset();
         processor= nullptr;
     }
     return 0;
