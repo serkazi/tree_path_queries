@@ -111,6 +111,7 @@ namespace experiments {
             case static_cast<int>(experiments::IMPLS::TREE_EXT_SCT_RRR): {
                 return std::move(std::make_unique<tree_ext_sct_rrr>(topology, w));
             }
+            default: assert( false );
         }
     }
 }
