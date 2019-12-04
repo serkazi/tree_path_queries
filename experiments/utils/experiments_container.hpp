@@ -15,6 +15,7 @@
 #include <nlohmann/json.hpp>
 #include <memory>
 #include <chrono>
+#include "sha512.hh"
 
 // we expose this since it is useful in general
 /**
@@ -81,10 +82,10 @@ private:
         auto total_count_for_type= vis->counts.find(type)->second;
         return vis->aggregates.find(type)->second/total_count_for_type;
     }
-
+    [[nodiscard]] std::string get_sha512( path_queries::QUERY_TYPE type ) const {
+        return sw::sha512::calculate(vis->to_be_hashed.find(type)->second);
+    }
 public:
-
-
 
     /**
      * @brief: constructor; the container is associated with a path query processor
@@ -127,6 +128,10 @@ void experiments_container<node_type,size_type,value_type>
         // with the time of "count"'s execution
     }
     auto &v= to_be_hashed[path_queries::QUERY_TYPE::REPORTING];
+    // sort by the second, since the first stands for identifiers, which wt_hpd scrambles anyway
+    std::sort(res.begin(),res.end(),[]( const auto &a, const auto &b ) {
+        return a.second < b.second;
+    });
     v+= std::accumulate(std::make_move_iterator(res.begin()),std::make_move_iterator(res.end()),
             std::string(""),[&]( std::string acc, auto pr ) {
         acc+= " ", acc+= std::to_string(pr.second);
@@ -212,10 +217,10 @@ nlohmann::json experiments_container<node_type,size_type,value_type>
     std::for_each( begin(requests),end(requests),[&]( const pq_request &r ) {std::visit(*vis,r);} );
     // JSON-ify the summary
     nlohmann::json obj;
-    obj["counting"]= get_avg(path_queries::QUERY_TYPE::COUNTING);
-    obj["reporting"]= get_avg(path_queries::QUERY_TYPE::REPORTING);
-    obj["median"]= get_avg(path_queries::QUERY_TYPE::MEDIAN);
-    obj["selection"]= get_avg(path_queries::QUERY_TYPE::SELECTION);
+    obj["counting"]= {{"avg",get_avg(path_queries::QUERY_TYPE::COUNTING)},{"sha512",get_sha512(path_queries::QUERY_TYPE::COUNTING)}};
+    obj["reporting"]= {{"avg",get_avg(path_queries::QUERY_TYPE::REPORTING)},{"sha512",get_sha512(path_queries::QUERY_TYPE::REPORTING)}};
+    obj["median"]= {{"avg",get_avg(path_queries::QUERY_TYPE::MEDIAN)},{"sha512",get_sha512(path_queries::QUERY_TYPE::MEDIAN)}};
+    obj["selection"]= {{"avg",get_avg(path_queries::QUERY_TYPE::SELECTION)},{"sha512",get_sha512(path_queries::QUERY_TYPE::SELECTION)}};
     return std::move(obj);
 }
 #endif //PROJECT_EXPERIMENTS_CONTAINER_HPP

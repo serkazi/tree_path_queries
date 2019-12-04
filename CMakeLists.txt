@@ -55,6 +55,7 @@ set(BENCHMARK_INCLUDE_DIR ~/local/benchmark/include)
 set(nlohmann_json_DIR ~/local/lib/cmake/nlohmann_json)
 find_package(nlohmann_json 3.2.0 REQUIRED)
 
+
 # find_package(sdsl REQUIRED)
 
 # set(GTEST_LIBRARY ~/local/lib/libgtest.a)
@@ -69,6 +70,9 @@ find_package(nlohmann_json 3.2.0 REQUIRED)
 # find_package(benchmark REQUIRED)
 
 # adding library for simple_bitset
+
+add_subdirectory(${PROJECT_SOURCE_DIR}/extern/sha512)
+
 set(SIMPLE_BITSET sb)
 add_library(${SIMPLE_BITSET} ${PROJECT_SOURCE_DIR}/src/misc/simple_bitset.cpp)
 target_include_directories(${SIMPLE_BITSET} PUBLIC ${PROJECT_SOURCE_DIR}/src/misc)
@@ -302,7 +306,7 @@ add_library(
         ${PROJECT_SOURCE_DIR}/experiments/managers/fixed_dataset_manager.hpp
         )
 set_target_properties(experiment_utils PROPERTIES LINKER_LANGUAGE CXX)
-target_link_libraries(experiment_utils PUBLIC nlohmann_json::nlohmann_json pq_requests)
+target_link_libraries(experiment_utils PUBLIC nlohmann_json::nlohmann_json pq_requests sha512)
 target_include_directories(
         experiment_utils PUBLIC
         ${PROJECT_SOURCE_DIR}/experiments/utils
@@ -313,6 +317,7 @@ target_include_directories(
         ${PROJECT_SOURCE_DIR}/include/data_structures/plain
         ${PROJECT_SOURCE_DIR}/include/data_structures/hybrid
         ${PROJECT_SOURCE_DIR}/include/data_structures/succinct
+        ${PROJECT_SOURCE_DIR}/extern/sha512
 )
 
 # adding the test
@@ -332,3 +337,4 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/src/tests/misc)
 
 add_subdirectory(${PROJECT_SOURCE_DIR}/src/tests/integration)
 add_subdirectory(${PROJECT_SOURCE_DIR}/src/benchmarking/utils)
+
