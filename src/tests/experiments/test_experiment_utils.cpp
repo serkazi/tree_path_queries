@@ -17,20 +17,28 @@ const std::string paths[]= {
 
 const std::string root= "/users/grad/kazi/CLionProjects/tree_path_queries/data/";
 
-
 // receive the name of the dataset in the command-line arguments
-// TODO: add the possibility of adding abitmask to restrict the experiment to the specified data structures
 int main( int argc, char **argv ) {
-    std::ifstream is(root+paths[3]);
-    auto fmd= std::make_unique<fixed_dataset_manager<pq_types::node_type,pq_types::size_type,pq_types::value_type>>
-    (is,511,argc>1?std::string(argv[1]):paths[3]);
-    const int MLN= 1'000'000;
+
+    if ( argc < 4 ) {
+        std::cerr << "usage: ./<this_binary> <input_file> <bitmask> <num_of_queries>" << std::endl;
+        exit(1);
+    }
+
+    std::string filename= std::string(argv[1]); //the file should be full path
+    std::ifstream is(filename);
+    uint16_t mask= strtol(argv[2],nullptr,10);
+    auto nq=  std::strtol(argv[3],nullptr,10);
+
+    auto fmd= std::make_unique<
+            fixed_dataset_manager<pq_types::node_type,pq_types::size_type,pq_types::value_type>
+            >(is,mask,filename);
     nlohmann::json configs[]= {
-                                {{"counting",MLN},{"reporting",MLN},{"median",MLN},{"selection",0},{"K",1}},
-                                {{"counting",MLN},{"reporting",MLN},{"median",0},  {"selection",0},{"K",10}},
-                                {{"counting",MLN},{"reporting",MLN},{"median",0},  {"selection",0},{"K",100}},
+                                {{"counting",nq},{"reporting",nq},{"median",nq},{"selection",0},{"K",1}},
+                                {{"counting",nq},{"reporting",nq},{"median",0 },{"selection",0},{"K",10}},
+                                {{"counting",nq},{"reporting",nq},{"median",0 },{"selection",0},{"K",100}},
                               };
-    for ( auto config: configs ) {
+    for ( const auto& config: configs ) {
         auto res = fmd->run_config(config);
         std::cout << std::fixed << std::setprecision(2) << res.dump(2) << std::endl;
     }
