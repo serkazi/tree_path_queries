@@ -8,7 +8,7 @@ my $target_path = "/users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-
 my $executable = $target_path."observe_memusage";
 
 # my $valgrind_command= "valgrind --tool=massif --heap=yes --stacks=no --depth=3 --time-unit=ms --detailed-freq=5 --massif-out-file=outfile ".$executable ." ".$data_path."input";
-my $valgrind_command= "valgrind --tool=massif --heap=yes --stacks=no --depth=3  --max-snapshots=1000 --time-unit=ms --detailed-freq=5 --massif-out-file=outfile ".$executable ." ".$data_path."input bitmask";
+my $valgrind_command= "valgrind --tool=massif --heap=yes --stacks=no --depth=3 --max-snapshots=1000 --time-unit=ms --detailed-freq=100 --massif-out-file=outfile ".$executable ." ".$data_path."input bitmask";
 
 opendir my $dir, $data_path or die "Cannot open directory: $!";
 my @files = readdir $dir;

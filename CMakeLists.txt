@@ -40,6 +40,9 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
 set(THREADS_PREFER_PTHREAD_FLAG TRUE)
+
+add_compile_options(-mcmodel=large -g -O2)
+
 find_package(Threads REQUIRED)
 # adding gtest as a subproject
 # add_subdirectory(${PROJECT_SOURCE_DIR}/extern/gtest)
