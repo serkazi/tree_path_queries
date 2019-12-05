@@ -14,6 +14,7 @@
 #include "hybrid_processor.hpp"
 #include <random>
 #include <functional>
+#include <algorithm>
 #include "sdsl/rrr_vector.hpp"
 #include <bp_tree_sada.hpp>
 #include "nsrs.hpp"
@@ -65,6 +66,7 @@ using tree_ext_sct_rrr  = tree_ext_sct<
 >;
 
 const std::string root= "/users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/";
+std::string dataset_path;
 
 template<typename T>
 class path_queries_benchmark: public benchmark::Fixture {
@@ -72,22 +74,29 @@ protected:
     std::unique_ptr<T> processor;
     std::default_random_engine engine{};
     std::unique_ptr<std::uniform_int_distribution<node_type>> distribution;
+    std::unique_ptr<std::uniform_int_distribution<value_type>> weight_distribution;
     size_type n;
 public:
     void SetUp(const ::benchmark::State& state) {
-        std::ifstream is(root+paths[3]);
+        std::ifstream is(dataset_path);
         std::string topology;
         is >> topology;
         std::vector<value_type> w(n= topology.size()/2);
         for ( auto &x: w ) is >> x;
+        auto a= *(std::min_element(w.begin(),w.end()));
+        auto b= *(std::max_element(w.begin(),w.end()));
         processor= std::make_unique<T>(topology,w);
         distribution= std::make_unique<std::uniform_int_distribution<node_type>>(0,n-1);
+        weight_distribution= std::make_unique<std::uniform_int_distribution<value_type>>(a,b);
     }
     void TearDown(const ::benchmark::State& state) {
         //some clean-up
     }
     auto median( node_type x, node_type y ) {
         return processor->query(x,y);
+    }
+    auto counting( node_type x, node_type y, value_type a, value_type b ) {
+        return processor->count(x,y,a,b);
     }
 };
 
@@ -107,7 +116,54 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_median,nv)(benchmark::State &stat
     }
 }
 
-/*
+BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_lca_median,nv_lca)(benchmark::State &state) {
+    for ( auto _ : state ) {
+        // the code that gets measured
+        state.PauseTiming(); // <-- need to pause for a set up though
+        auto dice= std::bind(*distribution,engine);
+        auto x= dice(), y= dice();
+        // we are ready to go now
+        state.ResumeTiming();
+        auto res= median(x,y);
+        benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
+        benchmark::ClobberMemory(); // <-- took these lines from the documentation,
+        // @see https://github.com/google/benchmark#user-guide
+        // end of the code that gets measured
+    }
+}
+
+BENCHMARK_TEMPLATE_F(path_queries_benchmark,nsrs_median,nv_succ)(benchmark::State &state) {
+    for ( auto _ : state ) {
+        // the code that gets measured
+        state.PauseTiming(); // <-- need to pause for a set up though
+        auto dice= std::bind(*distribution,engine);
+        auto x= dice(), y= dice();
+        // we are ready to go now
+        state.ResumeTiming();
+        auto res= median(x,y);
+        benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
+        benchmark::ClobberMemory(); // <-- took these lines from the documentation,
+        // @see https://github.com/google/benchmark#user-guide
+        // end of the code that gets measured
+    }
+}
+
+BENCHMARK_TEMPLATE_F(path_queries_benchmark,hybrid_median,hybrid)(benchmark::State &state) {
+    for ( auto _ : state ) {
+        // the code that gets measured
+        state.PauseTiming(); // <-- need to pause for a set up though
+        auto dice= std::bind(*distribution,engine);
+        auto x= dice(), y= dice();
+        // we are ready to go now
+        state.ResumeTiming();
+        auto res= median(x,y);
+        benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
+        benchmark::ClobberMemory(); // <-- took these lines from the documentation,
+        // @see https://github.com/google/benchmark#user-guide
+        // end of the code that gets measured
+    }
+}
+
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,
                      ext_ptr_median,tree_ext_ptr)(benchmark::State &state) {
     for ( auto _ : state ) {
@@ -124,7 +180,6 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,
         // end of the code that gets measured
     }
 }
-*/
 
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,
                      ext_ptr_sct_median,tree_ext_sct_un)(benchmark::State &state) {
@@ -143,6 +198,225 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,
     }
 }
 
+BENCHMARK_TEMPLATE_F(path_queries_benchmark,
+                     ext_ptr_sct_rrr_median,tree_ext_sct_rrr)(benchmark::State &state) {
+    for ( auto _ : state ) {
+        // the code that gets measured
+        state.PauseTiming(); // <-- need to pause for a set up though
+        auto dice= std::bind(*distribution,engine);
+        auto x= dice(), y= dice();
+        // we are ready to go now
+        state.ResumeTiming();
+        auto res= median(x,y);
+        benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
+        benchmark::ClobberMemory(); // <-- took these lines from the documentation,
+        // @see https://github.com/google/benchmark#user-guide
+        // end of the code that gets measured
+    }
+}
+
+BENCHMARK_TEMPLATE_F(path_queries_benchmark,
+                     wt_hpd_un_median,wt_hpd_uncompressed)(benchmark::State &state) {
+    for ( auto _ : state ) {
+        // the code that gets measured
+        state.PauseTiming(); // <-- need to pause for a set up though
+        auto dice= std::bind(*distribution,engine);
+        auto x= dice(), y= dice();
+        // we are ready to go now
+        state.ResumeTiming();
+        auto res= median(x,y);
+        benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
+        benchmark::ClobberMemory(); // <-- took these lines from the documentation,
+        // @see https://github.com/google/benchmark#user-guide
+        // end of the code that gets measured
+    }
+}
+
+BENCHMARK_TEMPLATE_F(path_queries_benchmark,
+                     wt_hpd_compressed,wt_hpd_rrr)(benchmark::State &state) {
+    for ( auto _ : state ) {
+        // the code that gets measured
+        state.PauseTiming(); // <-- need to pause for a set up though
+        auto dice= std::bind(*distribution,engine);
+        auto x= dice(), y= dice();
+        // we are ready to go now
+        state.ResumeTiming();
+        auto res= median(x,y);
+        benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
+        benchmark::ClobberMemory(); // <-- took these lines from the documentation,
+        // @see https://github.com/google/benchmark#user-guide
+        // end of the code that gets measured
+    }
+}
+
+//=============================== Counting ==============================================/
+BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_counting,nv)(benchmark::State &state) {
+    for ( auto _ : state ) {
+        // the code that gets measured
+        state.PauseTiming(); // <-- need to pause for a set up though
+        auto dice= std::bind(*distribution,engine);
+        auto wdice= std::bind(*weight_distribution,engine);
+        auto x= dice(), y= dice();
+        auto a= wdice(), b= wdice();
+        // we are ready to go now
+        state.ResumeTiming();
+        auto res= counting(x,y,a,b);
+        benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
+        benchmark::ClobberMemory(); // <-- took these lines from the documentation,
+        // @see https://github.com/google/benchmark#user-guide
+        // end of the code that gets measured
+    }
+}
+
+BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_lca_counting,nv_lca)(benchmark::State &state) {
+    for ( auto _ : state ) {
+        // the code that gets measured
+        state.PauseTiming(); // <-- need to pause for a set up though
+        auto dice= std::bind(*distribution,engine);
+        auto wdice= std::bind(*weight_distribution,engine);
+        auto x= dice(), y= dice();
+        auto a= wdice(), b= wdice();
+        // we are ready to go now
+        state.ResumeTiming();
+        auto res= counting(x,y,a,b);
+        benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
+        benchmark::ClobberMemory(); // <-- took these lines from the documentation,
+        // @see https://github.com/google/benchmark#user-guide
+        // end of the code that gets measured
+    }
+}
+
+BENCHMARK_TEMPLATE_F(path_queries_benchmark,nsrs_counting,nv_succ)(benchmark::State &state) {
+    for ( auto _ : state ) {
+        // the code that gets measured
+        state.PauseTiming(); // <-- need to pause for a set up though
+        auto dice= std::bind(*distribution,engine);
+        auto wdice= std::bind(*weight_distribution,engine);
+        auto x= dice(), y= dice();
+        auto a= wdice(), b= wdice();
+        // we are ready to go now
+        state.ResumeTiming();
+        auto res= counting(x,y,a,b);
+        benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
+        benchmark::ClobberMemory(); // <-- took these lines from the documentation,
+        // @see https://github.com/google/benchmark#user-guide
+        // end of the code that gets measured
+    }
+}
+
+BENCHMARK_TEMPLATE_F(path_queries_benchmark,hybrid_counting,hybrid)(benchmark::State &state) {
+    for ( auto _ : state ) {
+        // the code that gets measured
+        state.PauseTiming(); // <-- need to pause for a set up though
+        auto dice= std::bind(*distribution,engine);
+        auto wdice= std::bind(*weight_distribution,engine);
+        auto x= dice(), y= dice();
+        auto a= wdice(), b= wdice();
+        // we are ready to go now
+        state.ResumeTiming();
+        auto res= counting(x,y,a,b);
+        benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
+        benchmark::ClobberMemory(); // <-- took these lines from the documentation,
+        // @see https://github.com/google/benchmark#user-guide
+        // end of the code that gets measured
+    }
+}
+
+BENCHMARK_TEMPLATE_F(path_queries_benchmark,
+                     ext_ptr_counting,tree_ext_ptr)(benchmark::State &state) {
+    for ( auto _ : state ) {
+        // the code that gets measured
+        state.PauseTiming(); // <-- need to pause for a set up though
+        auto dice= std::bind(*distribution,engine);
+        auto wdice= std::bind(*weight_distribution,engine);
+        auto x= dice(), y= dice();
+        auto a= wdice(), b= wdice();
+        // we are ready to go now
+        state.ResumeTiming();
+        auto res= counting(x,y,a,b);
+        benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
+        benchmark::ClobberMemory(); // <-- took these lines from the documentation,
+        // @see https://github.com/google/benchmark#user-guide
+        // end of the code that gets measured
+    }
+}
+
+BENCHMARK_TEMPLATE_F(path_queries_benchmark,
+                     ext_ptr_sct_counting,tree_ext_sct_un)(benchmark::State &state) {
+    for ( auto _ : state ) {
+        // the code that gets measured
+        state.PauseTiming(); // <-- need to pause for a set up though
+        auto dice= std::bind(*distribution,engine);
+        auto wdice= std::bind(*weight_distribution,engine);
+        auto x= dice(), y= dice();
+        auto a= wdice(), b= wdice();
+        // we are ready to go now
+        state.ResumeTiming();
+        auto res= counting(x,y,a,b);
+        benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
+        benchmark::ClobberMemory(); // <-- took these lines from the documentation,
+        // @see https://github.com/google/benchmark#user-guide
+        // end of the code that gets measured
+    }
+}
+
+BENCHMARK_TEMPLATE_F(path_queries_benchmark,
+                     ext_ptr_sct_rrr_counting,tree_ext_sct_rrr)(benchmark::State &state) {
+    for ( auto _ : state ) {
+        // the code that gets measured
+        state.PauseTiming(); // <-- need to pause for a set up though
+        auto dice= std::bind(*distribution,engine);
+        auto wdice= std::bind(*weight_distribution,engine);
+        auto x= dice(), y= dice();
+        auto a= wdice(), b= wdice();
+        // we are ready to go now
+        state.ResumeTiming();
+        auto res= counting(x,y,a,b);
+        benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
+        benchmark::ClobberMemory(); // <-- took these lines from the documentation,
+        // @see https://github.com/google/benchmark#user-guide
+        // end of the code that gets measured
+    }
+}
+
+BENCHMARK_TEMPLATE_F(path_queries_benchmark,
+                     wt_hpd_un_counting,wt_hpd_uncompressed)(benchmark::State &state) {
+    for ( auto _ : state ) {
+        // the code that gets measured
+        state.PauseTiming(); // <-- need to pause for a set up though
+        auto dice= std::bind(*distribution,engine);
+        auto wdice= std::bind(*weight_distribution,engine);
+        auto x= dice(), y= dice();
+        auto a= wdice(), b= wdice();
+        // we are ready to go now
+        state.ResumeTiming();
+        auto res= counting(x,y,a,b);
+        benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
+        benchmark::ClobberMemory(); // <-- took these lines from the documentation,
+        // @see https://github.com/google/benchmark#user-guide
+        // end of the code that gets measured
+    }
+}
+
+BENCHMARK_TEMPLATE_F(path_queries_benchmark,
+                     wt_hpd_counting,wt_hpd_rrr)(benchmark::State &state) {
+    for ( auto _ : state ) {
+        // the code that gets measured
+        state.PauseTiming(); // <-- need to pause for a set up though
+        auto dice= std::bind(*distribution,engine);
+        auto wdice= std::bind(*weight_distribution,engine);
+        auto x= dice(), y= dice();
+        auto a= wdice(), b= wdice();
+        // we are ready to go now
+        state.ResumeTiming();
+        auto res= counting(x,y,a,b);
+        benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
+        benchmark::ClobberMemory(); // <-- took these lines from the documentation,
+        // @see https://github.com/google/benchmark#user-guide
+        // end of the code that gets measured
+    }
+}
+
 
 static void CustomArguments(benchmark::internal::Benchmark* b) {
     for (int i = 0; i <= 10; ++i)
@@ -151,5 +425,18 @@ static void CustomArguments(benchmark::internal::Benchmark* b) {
 }
 
 // BENCHMARK(BM_SetInsert)->Apply(CustomArguments);
+// @see https://stackoverflow.com/questions/51519376/how-to-pass-arguments-to-a-google-benchmark-program
 
-BENCHMARK_MAIN();
+// BENCHMARK_MAIN();
+// BENCHMARK_MAIN() lives in benchmark_api.h
+// should be run like this:
+// perl benchmark_runner.pl count /users/grad/kazi/CLionProjects/tree_path_queries/data/testdata/linear_small_weights.txt
+// so essentially:
+// perl benchmark_runner.pl <median|count|report|select> <full_ath_to_dataset>
+int main (int argc, char** argv)
+{
+    dataset_path= std::string(argv[2]);
+    std::cerr << "Dataset path: " << dataset_path << std::endl;
+    ::benchmark::Initialize (&argc, argv);
+    ::benchmark::RunSpecifiedBenchmarks ();
+}
