@@ -28,7 +28,8 @@ const std::string paths[]= {
         std::string("degenerate_tree_equal_weights.txt"), //0
         std::string("log_weights.txt"), //1
         std::string("sqrt_weights.txt"), //2
-        std::string("linear_small_weights.txt"), //3
+        //std::string("linear_small_weights.txt"), //3
+        std::string("rnd.100mln.sqrt.puu"),
         std::string("linear_weights.txt"), //4
         std::string("us.rd.d.dfs.dimacs.puu") //5
 };
@@ -63,7 +64,7 @@ using tree_ext_sct_rrr  = tree_ext_sct<
         sdsl::rrr_vector<>
 >;
 
-const std::string root= "/users/grad/kazi/CLionProjects/tree_path_queries/data/testdata/";
+const std::string root= "/users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/";
 
 template<typename T>
 class path_queries_benchmark: public benchmark::Fixture {
@@ -106,6 +107,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_median,nv)(benchmark::State &stat
     }
 }
 
+/*
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,
                      ext_ptr_median,tree_ext_ptr)(benchmark::State &state) {
     for ( auto _ : state ) {
@@ -122,6 +124,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,
         // end of the code that gets measured
     }
 }
+*/
 
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,
                      ext_ptr_sct_median,tree_ext_sct_un)(benchmark::State &state) {
