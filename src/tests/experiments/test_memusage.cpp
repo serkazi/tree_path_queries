@@ -23,18 +23,24 @@ std::vector<value_type> w;
 void instantiate_exp( uint16_t mask, experiments::IMPLS impl ) {
     double tm= 0;
     if ( mask & static_cast<uint16_t>(impl) ) {
-        {
-            duration_timer<std::chrono::minutes> timer(tm);
-            processor = experiments::instantiate<node_type,size_type,value_type>(topology,w,static_cast<uint16_t>(impl));
+        try {
+            {
+                duration_timer<std::chrono::minutes> timer(tm);
+                processor = experiments::instantiate<node_type, size_type, value_type>(topology, w,
+                                                                                       static_cast<uint16_t>(impl));
+            }
+            std::cerr << "Construction time: " << std::fixed << std::setprecision(2) << tm << "m" << std::endl;
+            // we are writing the results so that the compiler does not optimize it out
+            for (auto it = 0; it < ITERATIONS; ++it) {
+                arr[it & 0xf] = processor->query((*distribution)(engine), (*distribution)(engine));
+            }
+            std::cerr << std::accumulate(arr.begin(), arr.end(), 0) << std::endl;
+            // delete the object owned by the processor pointer
+            processor.reset();
+            processor = nullptr;
+        } catch ( std::exception &e ) {
+            throw e;
         }
-        std::cerr << "Construction time: " << std::fixed << std::setprecision(2) << tm << "m" << std::endl;
-        // we are writing the results so that the compiler does not optimize it out
-        for( auto it= 0; it < ITERATIONS; ++it ) {
-            arr[it&0xf]= processor->query((*distribution)(engine),(*distribution)(engine));
-        }
-        std::cerr << std::accumulate(arr.begin(),arr.end(),0) << std::endl;
-        // delete the object owned by the processor pointer
-        processor.reset(); processor= nullptr;
     }
 }
 

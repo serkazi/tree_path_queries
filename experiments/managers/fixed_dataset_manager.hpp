@@ -83,35 +83,40 @@ namespace experiments {
                 sdsl::rrr_vector<>
         >;
 
-        switch ( i ) {
-            case static_cast<int>(experiments::IMPLS::NV): {
-                return std::move(std::make_unique<nv>(topology, w));
+        try {
+            switch (i) {
+                case static_cast<int>(experiments::IMPLS::NV): {
+                    return std::move(std::make_unique<nv>(topology, w));
+                }
+                case static_cast<int>(experiments::IMPLS::NV_LCA): {
+                    return std::move(std::make_unique<nv_lca>(topology, w));
+                }
+                case static_cast<int>(experiments::IMPLS::NV_SUCC): {
+                    return std::move(std::make_unique<nv_succ>(topology, w));
+                }
+                case static_cast<int>(experiments::IMPLS::HYBRID): {
+                    return std::move(std::make_unique<hybrid>(topology, w));
+                }
+                case static_cast<int>(experiments::IMPLS::TREE_EXT_PTR): {
+                    return std::move(std::make_unique<tree_ext_ptr>(topology, w));
+                }
+                case static_cast<int>(experiments::IMPLS::WT_HPD_UN): {
+                    return std::move(std::make_unique<wt_hpd_uncompressed>(topology, w));
+                }
+                case static_cast<int>(experiments::IMPLS::WT_HPD_RRR): {
+                    return std::move(std::make_unique<wt_hpd_rrr>(topology, w));
+                }
+                case static_cast<int>(experiments::IMPLS::TREE_EXT_SCT_UN): {
+                    return std::move(std::make_unique<tree_ext_sct_un>(topology, w));
+                }
+                case static_cast<int>(experiments::IMPLS::TREE_EXT_SCT_RRR): {
+                    return std::move(std::make_unique<tree_ext_sct_rrr>(topology, w));
+                }
+                default:
+                    assert(false);
             }
-            case static_cast<int>(experiments::IMPLS::NV_LCA): {
-                return std::move(std::make_unique<nv_lca>(topology, w));
-            }
-            case static_cast<int>(experiments::IMPLS::NV_SUCC): {
-                return std::move(std::make_unique<nv_succ>(topology, w));
-            }
-            case static_cast<int>(experiments::IMPLS::HYBRID): {
-                return std::move(std::make_unique<hybrid>(topology, w));
-            }
-            case static_cast<int>(experiments::IMPLS::TREE_EXT_PTR): {
-                return std::move(std::make_unique<tree_ext_ptr>(topology, w));
-            }
-            case static_cast<int>(experiments::IMPLS::WT_HPD_UN): {
-                return std::move(std::make_unique<wt_hpd_uncompressed>(topology, w));
-            }
-            case static_cast<int>(experiments::IMPLS::WT_HPD_RRR): {
-                return std::move(std::make_unique<wt_hpd_rrr>(topology, w));
-            }
-            case static_cast<int>(experiments::IMPLS::TREE_EXT_SCT_UN): {
-                return std::move(std::make_unique<tree_ext_sct_un>(topology, w));
-            }
-            case static_cast<int>(experiments::IMPLS::TREE_EXT_SCT_RRR): {
-                return std::move(std::make_unique<tree_ext_sct_rrr>(topology, w));
-            }
-            default: assert( false );
+        } catch ( std::exception &e ) {
+            throw e;
         }
     }
 }

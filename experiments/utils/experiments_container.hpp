@@ -79,10 +79,14 @@ private:
     request_stream read_requests( std::istream &is ) ;
 
     [[nodiscard]] double get_avg( path_queries::QUERY_TYPE type ) const {
+        if ( not vis->counts.count(type) )
+            return 0;
         auto total_count_for_type= vis->counts.find(type)->second;
         return vis->aggregates.find(type)->second/total_count_for_type;
     }
     [[nodiscard]] std::string get_sha512( path_queries::QUERY_TYPE type ) const {
+        if ( not vis->to_be_hashed.count(type) )
+            return "";
         return sw::sha512::calculate(vis->to_be_hashed.find(type)->second);
     }
 public:

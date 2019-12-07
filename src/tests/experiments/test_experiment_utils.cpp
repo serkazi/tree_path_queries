@@ -30,17 +30,22 @@ int main( int argc, char **argv ) {
     uint16_t mask= strtol(argv[2],nullptr,10);
     auto nq=  std::strtol(argv[3],nullptr,10);
 
-    auto fmd= std::make_unique<
-            fixed_dataset_manager<pq_types::node_type,pq_types::size_type,pq_types::value_type>
-            >(is,mask,filename);
-    nlohmann::json configs[]= {
-                                {{"counting",nq},{"reporting",nq},{"median",nq},{"selection",0},{"K",1}},
-                                {{"counting",nq},{"reporting",nq},{"median",0 },{"selection",0},{"K",10}},
-                                {{"counting",nq},{"reporting",nq},{"median",0 },{"selection",0},{"K",100}},
-                              };
-    for ( const auto& config: configs ) {
-        auto res = fmd->run_config(config);
-        std::cout << std::fixed << std::setprecision(2) << res.dump(2) << std::endl;
+    std::unique_ptr<fixed_dataset_manager<pq_types::node_type,pq_types::size_type,pq_types::value_type>> fmd;
+    try {
+        fmd = std::make_unique<
+                fixed_dataset_manager<pq_types::node_type, pq_types::size_type, pq_types::value_type>
+        >(is, mask, filename);
+        nlohmann::json configs[] = {
+                {{"counting", nq}, {"reporting", nq}, {"median", nq}, {"selection", 0}, {"K", 1}},
+                {{"counting", nq}, {"reporting", nq}, {"median", 0},  {"selection", 0}, {"K", 10}},
+                {{"counting", nq}, {"reporting", nq}, {"median", 0},  {"selection", 0}, {"K", 100}},
+        };
+        for ( const auto& config: configs ) {
+            auto res = fmd->run_config(config);
+            std::cout << std::fixed << std::setprecision(2) << res.dump(2) << std::endl;
+        }
+    } catch ( std::exception &e ) {
+        std::cout << e.what() << std::endl;
     }
     return 0;
 }
