@@ -31,3 +31,12 @@
 # if (CMAKE_VERSION VERSION_LESS 2.8.11)
 #     include_directories("${gtest_SOURCE_DIR}/include")
 # endif()
+#
+_GLIBCXX_DEBUG
+_GLIBCXX_DEBUG_PEDANTIC
+-fsanitize=address
+-g -fno-omit-frame-pointer
+-fno-optimize-sibling-calls
+dpkg -L llvm-6.0
+ASAN_SYMBOLIZER_PATH
+_LIBCPP_DEBUG=1

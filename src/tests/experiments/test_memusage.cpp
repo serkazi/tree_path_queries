@@ -24,10 +24,10 @@ void instantiate_exp( uint16_t mask, experiments::IMPLS impl ) {
     double tm= 0;
     if ( mask & static_cast<uint16_t>(impl) ) {
         {
-            duration_timer<std::chrono::milliseconds> timer(tm);
+            duration_timer<std::chrono::minutes> timer(tm);
             processor = experiments::instantiate<node_type,size_type,value_type>(topology,w,static_cast<uint16_t>(impl));
         }
-        std::cerr << "Construction time: " << std::fixed << std::setprecision(2) << tm << std::endl;
+        std::cerr << "Construction time: " << std::fixed << std::setprecision(2) << tm << "m" << std::endl;
         // we are writing the results so that the compiler does not optimize it out
         for( auto it= 0; it < ITERATIONS; ++it ) {
             arr[it&0xf]= processor->query((*distribution)(engine),(*distribution)(engine));

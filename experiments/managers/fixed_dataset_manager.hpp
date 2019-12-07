@@ -204,10 +204,7 @@ public:
                  "_on_"+std::to_string(sdsl::util::pid())+".json";
          std::ofstream os(filename);
          builder.build();
-         for ( const auto &q: builder ) {
-             // std::cerr << q << std::endl;
-             os << q << '\n';
-         }
+         for ( const auto &q: builder ) os << q << '\n';
          os.close();
          nlohmann::json res, per_datastructure;
 
@@ -215,18 +212,25 @@ public:
              if ( not (mask & (1u<<i)) ) continue ;
              nlohmann::json obj;
              double construction_time= 0.00;
+             std::unique_ptr<fixed_processor_manager<node_type,size_type,value_type>> pm;
              // using I.I.L.E. in order to measure construction time
-             std::unique_ptr<fixed_processor_manager<node_type,size_type,value_type>> pm= [&](){
-                 duration_timer<std::chrono::seconds> dt(construction_time);
-                 return std::make_unique<fixed_processor_manager<node_type,size_type,value_type>>(
-                                         experiments::instantiate<node_type,size_type,value_type>(topology,w,1<<i));
-             }();
-             obj["constructionTimeInSeconds"]= construction_time;
-             std::ifstream is(filename);
-             obj["breakdownInMicroseconds"]= pm->invoke_with(is);
+             // we use try-catch, because some datasets may be too large to fit into a specific
+             // data structure
+             try {
+                 pm = [&]() {
+                     duration_timer<std::chrono::seconds> dt(construction_time);
+                     return std::make_unique<fixed_processor_manager<node_type, size_type, value_type>>(
+                             experiments::instantiate<node_type, size_type, value_type>(topology, w, 1 << i));
+                 }();
+                 obj["constructionTimeInSeconds"] = construction_time;
+                 std::ifstream is(filename);
+                 obj["breakdownInMicroseconds"] = pm->invoke_with(is);
+             } catch ( std::exception &e ) {
+                 obj["exceptionThrown"]= std::string(e.what());
+             }
              per_datastructure[experiments::hrnames[i]] = obj;
          }
-         res["dataset"]= description, res["config"]= configs, res["results"]= per_datastructure;
+         res= {{"dataset",description},{"config",configs},{"results",per_datastructure}};
          std::remove(filename.c_str());
          return res;
     }

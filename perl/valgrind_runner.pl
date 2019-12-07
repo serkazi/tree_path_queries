@@ -17,7 +17,6 @@ closedir $dir;
 printf("Read the bitmask %d\n",$bitmask);
 
 foreach(@files) {
-
     if ( $_ =~ /.*\.txt/ && $_ =~ /sqrt/ ) {
     # if ( $_ =~ /.*\.txt|.*\.puu/ ) {
         my $vg= $valgrind_command;
