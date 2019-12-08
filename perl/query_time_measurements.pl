@@ -16,7 +16,7 @@ my $data_path = "/users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/
 my $target_path = "/users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/tests/experiments/";
 my $executable = $target_path."test_experiment_utils";
 my $command_to_run= $executable ." ".$data_path."input bitmask num_of_queries >> results_file 2>&1";
-my $results=$target_path."results.out";
+my $results=$target_path."results.json";
 system("rm $results");
 
 opendir my $dir, $data_path or die "Cannot open directory: $!";
@@ -31,13 +31,13 @@ foreach(@files) {
         $vg =~ s/bitmask/$bitmask/g;
         $vg =~ s/results_file/$results/g;
         $vg =~ s/num_of_queries/$num_queries/g;
-        print color('green');
+        # print color('green');
         printf("%s\n",$vg);
-        print color('reset');
-        system($vg);
+        # print color('reset');
+        # system($vg);
     }
 }
-system("mv $results .");
+# system("mv $results .");
 
 
 
