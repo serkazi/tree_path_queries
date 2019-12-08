@@ -31,6 +31,9 @@ int main( int argc, char **argv ) {
     auto nq=  std::strtol(argv[3],nullptr,10);
 
     std::unique_ptr<fixed_dataset_manager<pq_types::node_type,pq_types::size_type,pq_types::value_type>> fmd;
+    bool first_to_be_printed= true;
+    // open the JSON array
+    std::cout << "[\n";
     try {
         fmd = std::make_unique<
                 fixed_dataset_manager<pq_types::node_type, pq_types::size_type, pq_types::value_type>
@@ -42,10 +45,15 @@ int main( int argc, char **argv ) {
         };
         for ( const auto& config: configs ) {
             auto res = fmd->run_config(config);
-            std::cout << std::fixed << std::setprecision(2) << res.dump(2) << std::endl;
+            if ( not first_to_be_printed )
+                std::cout << "\n," << std::endl;
+            std::cout << std::fixed << std::setprecision(2) << res.dump(2);
+            first_to_be_printed= false ;
         }
     } catch ( std::exception &e ) {
         std::cout << e.what() << std::endl;
     }
+    // close the JSON array
+    std::cout << "\n]";
     return 0;
 }

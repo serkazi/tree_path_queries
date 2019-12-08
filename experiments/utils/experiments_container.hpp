@@ -15,6 +15,7 @@
 #include <nlohmann/json.hpp>
 #include <memory>
 #include <chrono>
+#include <fixed_dataset_manager.hpp>
 #include "sha512.hh"
 
 // we expose this since it is useful in general
@@ -221,10 +222,14 @@ nlohmann::json experiments_container<node_type,size_type,value_type>
     std::for_each( begin(requests),end(requests),[&]( const pq_request &r ) {std::visit(*vis,r);} );
     // JSON-ify the summary
     nlohmann::json obj;
-    obj["counting"]= {{"avg",get_avg(path_queries::QUERY_TYPE::COUNTING)},{"sha512",get_sha512(path_queries::QUERY_TYPE::COUNTING)}};
-    obj["reporting"]= {{"avg",get_avg(path_queries::QUERY_TYPE::REPORTING)},{"sha512",get_sha512(path_queries::QUERY_TYPE::REPORTING)}};
-    obj["median"]= {{"avg",get_avg(path_queries::QUERY_TYPE::MEDIAN)},{"sha512",get_sha512(path_queries::QUERY_TYPE::MEDIAN)}};
-    obj["selection"]= {{"avg",get_avg(path_queries::QUERY_TYPE::SELECTION)},{"sha512",get_sha512(path_queries::QUERY_TYPE::SELECTION)}};
+    for ( int t= 0; t < 4; ++t ) {
+        auto tp= static_cast<path_queries::QUERY_TYPE>(t);
+        if ( vis->aggregates.count(tp) ) {
+            nlohmann::json d= tp; // converting the type to JSON --
+            // we can do it, as we've created a serialization rule for it
+            obj[d.get<std::string>()] = {{"avg",get_avg(tp)},{"sha512", get_sha512(tp)}};
+        }
+    }
     return std::move(obj);
 }
 #endif //PROJECT_EXPERIMENTS_CONTAINER_HPP

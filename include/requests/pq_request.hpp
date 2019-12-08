@@ -23,11 +23,13 @@ namespace path_queries {
         REPORTING //3
     };
 
+    const std::string normal_names[]= {"selection","median","counting","reporting"};
+
     NLOHMANN_JSON_SERIALIZE_ENUM( QUERY_TYPE, {
-        {QUERY_TYPE::SELECTION, "selection"},
-        {QUERY_TYPE::MEDIAN, "median"},
-        {QUERY_TYPE::COUNTING, "counting"},
-        {QUERY_TYPE::REPORTING, "reporting"},
+        {QUERY_TYPE::SELECTION, normal_names[0]},
+        {QUERY_TYPE::MEDIAN,    normal_names[1]},
+        {QUERY_TYPE::COUNTING,  normal_names[2]},
+        {QUERY_TYPE::REPORTING, normal_names[3]},
     })
 
     /**
