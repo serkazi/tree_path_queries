@@ -46,6 +46,9 @@ private:
     using median_query= path_queries::median_query<node_type,size_type,value_type>;
 
 public:
+
+    void clear() { requests.clear(); }
+
     query_stream_builder() {
         K_= 1, requests.clear();
         how_many_of[path_queries::QUERY_TYPE::COUNTING]= 0;

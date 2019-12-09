@@ -90,7 +90,11 @@ public:
         for ( auto &x: w ) is >> x;
         auto a= *(std::min_element(w.begin(),w.end()));
         auto b= *(std::max_element(w.begin(),w.end()));
-        processor= std::make_unique<T>(topology,w);
+        try {
+            processor = std::make_unique<T>(topology, w);
+        } catch ( std::exception &e ) {
+            std::cerr << e.what() << std::endl;
+        }
         distribution= std::make_unique<std::uniform_int_distribution<node_type>>(0,n-1);
         weight_distribution= std::make_unique<std::uniform_int_distribution<value_type>>(a,b);
     }

@@ -20,3 +20,23 @@ target_include_directories(
         ${PROJECT_SOURCE_DIR}/include/data_structures/succinct
         ${PROJECT_SOURCE_DIR}/include/data_structures/hybrid
 )
+
+add_executable(aggregate_bench aggregate_bench.cpp)
+target_link_libraries(
+        aggregate_bench
+        PUBLIC
+        benchmark benchmark_main pthread nlohmann_json::nlohmann_json naive
+        hybrid wt_hpd ext_ptr tree_ext_sct)
+target_link_directories(hunch_bench PUBLIC ${BENCHMARK_ROOT})
+target_include_directories(
+        aggregate_bench
+        PUBLIC
+        ${BENCHMARK_INCLUDE_DIR}
+        ${PROJECT_SOURCE_DIR}/include/interfaces
+        ${PROJECT_SOURCE_DIR}/include/requests
+        ${PROJECT_SOURCE_DIR}/src/misc
+        ${PROJECT_SOURCE_DIR}/include/data_structures/plain
+        ${PROJECT_SOURCE_DIR}/include/data_structures/succinct
+        ${PROJECT_SOURCE_DIR}/include/data_structures/hybrid
+        ${PROJECT_SOURCE_DIR}/experiments/utils
+)
