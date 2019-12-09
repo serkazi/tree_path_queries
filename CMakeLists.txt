@@ -113,8 +113,8 @@ target_include_directories(${HPD} PUBLIC
 
 # adding library for range_tree
 set(RANGE_TREE rt)
-set(LIB_SRC ${PROJECT_SOURCE_DIR}/include/data_structures/range_tree/range_tree.hpp)
-add_library(${RANGE_TREE} ${LIB_SRC})
+set(LIB_SRC ${PROJECT_SOURCE_DIR}/include/data_structures/range_tree/range_tree.hpp include/data_structures/range_tree/range_tree_simple.hpp)
+add_library(${RANGE_TREE} ${LIB_SRC} include/data_structures/range_tree/range_tree_simple.hpp)
 set_target_properties(${RANGE_TREE} PROPERTIES LINKER_LANGUAGE CXX)
 target_link_libraries(${RANGE_TREE} PUBLIC sb)
 target_include_directories(${RANGE_TREE} PUBLIC

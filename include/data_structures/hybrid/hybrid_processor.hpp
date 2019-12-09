@@ -5,7 +5,7 @@
 #define SPQ_HYBRID_PROCESSOR_HPP
 #include "pq_types.hpp"
 #include "heavy_path_decomp.hpp"
-#include "range_tree.hpp"
+#include "range_tree_simple.hpp"
 #include "wavelet_tree.hpp"
 // #include "succinct_container.hpp" <-- we'll worry about memory later
 #include "path_query_processor.hpp"
@@ -21,7 +21,7 @@ class hybrid_processor:
 private:
     std::unique_ptr<heavy_path_decomp<node_type,size_type,value_type>> h= nullptr;
     std::unique_ptr<wavelet_tree<size_type,value_type>> wt= nullptr;
-    std::unique_ptr<range_tree<size_type,value_type>> rt= nullptr;
+    std::unique_ptr<range_tree_simple<size_type,value_type>> rt= nullptr;
     std::shared_ptr<tree<node_type,size_type,value_type>> T= nullptr;
     void init() ;
 public:
@@ -152,11 +152,11 @@ void hybrid_processor<node_type,size_type,value_type>::init() {
     h= std::make_unique<heavy_path_decomp<node_type,size_type,value_type>>(T);
     const auto &src= h->get_chain();
     wt= std::make_unique<wavelet_tree<size_type,value_type>>(src);
-    std::vector<typename range_tree<size_type,value_type>::point2d> points;
+    std::vector<typename range_tree_simple<size_type,value_type>::point2d> points;
     points.reserve(src.size());
     for ( auto l= 0; l < src.size(); ++l )
         points.emplace_back(l,src[l]);
-    rt= std::make_unique<range_tree<size_type,value_type>>(points);
+    rt= std::make_unique<range_tree_simple<size_type,value_type>>(points);
     T->shed_redudancy(); //delete the child-information, since we are going to traverse upwards only
 }
 #endif //SPQ_HYBRID_PROCESSOR_HPP

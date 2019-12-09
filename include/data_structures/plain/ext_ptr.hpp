@@ -20,118 +20,107 @@ class ext_ptr:
         public path_query_processor<node_type,size_type,value_type>,
         public succinct_tree<node_type,size_type>
 {
-private:
-    //inner classes
+public:
+    //inner class
+    // we are making this inner class, together with the constructor
+    // that makes use of it, public so that unique_ptr can be created
     class weighted_tree {
     private:
-        std::unique_ptr<std::vector<node_type>[]> adj;
         size_type n,E;
-        std::unique_ptr<size_type[]> d;
-        std::unique_ptr<value_type[]> weights;
         node_type V;
-        std::unique_ptr<node_type[]> prnt, oid;
+        std::vector<size_type> d;
+        std::vector<value_type> weights;
+        std::vector<std::optional<node_type>> prnt;
+        std::vector<node_type> oid;
+        std::vector<std::vector<node_type>> adj;
     public:
         weighted_tree( size_type n ) {
             this->n= n, E= V= 0;
-            oid= std::make_unique<node_type[]>(n);
-            weights= std::make_unique<value_type[]>(n);
-            prnt= std::make_unique<node_type[]>(n);
-            d= std::make_unique<size_type[]>(n);
-            adj= std::make_unique<std::vector<node_type>[]>(n);
-            for ( node_type x= 0; x < n; adj[x++].clear() ) ;
+            oid.resize(n), weights.resize(n), prnt.resize(n), d.resize(n), adj.resize(n);
+            std::fill(prnt.begin(),prnt.end(),std::nullopt);
+            for ( auto &v: adj ) v.clear();
         }
         size_type nvertices() const { return V; }
-        node_type original_id( node_type x ) const { return oid[x]; }
-        ~weighted_tree() = default;
-        void add_arc( node_type p, node_type x ) { ++E, adj[prnt[x]= p].push_back(x); }
+        node_type original_id( node_type x ) const {
+            assert( x < V );
+            return oid[x];
+        }
+        virtual ~weighted_tree() = default;
+        void add_arc( node_type p, node_type x ) { ++E, adj[(prnt[x]= p).value()].push_back(x); }
         value_type weight_of( node_type x ) const { return weights[x]; }
         const std::vector<node_type> &children( node_type x ) const {
             return adj[x];
         }
         size_type size() const { return n; }
         std::optional<node_type> parent( node_type x ) const {
-            if ( x == 0 )
-                return std::nullopt;
             return prnt[x];
         }
         node_type depth( node_type x ) const { return d[x]; }
         void assign_weight( node_type x, value_type w ) { weights[x]= w; }
         void assign_depth( node_type x, value_type w ) { d[x]= w; }
+        void assign_original_id( node_type x, node_type ox ) {
+            oid[x]= ox;
+        }
         node_type new_node( node_type _oid ) {
             oid[V++]= _oid;
             return V-1;
         }
         size_type nedges() const { return E; }
-        weighted_tree( const std::string &s, const std::vector<value_type> &w ) {
-            this->n= s.size()/2, E= V= 0;
-            std::stack<node_type> stck;
-            oid= std::make_unique<node_type[]>(n);
+        weighted_tree( const std::string &s, const std::vector<value_type> &w ) : weighted_tree(s.size()/2) {
             for ( node_type x= 0; x < n; oid[x]= x, ++x ) ;
-            weights= std::make_unique<value_type[]>(n);
-            prnt= std::make_unique<node_type[]>(n);
-            d= std::make_unique<size_type[]>(n);
-            adj= std::make_unique<std::vector<node_type>[]>(n);
-            for ( node_type x= 0; x < n; adj[x++].clear() ) ;
+            std::stack<node_type> stck;
             for ( int i= 0; i < (int)w.size(); weights[i]= w[i], ++i ) ;
             for ( char ch: s )
                 if ( ch == '(' ) {
                     if ( not stck.empty() )
-                        add_arc(prnt[V]= stck.top(),V);
+                        add_arc(stck.top(),V);
                     d[V]= stck.size(), stck.push(V++);
                 }
                 else stck.pop();
             assert( V == n );
         }
     };
+private:
 
-    std::unique_ptr<std::unique_ptr<std::optional<node_type>[]>[]> precomputed_image= nullptr;
-    std::unique_ptr<node_type[]> original_node= nullptr, prnt= nullptr;
-    std::unique_ptr<value_type[]> wgt= nullptr;
-    std::unique_ptr<std::vector<node_type>[]> adj= nullptr;
-    std::unique_ptr<size_type[]> d= nullptr;
     size_type n,K;
     value_type lower, upper;
-    ext_ptr<node_type,size_type,value_type> *subtree[2];
+    std::vector<std::vector<std::optional<node_type>>> precomputed_image;
+    std::vector<std::vector<node_type>> adj;
+    std::vector<node_type> original_node;
+    std::vector<std::optional<node_type>> prnt;
+    std::vector<value_type> wgt;
+    std::vector<size_type> d;
+    std::vector<std::unique_ptr<ext_ptr<node_type,size_type,value_type>>> subtree;
 
-    ext_ptr( value_type a, value_type b,
-            const weighted_tree *un_compressed_tree )
-    {
-        d= std::make_unique<size_type[]>(n= un_compressed_tree->size());
-        original_node= std::make_unique<node_type[]>(n);
-        prnt= std::make_unique<node_type[]>(n);
-        for ( node_type x= 0; x < n; original_node[x]= un_compressed_tree->original_id(x),\
-        d[x]= un_compressed_tree->depth(x), prnt[x]= x==0?0:un_compressed_tree->parent(x).value(), ++x ) ;
-        init(a,b,un_compressed_tree);
-    }
+    std::vector<bool> seen;
+    std::stack<node_type> st[2];
 
-    node_type *st[2],*top[2];
-    std::unique_ptr<bool[]> seen= nullptr;
-
-    void precalc( const weighted_tree *tr, node_type x, weighted_tree *str[], value_type mid ) {
+    void precalc( const weighted_tree *tr, node_type x, std::vector<std::unique_ptr<weighted_tree>> &str, value_type mid ) {
         assert( not seen[x] );
         seen[x]= true;
         value_type color= tr->weight_of(x)<=mid?0:1;
         node_type ix= str[color]->new_node(tr->original_id(x));
-        std::optional<node_type> px= (top[color]==st[color]?std::nullopt:std::optional<node_type>(*top[color]));
+        std::optional<node_type> px= (st[color].empty()?std::nullopt:std::optional<node_type>(st[color].top()));
+        // str[color]->assign_original_id(ix,x);
         str[color]->assign_weight(ix,tr->weight_of(x));
-        str[color]->assign_depth(ix,top[color]-st[color]);
+        str[color]->assign_depth(ix,st[color].size());
         if ( px.has_value() )
             str[color]->add_arc(px.value(),ix);
-        *++top[color]= ix;
+        st[color].push(ix);
         for ( value_type tt= 0; tt <= 1; ++tt )
-            if ( precomputed_image[tt] != nullptr )
-                precomputed_image[tt][x]= (top[tt]>st[tt]?std::optional<node_type>(*top[tt]):std::nullopt);
+            if ( not precomputed_image[tt].empty() )
+                precomputed_image[tt][x]= ((not st[tt].empty())?std::optional<node_type>(st[tt].top()):std::nullopt);
         auto kinder= tr->children(x);
         for ( auto y: kinder ) {
             assert( not seen[y] );
             precalc(tr,y,str,mid);
         }
-        assert( *top[color] == ix );
-        --top[color];
+        assert( st[color].top() == ix );
+        st[color].pop();
     }
 
     void init( value_type a, value_type b, const weighted_tree *un_compressed_tree ) {
-        for ( auto t= 0; t <= 1; subtree[t++] = nullptr ) ;
+        subtree.resize(2), std::fill(subtree.begin(),subtree.end(),nullptr);
         if ( (this->lower= a) == (this->upper= b) or not un_compressed_tree )
             return ;
         auto mid= (a+b)>>1;
@@ -141,29 +130,24 @@ private:
             ++nsz[un_compressed_tree->weight_of(x) <= mid ? 0 : 1];
         }
 
-        weighted_tree *str[]= { new weighted_tree(nsz[0]), new weighted_tree(nsz[1]) };
+        std::vector<std::unique_ptr<weighted_tree>> str;
+        str.push_back(std::move(std::make_unique<weighted_tree>(nsz[0])));
+        str.push_back(std::move(std::make_unique<weighted_tree>(nsz[1])));
 
-        precomputed_image= std::make_unique<std::unique_ptr<std::optional<node_type>[]>[]>(2);
+        precomputed_image.resize(2);
         for ( auto tt= 0; tt <= 1; ++tt )
             if ( str[tt] and str[tt]->size() >= 1 )
-                precomputed_image[tt]= std::make_unique<std::optional<node_type>[]>(n);
-            else precomputed_image[tt] = nullptr;
-        //for ( auto t= 0; t <= 1; precomputed_image[t++]= new node_type[n] ) ;
-        for ( auto t= 0; t <= 1; ++t )
-            top[t]= st[t]= new node_type[nsz[t]+1];
-        seen= std::make_unique<bool[]>(n);
-        for ( node_type x= 0; x < n; seen[x++]= false ) ;
+                precomputed_image[tt].resize(n);
+        seen.resize(n), std::fill(seen.begin(),seen.end(),false);
         for ( node_type x= 0; x < n; ++x )
             if ( not seen[x] )
                 precalc(un_compressed_tree,x,str,mid);
-        seen= nullptr;
-        for ( value_type t= 0; t <= 1; delete str[t++] )
+        seen.clear();
+        for ( value_type t= 0; t <= 1; str[t++].reset() )
             if ( nsz[t] ) {
                 auto na = (t == 0 ? a : mid + 1), nb = (t == 0 ? mid : b);
-                assert(top[t] == st[t]);
-                subtree[t] = new ext_ptr<node_type,size_type,value_type>(na,nb,str[t]);
+                subtree[t] = std::make_unique<ext_ptr<node_type,size_type,value_type>>(na,nb,str[t].get());
             }
-        for ( auto t= 0; t <= 1; delete[] st[t++] ) ;
     }
 
     std::unique_ptr<lca_processor<node_type,size_type>> prc= nullptr;
@@ -252,58 +236,44 @@ private:
     }
 
 public:
+    ext_ptr( value_type a, value_type b,
+             const weighted_tree *un_compressed_tree )
+    {
+        d.resize(n= un_compressed_tree->size());
+        original_node.resize(n);
+        prnt.resize(n);
+        for ( node_type x= 0; x < n; original_node[x]= un_compressed_tree->original_id(x),\
+        d[x]= un_compressed_tree->depth(x), prnt[x]= un_compressed_tree->parent(x), ++x ) ;
+        init(a,b,un_compressed_tree);
+    }
+    // in an ideal world, the above should be private
 
     ext_ptr() {};
 
     value_type weight_of(node_type x) const override { return wgt[x]; }
     value_type weight(node_type x) const override { return wgt[x]; }
 
-    /*
-    [[nodiscard]] double size_in_bytes() const override {
-        return 0;
-    }
-    */
-
     ext_ptr( const std::string &s, const std::vector<value_type> &w ) {
-        //TODO: add a constructor for weighted tree
         auto un_compressed_version= std::make_unique<weighted_tree>(s,w);
         assert( un_compressed_version->nvertices() == s.size()/2 );
-        assert( un_compressed_version->nedges() == s.size()/2-1 );
-        wgt= std::make_unique<value_type[]>(n= un_compressed_version->size());
-        original_node= std::make_unique<node_type[]>(n);
-        adj= std::make_unique<std::vector<node_type>[]>(n);
-        for ( auto ii= 0; ii < n; adj[ii++].clear() ) ;
-        d= std::make_unique<size_type[]>(n), prnt= std::make_unique<node_type[]>(n);
-        for ( node_type xx= 0; xx < n; prnt[xx++]= std::numeric_limits<node_type>::max() ) ;
+        assert( un_compressed_version->nedges()+1 == s.size()/2 );
+        wgt.resize(n= un_compressed_version->size());
+        original_node.resize(n), adj.resize(n);
+        for ( auto &v: adj ) v.clear();
+        d.resize(n), prnt.resize(n), std::fill(prnt.begin(),prnt.end(),std::nullopt);
         for ( node_type x= 0; x < n;\
         wgt[x]= w[x], original_node[x]= x, d[x]= un_compressed_version->depth(x), ++x ) ;
         for ( node_type x= 0; x < n; ++x )
             if ( x != 0 )
-                adj[prnt[x]= un_compressed_version->parent(x).value()].push_back(x);
-        int sm= 0;
-        for ( node_type x= 0; x < n; sm += adj[x++].size() ) ;
-        assert( sm == n-1 );
-        auto minw= *(std::min_element(wgt.get(),wgt.get()+n)),
-             maxw= *(std::max_element(wgt.get(),wgt.get()+n));
+                adj[(prnt[x]= un_compressed_version->parent(x)).value()].push_back(x);
+        auto sm= std::accumulate(adj.begin(),adj.end(),0,[](size_type res, const auto &c){return res+c.size();});
+        assert( sm+1 == n );
+        auto minw= *(std::min_element(wgt.begin(),wgt.end())),
+             maxw= *(std::max_element(wgt.begin(),wgt.end()));
         for ( K= 0; (1<<K) <= n; ++K ) ;
         init(0,maxw,un_compressed_version.get());
         prc= std::make_unique<lca_processor<node_type,size_type>>(this);
     }
-
-    /*
-    double size_in_bytes() const override {
-        auto res= ext_ptr::size_in_bytes();
-        if ( prc ) {
-            res+= prc->size_in_bytes();
-        }
-        if ( adj ) {
-            for (node_type x = 0; x < n; ++x)
-                res += (sizeof(node_type)) * adj[x].size();
-        }
-        return res+sizeof adj+sizeof prc;
-    }
-    */
-
 
     node_type lca( node_type cx, node_type cy ) const override {
 		return (*prc)(cx,cy);
@@ -345,6 +315,7 @@ public:
     void report(node_type x, node_type y, value_type a, value_type b,
                 std::vector<std::pair<value_type, size_type>> &res) const override {
         auto z= lca(x,y);
+        res.clear();
         search(*this,x,y,z,a,b,weight_of(z),res,true,lower,upper);
     }
 
@@ -352,45 +323,7 @@ public:
 
     size_type size() const override { return n; }
 
-    /*
-     * //TODO
-    double size_in_bytes() const override {
-        double res= sizeof n + sizeof K + sizeof precomputed_image + sizeof original_node +\
-            sizeof prnt + sizeof anc + sizeof wgt + sizeof lower + sizeof upper + sizeof d +\
-            sizeof subtree[0] + sizeof subtree[1];
-        std::for_each(subtree,subtree+1,[&]( const auto *pt ) { if ( pt ) res+= pt->size_in_bytes(); });
-        if ( precomputed_image ) {
-            for ( auto t= 0; t <= 1; ++t ) {
-                res += sizeof precomputed_image[t];
-                if ( precomputed_image[t] )
-                    res += n*sizeof *precomputed_image[t];
-            }
-        }
-        if ( original_node )
-            res += n*sizeof *original_node;
-        if ( prnt )
-            res += n*sizeof *prnt;
-        if ( wgt )
-            res += n*sizeof *wgt;
-        if ( d )
-            res += n*sizeof *d;
-        if ( prc ) {
-            res+= prc->size_in_bytes();
-        }
-        if ( adj ) {
-            for (node_type x = 0; x < n; ++x)
-                res += (sizeof(node_type)) * adj[x].size();
-        }
-        return res+sizeof adj+sizeof prc;
-    }
-    */
-
-    /*double bits_per_node() const override {
-        return 8*size_in_bytes()/(size()+0.00);
-    }*/
-
     std::optional<node_type> parent(node_type x) const override {
-        if ( x == 0 ) return std::nullopt;
         return prnt[x];
     }
 

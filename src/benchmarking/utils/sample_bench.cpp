@@ -1,6 +1,7 @@
 //
 // Created by kazi on 2019-11-25.
 //
+#include <sys/resource.h>
 #include <benchmark/benchmark.h>
 #include <fstream>
 #include <string>
@@ -66,19 +67,23 @@ using tree_ext_sct_rrr  = tree_ext_sct<
 >;
 
 const std::string root= "/users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/";
-std::string dataset_path;
+
+namespace experiment_settings {
+    std::string dataset_path;
+    int K, nq;
+}
 
 template<typename T>
 class path_queries_benchmark: public benchmark::Fixture {
 protected:
+    size_type n;
     std::unique_ptr<T> processor;
     std::default_random_engine engine{};
     std::unique_ptr<std::uniform_int_distribution<node_type>> distribution;
     std::unique_ptr<std::uniform_int_distribution<value_type>> weight_distribution;
-    size_type n;
 public:
     void SetUp(const ::benchmark::State& state) {
-        std::ifstream is(dataset_path);
+        std::ifstream is(experiment_settings::dataset_path);
         std::string topology;
         is >> topology;
         std::vector<value_type> w(n= topology.size()/2);
@@ -101,10 +106,10 @@ public:
 };
 
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_median,nv)(benchmark::State &state) {
+    auto dice= std::bind(*distribution,engine);
     for ( auto _ : state ) {
         // the code that gets measured
         state.PauseTiming(); // <-- need to pause for a set up though
-        auto dice= std::bind(*distribution,engine);
         auto x= dice(), y= dice();
         // we are ready to go now
         state.ResumeTiming();
@@ -117,10 +122,10 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_median,nv)(benchmark::State &stat
 }
 
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_lca_median,nv_lca)(benchmark::State &state) {
+    auto dice= std::bind(*distribution,engine);
     for ( auto _ : state ) {
         // the code that gets measured
         state.PauseTiming(); // <-- need to pause for a set up though
-        auto dice= std::bind(*distribution,engine);
         auto x= dice(), y= dice();
         // we are ready to go now
         state.ResumeTiming();
@@ -133,10 +138,10 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_lca_median,nv_lca)(benchmark::Sta
 }
 
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,nsrs_median,nv_succ)(benchmark::State &state) {
+    auto dice= std::bind(*distribution,engine);
     for ( auto _ : state ) {
         // the code that gets measured
         state.PauseTiming(); // <-- need to pause for a set up though
-        auto dice= std::bind(*distribution,engine);
         auto x= dice(), y= dice();
         // we are ready to go now
         state.ResumeTiming();
@@ -149,10 +154,10 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,nsrs_median,nv_succ)(benchmark::Stat
 }
 
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,hybrid_median,hybrid)(benchmark::State &state) {
+    auto dice= std::bind(*distribution,engine);
     for ( auto _ : state ) {
         // the code that gets measured
         state.PauseTiming(); // <-- need to pause for a set up though
-        auto dice= std::bind(*distribution,engine);
         auto x= dice(), y= dice();
         // we are ready to go now
         state.ResumeTiming();
@@ -166,10 +171,10 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,hybrid_median,hybrid)(benchmark::Sta
 
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,
                      ext_ptr_median,tree_ext_ptr)(benchmark::State &state) {
+    auto dice= std::bind(*distribution,engine);
     for ( auto _ : state ) {
         // the code that gets measured
         state.PauseTiming(); // <-- need to pause for a set up though
-        auto dice= std::bind(*distribution,engine);
         auto x= dice(), y= dice();
         // we are ready to go now
         state.ResumeTiming();
@@ -183,10 +188,10 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,
 
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,
                      ext_ptr_sct_median,tree_ext_sct_un)(benchmark::State &state) {
+    auto dice= std::bind(*distribution,engine);
     for ( auto _ : state ) {
         // the code that gets measured
         state.PauseTiming(); // <-- need to pause for a set up though
-        auto dice= std::bind(*distribution,engine);
         auto x= dice(), y= dice();
         // we are ready to go now
         state.ResumeTiming();
@@ -200,10 +205,10 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,
 
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,
                      ext_ptr_sct_rrr_median,tree_ext_sct_rrr)(benchmark::State &state) {
+    auto dice= std::bind(*distribution,engine);
     for ( auto _ : state ) {
         // the code that gets measured
         state.PauseTiming(); // <-- need to pause for a set up though
-        auto dice= std::bind(*distribution,engine);
         auto x= dice(), y= dice();
         // we are ready to go now
         state.ResumeTiming();
@@ -217,10 +222,10 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,
 
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,
                      wt_hpd_un_median,wt_hpd_uncompressed)(benchmark::State &state) {
+    auto dice= std::bind(*distribution,engine);
     for ( auto _ : state ) {
         // the code that gets measured
         state.PauseTiming(); // <-- need to pause for a set up though
-        auto dice= std::bind(*distribution,engine);
         auto x= dice(), y= dice();
         // we are ready to go now
         state.ResumeTiming();
@@ -234,10 +239,10 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,
 
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,
                      wt_hpd_compressed,wt_hpd_rrr)(benchmark::State &state) {
+    auto dice= std::bind(*distribution,engine);
     for ( auto _ : state ) {
         // the code that gets measured
         state.PauseTiming(); // <-- need to pause for a set up though
-        auto dice= std::bind(*distribution,engine);
         auto x= dice(), y= dice();
         // we are ready to go now
         state.ResumeTiming();
@@ -251,11 +256,11 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,
 
 //=============================== Counting ==============================================/
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_counting,nv)(benchmark::State &state) {
+    auto dice= std::bind(*distribution,engine);
+    auto wdice= std::bind(*weight_distribution,engine);
     for ( auto _ : state ) {
         // the code that gets measured
         state.PauseTiming(); // <-- need to pause for a set up though
-        auto dice= std::bind(*distribution,engine);
-        auto wdice= std::bind(*weight_distribution,engine);
         auto x= dice(), y= dice();
         auto a= wdice(), b= wdice();
         // we are ready to go now
@@ -269,11 +274,11 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_counting,nv)(benchmark::State &st
 }
 
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_lca_counting,nv_lca)(benchmark::State &state) {
+    auto dice= std::bind(*distribution,engine);
+    auto wdice= std::bind(*weight_distribution,engine);
     for ( auto _ : state ) {
         // the code that gets measured
         state.PauseTiming(); // <-- need to pause for a set up though
-        auto dice= std::bind(*distribution,engine);
-        auto wdice= std::bind(*weight_distribution,engine);
         auto x= dice(), y= dice();
         auto a= wdice(), b= wdice();
         // we are ready to go now
@@ -287,11 +292,11 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_lca_counting,nv_lca)(benchmark::S
 }
 
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,nsrs_counting,nv_succ)(benchmark::State &state) {
+    auto dice= std::bind(*distribution,engine);
+    auto wdice= std::bind(*weight_distribution,engine);
     for ( auto _ : state ) {
         // the code that gets measured
         state.PauseTiming(); // <-- need to pause for a set up though
-        auto dice= std::bind(*distribution,engine);
-        auto wdice= std::bind(*weight_distribution,engine);
         auto x= dice(), y= dice();
         auto a= wdice(), b= wdice();
         // we are ready to go now
@@ -305,11 +310,11 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,nsrs_counting,nv_succ)(benchmark::St
 }
 
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,hybrid_counting,hybrid)(benchmark::State &state) {
+    auto dice= std::bind(*distribution,engine);
+    auto wdice= std::bind(*weight_distribution,engine);
     for ( auto _ : state ) {
         // the code that gets measured
         state.PauseTiming(); // <-- need to pause for a set up though
-        auto dice= std::bind(*distribution,engine);
-        auto wdice= std::bind(*weight_distribution,engine);
         auto x= dice(), y= dice();
         auto a= wdice(), b= wdice();
         // we are ready to go now
@@ -324,11 +329,11 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,hybrid_counting,hybrid)(benchmark::S
 
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,
                      ext_ptr_counting,tree_ext_ptr)(benchmark::State &state) {
+    auto dice= std::bind(*distribution,engine);
+    auto wdice= std::bind(*weight_distribution,engine);
     for ( auto _ : state ) {
         // the code that gets measured
         state.PauseTiming(); // <-- need to pause for a set up though
-        auto dice= std::bind(*distribution,engine);
-        auto wdice= std::bind(*weight_distribution,engine);
         auto x= dice(), y= dice();
         auto a= wdice(), b= wdice();
         // we are ready to go now
@@ -343,11 +348,11 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,
 
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,
                      ext_ptr_sct_counting,tree_ext_sct_un)(benchmark::State &state) {
+    auto dice= std::bind(*distribution,engine);
+    auto wdice= std::bind(*weight_distribution,engine);
     for ( auto _ : state ) {
         // the code that gets measured
         state.PauseTiming(); // <-- need to pause for a set up though
-        auto dice= std::bind(*distribution,engine);
-        auto wdice= std::bind(*weight_distribution,engine);
         auto x= dice(), y= dice();
         auto a= wdice(), b= wdice();
         // we are ready to go now
@@ -362,11 +367,11 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,
 
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,
                      ext_ptr_sct_rrr_counting,tree_ext_sct_rrr)(benchmark::State &state) {
+    auto dice= std::bind(*distribution,engine);
+    auto wdice= std::bind(*weight_distribution,engine);
     for ( auto _ : state ) {
         // the code that gets measured
         state.PauseTiming(); // <-- need to pause for a set up though
-        auto dice= std::bind(*distribution,engine);
-        auto wdice= std::bind(*weight_distribution,engine);
         auto x= dice(), y= dice();
         auto a= wdice(), b= wdice();
         // we are ready to go now
@@ -381,11 +386,11 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,
 
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,
                      wt_hpd_un_counting,wt_hpd_uncompressed)(benchmark::State &state) {
+    auto dice= std::bind(*distribution,engine);
+    auto wdice= std::bind(*weight_distribution,engine);
     for ( auto _ : state ) {
         // the code that gets measured
         state.PauseTiming(); // <-- need to pause for a set up though
-        auto dice= std::bind(*distribution,engine);
-        auto wdice= std::bind(*weight_distribution,engine);
         auto x= dice(), y= dice();
         auto a= wdice(), b= wdice();
         // we are ready to go now
@@ -400,11 +405,11 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,
 
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,
                      wt_hpd_counting,wt_hpd_rrr)(benchmark::State &state) {
+    auto dice= std::bind(*distribution,engine);
+    auto wdice= std::bind(*weight_distribution,engine);
     for ( auto _ : state ) {
         // the code that gets measured
         state.PauseTiming(); // <-- need to pause for a set up though
-        auto dice= std::bind(*distribution,engine);
-        auto wdice= std::bind(*weight_distribution,engine);
         auto x= dice(), y= dice();
         auto a= wdice(), b= wdice();
         // we are ready to go now
@@ -416,7 +421,6 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,
         // end of the code that gets measured
     }
 }
-
 
 static void CustomArguments(benchmark::internal::Benchmark* b) {
     for (int i = 0; i <= 10; ++i)
@@ -432,11 +436,35 @@ static void CustomArguments(benchmark::internal::Benchmark* b) {
 // should be run like this:
 // perl benchmark_runner.pl count /users/grad/kazi/CLionProjects/tree_path_queries/data/testdata/linear_small_weights.txt
 // so essentially:
-// perl benchmark_runner.pl <median|count|report|select> <full_ath_to_dataset>
+// perl benchmark_runner.pl <median|count|report|select> <full_path_to_dataset>
 int main (int argc, char** argv)
 {
-    dataset_path= std::string(argv[2]);
-    std::cerr << "Dataset path: " << dataset_path << std::endl;
+    const rlim_t kStackSize = 20 * 1024ll * 1024ll * 1024ll;   // min stack size = 20 GiB
+    struct rlimit rl;
+    int result;
+
+    result = getrlimit(RLIMIT_STACK, &rl);
+    if (result == 0) {
+        if (rl.rlim_cur < kStackSize) {
+            rl.rlim_cur = kStackSize;
+            result = setrlimit(RLIMIT_STACK, &rl);
+            if ( result != 0 ) {
+                std::cerr << "setrlimit returned result = " << result << std::endl;
+            }
+        }
+    }
+
+    const int METHOD= 1,
+              FULL_PATH= 2,
+              NUM_QUERIES= 3,
+              K_VAL= 4;
+
+    experiment_settings::dataset_path= std::string(argv[FULL_PATH]);
+    /*
+    experiment_settings::K           = strtol(argv[K_VAL],nullptr,10);
+    experiment_settings::nq          = strtol(argv[NUM_QUERIES],nullptr,10);
+    */
+    std::cerr << "Dataset path: " << experiment_settings::dataset_path << std::endl;
     ::benchmark::Initialize (&argc, argv);
     ::benchmark::RunSpecifiedBenchmarks ();
 }

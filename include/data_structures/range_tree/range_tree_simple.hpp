@@ -1,8 +1,8 @@
 //
-// Created by sj on 01/11/19.
+// Created by kazi on 2019-12-09.
 //
-#ifndef SPQ_RANGE_TREE_HPP
-#define SPQ_RANGE_TREE_HPP
+#ifndef TREE_PATH_QUERIES_RANGE_TREE_SIMPLE_HPP
+#define TREE_PATH_QUERIES_RANGE_TREE_SIMPLE_HPP
 #include <vector>
 #include <queue>
 #include <tuple>
@@ -28,13 +28,14 @@
  * as we explicitly store the points anyway
  */
 /**
+ * @details we remove fractional cascading bridges in order to save space
  * For ease of copy/move constructors, we concatenate
  * all the levels into a single backbone
  * @tparam size_type
  * @tparam value_type
  */
 template<typename size_type= int, typename value_type= int>
-class range_tree {
+class range_tree_simple {
 public:
     using point2d= std::pair<size_type,value_type>;
     using result_type= std::vector<std::pair<value_type,size_type>>;
@@ -47,10 +48,31 @@ private:
      * regions of the backbone, saying where each section of the concatenated
      * range tree starts
      */
-    std::vector<std::optional<size_type>> bridge[2][2];
     std::vector<size_type> sorted_list;
     std::vector<size_type> offset;
     size_type n, num_nodes, len;
+
+    std::optional<size_type> bridge( int t, int j, size_type idx, size_type i ) const {
+        if ( idx >= num_nodes ) return std::nullopt;
+        assert( j == _pred or j == _succ );
+        assert( t == _left or t == _right );
+        if ( not(offset[idx] <= i and i < (idx+1==num_nodes?len:offset[idx+1])) ) {
+            std::cerr << idx << " " << offset[idx] << " " << i << " " << (idx+1==num_nodes?len:offset[idx+1]) << std::endl;
+        }
+        assert ( offset[idx] <= i and i < (idx+1==num_nodes?len:offset[idx+1]) );
+        size_type sons[2]= {2*idx+1,2*idx+2};
+        if ( sons[t] < num_nodes ) {
+            if ( j == _pred ) {
+                return predecessor_of(
+                        offset[sons[t]], sons[t]+1==num_nodes?len-1:offset[sons[t]+1]-1,
+                        original[sorted_list[i]].second);
+            }
+            return successor_of(
+                    offset[sons[t]], sons[t]+1==num_nodes?len-1:offset[sons[t]+1]-1,
+                    original[sorted_list[i]].second);
+        }
+        return std::nullopt;
+    }
     //std::unique_ptr<simple_bitset> valid_nodes= nullptr;
 
     /**
@@ -125,41 +147,40 @@ private:
                           value_type a, value_type b,
                           result_type *result,
                           size_type &cnt
-                          ) const ;
-    void establish_fractional_cascading_links() ;
+    ) const ;
     void construct_im( const std::vector<point2d> &pts ) ;
     void presort_lists() ;
 public:
 
     // remove copy-assignment
-    range_tree& operator = ( const range_tree& other ) = delete;
+    range_tree_simple& operator = ( const range_tree_simple& other ) = delete;
     // remove copy-constructor
-    range_tree( const range_tree &other ) = delete;
+    range_tree_simple( const range_tree_simple &other ) = delete;
 
     // move-assignment
-    range_tree &operator = ( range_tree &&other ) noexcept;
+    range_tree_simple &operator = ( range_tree_simple &&other ) noexcept;
     // move-constructor
-    range_tree( range_tree &&other ) noexcept;
+    range_tree_simple( range_tree_simple &&other ) noexcept;
 
     virtual size_t size() const { return n; }
     virtual size_type range_2d_counting_query( size_type qi, size_type qj, value_type a, value_type b ) const ;
     virtual void range_2d_reporting_query( size_type qi, size_type qj,
-                         value_type a, value_type b,
-                         result_type &result ) const ;
+                                           value_type a, value_type b,
+                                           result_type &result ) const ;
     /*
     virtual double size_in_bytes() const ;
     */
-    explicit range_tree( const std::vector<typename range_tree<size_type,value_type>::point2d> &points ) ;
-    virtual ~range_tree() ;
+    explicit range_tree_simple( const std::vector<typename range_tree_simple<size_type,value_type>::point2d> &points ) ;
+    virtual ~range_tree_simple() ;
 };
 
 template<typename size_type, typename value_type>
 void
-range_tree<size_type, value_type>::search_2d_range(
+range_tree_simple<size_type, value_type>::search_2d_range(
         bool report,
         size_type qi, size_type qj,
         value_type a, value_type b,
-        range_tree::result_type *result,
+        range_tree_simple::result_type *result,
         size_type &cnt) const
 {
     /**
@@ -203,15 +224,17 @@ range_tree<size_type, value_type>::search_2d_range(
     }
     assert( offset[idx] <= *sc and *pr <= (idx+1==num_nodes?len-1:offset[idx+1]-1) );
 
-    auto lsc= bridge[_left][_succ][*sc],  lpr= bridge[_left][_pred][*pr],
-         rsc= bridge[_right][_succ][*sc], rpr= bridge[_right][_pred][*pr];
+    auto lsc= bridge(_left,_succ,idx,*sc),
+         lpr= bridge(_left,_pred,idx,*pr),
+         rsc= bridge(_right,_succ,idx,*sc),
+         rpr= bridge(_right,_pred,idx,*pr);
 
     search_along_left_ridge(report,2*idx+1,l,(l+r)/2,qi,lsc,lpr,*result,cnt);
     search_along_right_ridge(report,2*idx+2,(l+r)/2+1,r,qj,rsc,rpr,*result,cnt);
 }
 
 template<typename size_type, typename value_type>
-size_type range_tree<size_type, value_type>
+size_type range_tree_simple<size_type, value_type>
 ::range_2d_counting_query(size_type qi, size_type qj,
                           value_type a, value_type b)
 const {
@@ -221,10 +244,10 @@ const {
 }
 
 template<typename size_type, typename value_type>
-void range_tree<size_type, value_type>
+void range_tree_simple<size_type, value_type>
 ::range_2d_reporting_query(size_type qi, size_type qj,
                            value_type a, value_type b,
-                           range_tree::result_type &result)
+                           range_tree_simple::result_type &result)
 const {
     size_type cnt= 0;
     search_2d_range(true,qi,qj,a,b,&result,cnt);
@@ -232,34 +255,29 @@ const {
 
 // destructor
 template<typename size_type, typename value_type>
-range_tree<size_type, value_type>::~range_tree() {
+range_tree_simple<size_type, value_type>::~range_tree_simple() {
     // this is essentially a No-Op, since we have smart pointers all round
 }
 
 // constructor
 template<typename size_type, typename value_type>
-range_tree<size_type, value_type>
-::range_tree( const std::vector<typename range_tree<size_type,value_type>::point2d> &input )
+range_tree_simple<size_type, value_type>
+::range_tree_simple( const std::vector<typename range_tree_simple<size_type,value_type>::point2d> &input )
 {
     for ( this->n= input.size(); (this->n & (this->n-1)); ++this->n ) ;
     original= std::vector<point2d>(input);
     for ( size_type idx= input.size(); original.size() < this->n; original.emplace_back(idx++,0) ) ;
     auto pr= get_config(this->n);
     num_nodes= pr.first+1, len= pr.second;
-    offset.resize(num_nodes);
-    sorted_list.resize(len);
-    for ( auto i= _left; i <= _right; ++i )
-        for ( auto j= _pred; j <= _succ; ++j )
-            bridge[i][j].resize(len);
+    offset.resize(num_nodes), sorted_list.resize(len);
     // mark_valid_nodes();
     construct_im(original);
     presort_lists();
-    establish_fractional_cascading_links();
 }
 
 template<typename size_type, typename value_type>
-void range_tree<size_type, value_type>
-::construct_im( const std::vector<range_tree::point2d> &pts ) {
+void range_tree_simple<size_type, value_type>
+::construct_im( const std::vector<range_tree_simple::point2d> &pts ) {
     std::queue<std::tuple<size_type,size_type,size_type>> q;
     std::unique_ptr<size_type[]> length= std::make_unique<size_type[]>(num_nodes+1);
     for ( auto it= 0; it < num_nodes; offset[it++]= std::numeric_limits<size_type>::max() ) ;
@@ -295,32 +313,11 @@ void range_tree<size_type, value_type>
 }
 
 template<typename size_type, typename value_type>
-void range_tree<size_type, value_type>
-::establish_fractional_cascading_links() {
-    for ( size_type idx= 0; idx < num_nodes; ++idx ) {
-        // if ( not valid_nodes->test(idx) ) continue ;
-        size_type sons[2]= {2*idx+1,2*idx+2};
-        for ( auto t= _left; t <= _right; ++t ) {
-            if ( sons[t] < num_nodes ) {
-                for (size_type i= offset[idx]; i < (idx+1==num_nodes?len:offset[idx+1]); ++i) {
-                    bridge[t][_pred][i]= predecessor_of(
-                                offset[sons[t]], sons[t]+1==num_nodes?len-1:offset[sons[t]+1]-1,
-                                original[sorted_list[i]].second);
-                    bridge[t][_succ][i]= successor_of(
-                                offset[sons[t]], sons[t]+1==num_nodes?len-1:offset[sons[t]+1]-1,
-                                original[sorted_list[i]].second);
-                }
-            }
-        }
-    }
-}
-
-template<typename size_type, typename value_type>
-void range_tree<size_type, value_type>
+void range_tree_simple<size_type, value_type>
 ::search_along_left_ridge(bool report, size_type idx, size_type l, size_type r,
                           size_type trg,
                           std::optional<size_type> sc, std::optional<size_type> pr,
-                          range_tree::result_type &result, size_type &cnt)
+                          range_tree_simple::result_type &result, size_type &cnt)
 const {
     if ( not(pr.has_value() and sc.has_value()) or *sc > *pr )
         return ;
@@ -339,7 +336,8 @@ const {
         size_type where_to_descend_next= _left;
         if ( l <= trg and trg <= mid ) {
             // explore the right subtree
-            auto it = bridge[_right][_succ][*sc], jt = bridge[_right][_pred][*pr];
+            auto it = bridge(_right,_succ,idx,*sc),
+                 jt = bridge(_right,_pred,idx,*pr);
             if ( it.has_value() and jt.has_value() ) {
                 auto kt= it.value();
                 for ( cnt+= (jt.value()-kt+1); kt <= jt.value() and report; result.push_back(original[sorted_list[kt++]]) ) ;
@@ -347,8 +345,8 @@ const {
         }
         else where_to_descend_next= _right;
         l= where_to_descend_next==_left?l:mid+1, r= where_to_descend_next==_left?mid:r;
-        idx= 2*idx+(where_to_descend_next==_left?1:2);
-        auto it= bridge[where_to_descend_next][_succ][*sc], jt= bridge[where_to_descend_next][_pred][*pr];
+        auto it= bridge(where_to_descend_next,_succ,idx,*sc), jt= bridge(where_to_descend_next,_pred,idx,*pr);
+        idx= 2*idx+where_to_descend_next, ++idx;
         if ( (not it.has_value()) or (not jt.has_value()) )
             return ;
         sc= it, pr= jt;
@@ -356,11 +354,11 @@ const {
 }
 
 template<typename size_type, typename value_type>
-void range_tree<size_type, value_type>
+void range_tree_simple<size_type, value_type>
 ::search_along_right_ridge(bool report, size_type idx, size_type l, size_type r,
                            size_type trg,
                            std::optional<size_type> sc, std::optional<size_type> pr,
-                           range_tree::result_type &result, size_type &cnt)
+                           range_tree_simple::result_type &result, size_type &cnt)
 const {
     //std::cerr << "Entering" << std::endl;
     if ( not(pr.has_value() and sc.has_value()) or *sc > *pr )
@@ -377,7 +375,7 @@ const {
         size_type where_to_descend_next= _right;
         if ( mid+1 <= trg and trg <= r ) {
             // explore the left subtree
-            auto it = bridge[_left][_succ][*sc], jt = bridge[_left][_pred][*pr];
+            auto it = bridge(_left,_succ,idx,*sc), jt = bridge(_left,_pred,idx,*pr);
             if ( it.has_value() and jt.has_value() ) {
                 auto kt= it.value();
                 for ( cnt += (jt.value()-kt+1); kt <= jt.value() and report; result.push_back(original[sorted_list[kt++]]) );
@@ -385,8 +383,8 @@ const {
         }
         else where_to_descend_next= _left;
         l= where_to_descend_next==_left?l:mid+1, r= where_to_descend_next==_left?mid:r;
-        idx= 2*idx+(where_to_descend_next==_left?1:2);
-        auto it= bridge[where_to_descend_next][_succ][*sc], jt= bridge[where_to_descend_next][_pred][*pr];
+        auto it= bridge(where_to_descend_next,_succ,idx,*sc), jt= bridge(where_to_descend_next,_pred,idx,*pr);
+        idx= 2*idx+where_to_descend_next, ++idx;
         if ( (not it.has_value()) or (not jt.has_value()) )
             return ;
         sc= it, pr= jt;
@@ -394,46 +392,40 @@ const {
 }
 
 template<typename size_type, typename value_type>
-void range_tree<size_type, value_type>::presort_lists() {
+void range_tree_simple<size_type, value_type>::presort_lists() {
     for ( size_type idx= 0; idx < num_nodes; ++idx )
         //if ( valid_nodes->test(idx) )
-            std::sort(
-                    sorted_list.begin()+offset[idx],sorted_list.begin()+(idx+1==num_nodes?len:offset[idx+1]),
-                    [&](auto a, auto b){return original[a].second < original[b].second;}
-            );
+        std::sort(
+                sorted_list.begin()+offset[idx],sorted_list.begin()+(idx+1==num_nodes?len:offset[idx+1]),
+                [&](auto a, auto b){return original[a].second < original[b].second;}
+        );
 }
 
 template<typename size_type, typename value_type>
-range_tree<size_type,value_type>
-&range_tree<size_type, value_type>::operator=(range_tree &&other) noexcept {
+range_tree_simple<size_type,value_type>
+&range_tree_simple<size_type, value_type>::operator=(range_tree_simple &&other) noexcept {
     if ( this != &other ) {
         original= std::move(other.original);
         offset = nullptr, offset = std::move(other.offset), other.offset = nullptr;
         sorted_list = std::move(other.sorted_list);
         n = other.n, num_nodes = other.num_nodes, len = other.len;
-        for ( auto i= _left; i <= _right; ++i )
-            for ( auto j= _pred; j <= _succ; ++j )
-                bridge[i][j] = std::move(other.bridge[i][j]);
         //valid_nodes= nullptr, valid_nodes= std::move(other.valid_nodes), other.valid_nodes= nullptr;
     }
     return *this;
 }
 
 template<typename size_type, typename value_type>
-range_tree<size_type, value_type>::range_tree(range_tree &&other) noexcept {
+range_tree_simple<size_type, value_type>::range_tree_simple(range_tree_simple &&other) noexcept {
     original= std::move(other.original);
     offset= std::move(other.offset), other.offset= nullptr;
     sorted_list= std::move(other.sorted_list);
     n= other.n, num_nodes= other.num_nodes, len= other.len;
-    for ( auto i= _left; i <= _right; ++i )
-        for ( auto j= _pred; j <= _succ; ++j )
-            bridge[i][j] = std::move(other.bridge[i][j]);
     //valid_nodes= std::move(other.valid_nodes), other.valid_nodes= nullptr;
 }
 
 /*
 template<typename size_type, typename value_type>
-double range_tree<size_type, value_type>::size_in_bytes() const {
+double range_tree_simple<size_type, value_type>::size_in_bytes() const {
     double ans= sizeof(n)+sizeof(num_nodes)+sizeof(len)+\
                 sizeof(offset)+sizeof(bridge)+sizeof(sorted_list);
     if ( offset )
@@ -450,7 +442,7 @@ double range_tree<size_type, value_type>::size_in_bytes() const {
 
 /*
 template<typename size_type, typename value_type>
-void range_tree<size_type, value_type>::mark_valid_nodes() {
+void range_tree_simple<size_type, value_type>::mark_valid_nodes() {
     valid_nodes= std::make_unique<simple_bitset>(num_nodes);
     std::queue<std::tuple<size_t,size_t,size_t>> q;
     for ( q.push({0,0,n-1}); not q.empty(); ) {
@@ -471,5 +463,4 @@ void range_tree<size_type, value_type>::mark_valid_nodes() {
     }
 }
 */
-
-#endif //SPQ_RANGE_TREE_HPP
+#endif //TREE_PATH_QUERIES_RANGE_TREE_SIMPLE_HPP

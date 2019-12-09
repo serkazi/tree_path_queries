@@ -6,16 +6,19 @@
 #include <numeric>
 #include <random>
 #include "range_tree.hpp"
+#include "range_tree_simple.hpp"
 #include "simple_bitset.hpp"
 
 namespace {
+    using datastructure= range_tree_simple<int,int>;
+
     TEST(range_trees, small_range_tree_construction) {
         std::vector<std::pair<int, int>> w = {{0, 3},
                                               {1, 5},
                                               {2, 1},
                                               {3, 2},
                                               {4, 4}};
-        auto uptr = std::make_unique<range_tree < int, int>>(w);
+        auto uptr = std::make_unique<datastructure>(w);
     }
 
     TEST(range_trees, large_random_tree_construction_permutations) {
@@ -26,7 +29,7 @@ namespace {
         std::shuffle(begin(v), end(v), std::default_random_engine());
         for (int i = 0; i < v.size(); ++i)
             w[i] = {i, v[i]};
-        auto uptr = std::make_unique<range_tree < int, int>>
+        auto uptr = std::make_unique<datastructure >
         (w);
         std::cerr << uptr->size() << std::endl;
     }
@@ -81,7 +84,7 @@ namespace {
         for (const auto &x: w)
             assert(0 <= x.second and x.second <= sigma);
 
-        auto uptr = std::make_unique<range_tree < int, int>>(w);
+        auto uptr = std::make_unique<datastructure >(w);
         std::cerr << "Tree constructed" << std::endl;
 
         auto rng = std::make_unique<std::default_random_engine>();
@@ -114,7 +117,7 @@ namespace {
         std::shuffle(begin(v), end(v), std::default_random_engine());
         for (int i = 0; i < n; ++i)
             w[i] = {i, v[i]};
-        auto uptr = std::make_unique<range_tree < int, int>>(w);
+        auto uptr = std::make_unique<datastructure >(w);
         std::cerr << "Tree constructed" << std::endl;
 
         auto rng = std::make_unique<std::default_random_engine>();
@@ -147,7 +150,7 @@ namespace {
         std::shuffle(begin(v), end(v), std::default_random_engine());
         for (int i = 0; i < n; ++i)
             w[i] = {i, v[i]};
-        auto uptr = std::make_unique<range_tree < int, int>>(w);
+        auto uptr = std::make_unique<datastructure >(w);
         std::cerr << "Tree constructed" << std::endl;
 
         auto rng = std::make_unique<std::default_random_engine>();
@@ -181,7 +184,7 @@ namespace {
         for (int i = 0; i < n; ++i)
             w[i] = {i, n + v[i]};
 
-        auto uptr = std::make_unique<range_tree < int, int>>(w);
+        auto uptr = std::make_unique<datastructure >(w);
         std::cerr << "Tree constructed" << std::endl;
 
         auto rng = std::make_unique<std::default_random_engine>();

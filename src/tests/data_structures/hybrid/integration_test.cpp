@@ -12,7 +12,7 @@ namespace {
     using value_type= pq_types::value_type;
     const int ITERS= 0x400;
 
-    const std::string root_dir= "/users/grad/kazi/CLionProjects/tree_path_queries/data/";
+    const std::string root_dir= "/users/grad/kazi/CLionProjects/tree_path_queries/data/testdata/";
     const std::string paths[]= {
             std::string("degenerate_tree_equal_weights.txt"),
             std::string("log_weights.txt"),
