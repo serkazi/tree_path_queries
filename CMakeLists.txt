@@ -19,6 +19,9 @@ message(WARNING "Gtest main library dir: " ${GTEST_MAIN_LIBRARIES})
 
 set(BENCHMARK_ROOT ~/local/benchmark/build/src)
 set(BENCHMARK_INCLUDE_DIR ~/local/benchmark/include)
+# set(BENCHMARK_ROOT /usr/local/lib/)
+# set(BENCHMARK_INCLUDE_DIR /usr/local/local/include)
+
 
 # set the variable point to the cmake-finder of nlohmann::json
 set(nlohmann_json_DIR ~/local/lib/cmake/nlohmann_json)

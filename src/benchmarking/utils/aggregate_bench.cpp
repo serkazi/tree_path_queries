@@ -2,7 +2,8 @@
 // Created by kazi on 2019-12-09.
 //
 #include <sys/resource.h>
-#include <benchmark/benchmark.h>
+// #include <benchmark/benchmark.h>
+#include "benchmark/benchmark.h"
 #include <fstream>
 #include <string>
 #include <vector>
@@ -545,6 +546,16 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,wt_hpd_rrr_reporting,wt_hpd_rrr)(ben
         // end of the code that gets measured
     }
 }
+
+/*
+BENCHMARK(path_queries_benchmark<wt_hpd>)->Unit(benchmark::kMillisecond);
+BENCHMARK(path_queries_benchmark<wt_hpd_rrr>)->Unit(benchmark::kMillisecond);
+BENCHMARK(path_queries_benchmark<naive_processor>)->Unit(benchmark::kMillisecond);
+BENCHMARK(path_queries_benchmark<naive_processor_lca>)->Unit(benchmark::kMillisecond);
+BENCHMARK(path_queries_benchmark<nsrs>)->Unit(benchmark::kMillisecond);
+BENCHMARK(path_queries_benchmark<hybrid_processor>)->Unit(benchmark::kMillisecond);
+BENCHMARK(path_queries_benchmark<tree_ext_sct_un>)->Unit(benchmark::kMillisecond);
+ */
 
 static void CustomArguments(benchmark::internal::Benchmark* b) {
     for (int i = 0; i <= 10; ++i)
