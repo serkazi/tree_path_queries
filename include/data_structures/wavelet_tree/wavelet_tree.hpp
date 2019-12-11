@@ -1,6 +1,7 @@
 //
 // Created by sj on 01/11/19.
 //
+
 #ifndef SPQ_WAVELET_TREE_HPP
 #define SPQ_WAVELET_TREE_HPP
 #include <vector>
@@ -39,7 +40,7 @@ private:
         state(
                 size_type l, size_type r,
                 value_type a, value_type b, size_type idx
-             ) : l(l), r(r), a(a), b(b), idx(idx) {};
+        ) : l(l), r(r), a(a), b(b), idx(idx) {};
     };
     size_type n, num_nodes, length;
     size_type *backbone= nullptr;
@@ -47,7 +48,7 @@ private:
     value_type sigma;
     std::unique_ptr<simple_bitset> valid_nodes= nullptr;
 
-    void construct_im( value_type *w ) ;
+    void construct_im( std::unique_ptr<value_type[]> w ) ;
     inline size_type rank0( size_type i ) const ;
     inline size_type rank1( size_type i ) const ;
     // removed these, since we needed explicit instantiation
@@ -77,18 +78,25 @@ public:
     virtual value_type range_quantile( size_type i, size_type j, size_type k ) const ;
     virtual value_type range_quantile(
             std::vector<std::pair<size_type,size_type>> &segments, size_type k
-                             ) const ;
+    ) const ;
 };
 
 template <typename size_type, typename value_type>
-void wavelet_tree<size_type,value_type>::construct_im( value_type *w ) {
+void wavelet_tree<size_type,value_type>::construct_im( std::unique_ptr<value_type[]> w ) {
     std::unique_ptr<size_type[]> len= std::make_unique<size_type[]>(2*sigma+7);
     auto* tw= new value_type[n];
     std::queue<state> q;
     auto tmp= state(0,n-1,0,sigma-1,0);
+    auto highest_accessed= std::numeric_limits<size_type>::min();
+
     for ( shifts[tmp.idx]= 0, len[tmp.idx]= n, q.push(std::move(tmp)); not q.empty(); ) {
         auto tr= q.front(); q.pop();
+        assert( shifts[tr.idx] < std::numeric_limits<size_type>::max() );
+        assert( len[tr.idx] == tr.r-tr.l+1 );
+        //std::cerr << "[" << tr.l << "," << tr.r << "]" << std::endl;
         if ( tr.a == tr.b ) {
+            backbone[shifts[tr.idx]]= 0, len[tr.idx]= 1; //just some value; we are not going to access it anyway, since it is a leaf
+            // highest_accessed= std::max(highest_accessed,shifts[tr.idx]);
             continue;
         }
         assert( tr.a < tr.b );
@@ -100,11 +108,17 @@ void wavelet_tree<size_type,value_type>::construct_im( value_type *w ) {
         for ( auto l= tr.l; l <= tr.r; ++l )
             if ( w[l] <= mid ) ++len[ls];
             else ++len[rs];
-        auto *lptr= tw, rptr= lptr+len[ls];
+        auto *lptr= tw;
+        auto *rptr= tw+len[ls];
+        //if ( tr.l <= tr.r ) {
+        //    std::cerr << "[" << shifts[tr.idx] << "," << shifts[tr.idx]+tr.r-tr.l << "]" << std::endl;
+        //}
         for ( auto l= tr.l; l <= tr.r; ++l ) {
             assert( shifts[tr.idx]+l-tr.l < length );
-            backbone[shifts[tr.idx] + l - tr.l] = w[l] <= mid ? (*lptr++ = w[l], 0) : (*rptr++ = w[l], 1);
+            backbone[shifts[tr.idx]+l-tr.l]= (w[l]<=mid) ? (*lptr++= w[l], 0) : (*rptr++= w[l], 1);
+            highest_accessed= std::max(highest_accessed,shifts[tr.idx]+l-tr.l);
         }
+        lptr= rptr= nullptr;
 
         for ( auto l= tr.l; l <= tr.r; w[l]= tw[l-tr.l], ++l ) ;
 
@@ -118,21 +132,31 @@ void wavelet_tree<size_type,value_type>::construct_im( value_type *w ) {
     }
     delete[] tw;
 
+    for ( auto l= 0; l <= highest_accessed; ++l ) {
+        if ( not(backbone[l] < std::numeric_limits<size_type>::max()) ) {
+            std::cerr << l << " " << length << " " << std::endl;
+            std::cerr << length << " " << highest_accessed << std::endl;
+        }
+        assert( backbone[l] < std::numeric_limits<size_type>::max() );
+    }
+
     value_type carry= backbone[0]; backbone[0]= 0;
-    for ( auto l= 1; l < length; ++l ) {
+    for ( auto l= 1; l <= highest_accessed; ++l ) {
         auto _tmp= carry; carry= backbone[l];
         backbone[l]= backbone[l-1]+_tmp;
     }
-    backbone[length]= backbone[length-1]+carry;
+    backbone[highest_accessed+1]= backbone[highest_accessed]+carry;
 }
 
 template <typename size_type, typename value_type>
 inline size_type wavelet_tree<size_type,value_type>::rank0( size_type i ) const {
+    assert( backbone[i] < std::numeric_limits<size_type>::max() );
     return i-backbone[i];
 }
 
 template <typename size_type, typename value_type>
 inline size_type wavelet_tree<size_type,value_type>::rank1( size_type i ) const {
+    assert( backbone[i] < std::numeric_limits<size_type>::max() );
     return backbone[i];
 }
 
@@ -155,14 +179,10 @@ size_type wavelet_tree<size_type,value_type>::srch( size_type j, Func f ) {
     for (;low+1 < high; f(mid= (low+high)/2) < j ? (low= mid):(high= mid) ) ;
     return low;
 }
- *                          /
-
-/*
 template <typename size_type,typename value_type>
 inline size_type wavelet_tree<size_type,value_type>::select0( size_type j ) const {
     return srch(j,this->rank0);
 }
-
 template <typename size_type,typename value_type>
 inline size_type wavelet_tree<size_type,value_type>::select1( size_type j ) const {
     return srch(j,this->rank1);
@@ -193,23 +213,24 @@ value_type wavelet_tree<size_type,value_type>::_range_quantile(
 // ctor
 template <typename size_type,typename value_type>
 wavelet_tree<size_type,value_type>::wavelet_tree( const std::vector<value_type> &w, bool make_power_of_two ) {
-    sigma= *(std::max_element(begin(w),end(w))) + 1;
+    sigma= *(std::max_element(begin(w),end(w)))+1;
     for (;make_power_of_two and (sigma & (sigma-1)); ++sigma ) ;
     // making sigma to be closest power of two
     n= w.size();
     auto pr= get_config(sigma);
     num_nodes= pr.first+1;
-    valid_nodes= std::make_unique<simple_bitset>(num_nodes);
-    auto num_levels= static_cast<size_type>(floor(log(sigma)/log(2))+1+(1e-7));
+    // valid_nodes= std::make_unique<simple_bitset>(num_nodes);
+    auto num_levels= static_cast<size_type>(floor(log(sigma)/log(2)+1+(1e-7)));
     length= num_levels*n+1;
     // std::cerr << "n*num_levels+1 = " << n*num_levels+1 << ", sigma= " << sigma << std::endl;
     backbone= new size_type[length+1];
+    for ( auto x= 0; x < length+1; backbone[x++]= std::numeric_limits<size_type>::max() ) ;
     shifts= std::make_unique<size_type[]>(num_nodes);
-    mark_valid_nodes();
-    auto *aw= new value_type[w.size()];
+    for ( auto l= 0; l < num_nodes; shifts[l++]= std::numeric_limits<size_type>::max() ) ;
+    // mark_valid_nodes();
+    auto aw= std::make_unique<value_type[]>(w.size());
     for ( auto l= 0; l < w.size(); aw[l]= w[l], ++l ) ;
-    construct_im(aw);
-    delete[] aw;
+    construct_im(std::move(aw));
 }
 
 // destructor
@@ -281,6 +302,7 @@ wavelet_tree<size_type, value_type>::range_quantile( std::vector<std::pair<size_
     return _range_quantile(0,vec,0,sigma-1,k);
 }
 
+// warning: modifies its own argument
 template<typename size_type, typename value_type>
 value_type
 wavelet_tree<size_type, value_type>::_range_quantile(
@@ -342,5 +364,4 @@ void wavelet_tree<size_type, value_type>::mark_valid_nodes() {
         }
     }
 }
-
 #endif //SPQ_WAVELET_TREE_HPP

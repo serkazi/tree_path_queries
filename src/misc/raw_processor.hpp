@@ -24,12 +24,12 @@ public:
         T= std::make_unique<tree<node_type,size_type,value_type>>(s,w);
     }
     virtual ~raw_processor() = default;
-    value_type query( node_type x, node_type y ) const {
+    value_type query( node_type x, node_type y ) const override {
 		std::vector<value_type> path;
 		path.clear();
 		auto z = T->lca(x,y);
-		for ( auto cur= x; cur != z; path.push_back(T->weight(cur)), cur= T->parent(cur) );
-		for ( auto cur= y; cur != z; path.push_back(T->weight(cur)), cur= T->parent(cur) );
+		for ( auto cur= x; cur != z; path.push_back(T->weight(cur)), cur= *(T->parent(cur)) );
+		for ( auto cur= y; cur != z; path.push_back(T->weight(cur)), cur= *(T->parent(cur)) );
 		path.push_back(T->weight(z));
 		std::sort(path.begin(),path.end());
 		return path[path.size()/2];
@@ -37,22 +37,22 @@ public:
 	value_type selection( node_type x, node_type y, size_type qntl ) const override {
 		std::vector<value_type> path;
 		assert( path.empty() );
-		auto z = T->lca(x,y);
-		for ( auto cur= x; cur != z; path.push_back(T->weight(cur)), cur= T->parent(cur) );
-		for ( auto cur= y; cur != z; path.push_back(T->weight(cur)), cur= T->parent(cur) );
+		auto z= T->lca(x,y);
+		for ( auto cur= x; cur != z; path.push_back(T->weight(cur)), cur= *(T->parent(cur)) ) ;
+		for ( auto cur= y; cur != z; path.push_back(T->weight(cur)), cur= *(T->parent(cur)) ) ;
 		path.push_back(T->weight(z));
 		std::sort(path.begin(),path.end());
 		return path[this->qntl2rnk(path.size(),qntl)];
 	}
 	size_type
 	count( const node_type x, const node_type y, 
-		   const value_type a, const value_type b ) const {
+		   const value_type a, const value_type b ) const override {
 		std::vector<value_type> path;
 		path.clear();
 		auto z= T->lca(x,y);
 		size_type res= 0;
-		for ( auto cur= x; cur != z; path.push_back(T->weight(cur)), cur= T->parent(cur) );
-		for ( auto cur= y; cur != z; path.push_back(T->weight(cur)), cur= T->parent(cur) );
+		for ( auto cur= x; cur != z; path.push_back(T->weight(cur)), cur= *(T->parent(cur)) );
+		for ( auto cur= y; cur != z; path.push_back(T->weight(cur)), cur= *(T->parent(cur)) );
 		path.push_back(T->weight(z));
 		for ( auto val: path )
 		    if ( path_query_processor<node_type,size_type,value_type>::lies_inside(val,a,b) )
@@ -62,11 +62,11 @@ public:
 	void
 	report( node_type x, node_type y,
 			value_type a, value_type b,
-			std::vector<std::pair<value_type,size_type>> &result ) const {
+			std::vector<std::pair<value_type,size_type>> &result ) const override {
 		std::vector<size_type> path;
 		auto z = T->lca(x,y);
-		for ( auto cur = x; cur != z; path.push_back(cur), cur = T->parent(cur) );
-		for ( auto cur = y; cur != z; path.push_back(cur), cur = T->parent(cur) );
+		for ( auto cur = x; cur != z; path.push_back(cur), cur = *(T->parent(cur)) );
+		for ( auto cur = y; cur != z; path.push_back(cur), cur = *(T->parent(cur)) );
 		path.push_back(z);
 		for ( auto idx: path )
 		    if ( path_query_processor<node_type,size_type,value_type>::lies_inside(T->weight(idx),a,b) )

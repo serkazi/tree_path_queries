@@ -5,6 +5,8 @@
 #include <queue>
 #include <stack>
 #include <cassert>
+#include <optional>
+#include <succinct_tree.hpp>
 
 /**
  * @brief simple tree that supports all basic queries in \f$O(1)\f$ time, and LCA in \f$ O(\log{n}) \f$ time
@@ -19,31 +21,30 @@ template<
         typename size_type,
         typename value_type
         >
-struct tree {
-    static const node_type NO_ANC= std::numeric_limits<node_type>::max();
+struct tree: public succinct_tree<node_type,size_type> {
     size_type n,K;
     const node_type root= 0;
     std::unique_ptr<std::vector<node_type>[]> adj;
-    std::unique_ptr<node_type[]> p;
+    std::vector<std::optional<node_type>> p;
     std::unique_ptr<value_type[]> w;
-    std::unique_ptr<size_type[]> d;
-    std::unique_ptr<std::unique_ptr<node_type[]>[]> anc;
+    std::vector<size_type> d;
+    std::vector<std::vector<std::optional<node_type>>> anc;
 
     // as we are traversing the tree upwards only, after
     // finding the HPD we no longer need children info, hence we delete it
     // we also don't need parents, since they are effectively served by anc[x][0]
-    void shed_redudancy() ;
-    node_type parent( node_type x ) const ;
-    size_type depth( node_type x ) const ;
+    void shed_redundancy() ;
+    std::optional<node_type> parent( node_type x ) const override;
+    size_type depth( node_type x ) const override;
     value_type weight( node_type x ) const ;
 
-    node_type up( node_type x, unsigned int u ) const ;
-    node_type lca( node_type x, node_type y ) const ;
-    bool is_leaf( node_type x ) const ;
+    std::optional<node_type> up( node_type x, unsigned int u ) const ;
+    node_type lca( node_type x, node_type y ) const override;
+    bool is_leaf( node_type x ) const override;
 
     void preprocess() ;
 
-    size_t size() const ;
+    size_t size() const override;
 
     void init( const std::string &s, const std::vector<value_type> &weights ) ;
 
@@ -54,60 +55,76 @@ struct tree {
     virtual ~tree() ;
     virtual const std::vector<node_type> &kinder( node_type x ) const ;
 
-    mutable double sz{};
-    mutable bool flag{};
-
-    // virtual double size_in_bytes() const ;
-
     // delete the copy constructor
-    tree<node_type,size_type,value_type>( const tree<node_type,size_type,value_type> &other ) = delete;
+    tree<node_type,size_type,value_type>( const tree<node_type,size_type,value_type> &other ) = default;
     // delete the copy assignment
     tree<node_type,size_type,value_type>& operator = ( const tree<node_type,size_type,value_type> &other ) = delete;
-
     // move-constructor
     tree<node_type,size_type,value_type>( tree<node_type,size_type,value_type> &&other ) noexcept = delete ;
-
     // move-assignment
-    tree<node_type,size_type,value_type>& operator = ( tree<node_type,size_type,value_type> &&other ) noexcept ;
+    tree<node_type,size_type,value_type>& operator = ( tree<node_type,size_type,value_type> &&other ) noexcept = delete;
+
+    std::optional<node_type> ancestor(node_type x, size_type i) const override;
+
+    std::vector<node_type> children(node_type x) const override;
+
+    bool is_ancestor(node_type p, node_type x) const override;
 };
 
 template<typename node_type, typename size_type, typename value_type>
-node_type tree<node_type, size_type, value_type>::parent(node_type x) const {
-    return anc[x][0];
+std::optional<node_type> tree<node_type, size_type, value_type>::parent(node_type x) const {
+    assert( 0 <= x and x < n );
+    return p[x];
 }
 
 template<typename node_type, typename size_type, typename value_type>
 size_type tree<node_type, size_type, value_type>::depth(node_type x) const {
+    assert( 0 <= x and x < n );
     return d[x];
 }
 
 template<typename node_type, typename size_type, typename value_type>
 value_type tree<node_type, size_type, value_type>::weight(node_type x) const {
+    assert( 0 <= x and x < n );
     return w[x];
 }
 
 template<typename node_type, typename size_type, typename value_type>
-node_type tree<node_type, size_type, value_type>::up(node_type x, unsigned int u) const {
+std::optional<node_type> tree<node_type, size_type, value_type>::up(node_type x, unsigned int u) const {
+    assert( 0 <= x and x < n );
+    if ( u > d[x] ) return std::nullopt;
     for ( size_type k= 0; k < K and u; u>>= 1, ++k )
-        if ( u & 1 )
-            x= anc[x][k];
+        if ( u & 1 ) {
+            if ( k >= anc[x].size() ) {
+                std::cerr << "k= " << k << ", and K= " << K << std::endl;
+            }
+            assert( k < anc[x].size() );
+            assert( anc[x][k] );
+            x = *anc[x][k];
+        }
     return x;
 }
 
 template<typename node_type, typename size_type, typename value_type>
 node_type tree<node_type, size_type, value_type>::lca(node_type x, node_type y) const {
-    if ( d[x] > d[y] )
-        return lca(up(x,d[x]-d[y]),y);
+    // since up() is an internal use function, we know that up() exists
+    // so we take its value
+    if ( d[x] > d[y] ) {
+        auto z= up(x,d[x]-d[y]);
+        assert( z.has_value() );
+        return lca(*z,y);
+    }
     if ( d[x] < d[y] )
         return lca(y,x);
     if ( x == y )
         return x;
     for ( size_type k= K-1; k; --k ) {
-        assert( anc[x][k] == anc[y][k] );
-        if ( anc[x][k-1] != anc[y][k-1] )
-            x= anc[x][k-1], y= anc[y][k-1];
+        assert( anc[x][k] == anc[y][k] ); //both exist or nullopts
+        assert( *anc[x][k] == *anc[y][k] );
+        if ( *anc[x][k-1] != *anc[y][k-1] )
+            x= *anc[x][k-1], y= *anc[y][k-1];
     }
-    return anc[x][0];
+    return *anc[x][0];
 }
 
 template<typename node_type, typename size_type, typename value_type>
@@ -116,53 +133,59 @@ bool tree<node_type, size_type, value_type>::is_leaf(node_type x) const {
 }
 
 template<typename node_type, typename size_type, typename value_type>
-void tree<node_type, size_type, value_type>::shed_redudancy() {
-    adj= nullptr, p= nullptr;
+void tree<node_type, size_type, value_type>::shed_redundancy() {
+    adj.reset();
+    for ( auto &vec: anc )
+        vec.clear();
+    anc.clear();
 }
 
 template<typename node_type, typename size_type, typename value_type>
 void tree<node_type, size_type, value_type>::preprocess() {
     for ( node_type x= 0; x < n; ++x )
-        for ( size_type k= 0; k < K; ++k )
-            anc[x][k]= NO_ANC;
+        for ( auto &v: anc[x] )
+            v= std::nullopt;
     std::queue<node_type> q;
-    for ( node_type x= 0; x < n; d[x++]= std::numeric_limits<size_type>::max() ) ;
+    std::fill(d.begin(),d.end(),std::numeric_limits<size_type>::max());
     for ( d[root]= 0, q.push(root); not q.empty(); ) {
-        node_type x= q.front(); q.pop();
+        auto x= q.front(); q.pop();
         const auto &kind= kinder(x);
         for ( auto y: kind )
             if ( d[y] > d[x]+1 ) {
-                d[y]= d[anc[y][0]= x]+1;
-                for ( size_type k= 1; k < K and anc[y][k-1] != NO_ANC; anc[y][k]= anc[anc[y][k-1]][k-1], ++k ) ;
+                d[y]= d[*(anc[y][0]= x)]+1;
+                for ( size_type k= 1; k < K and k < anc[y].size() and anc[y][k-1];\
+                anc[y][k]= anc[*anc[y][k-1]][k-1], ++k ) ;
                 q.push(y);
             }
     }
-    for ( auto x= 0; x < n; ++x )
-        assert( d[x] < std::numeric_limits<size_type>::max() );
+    assert( std::find_if(d.begin(),d.end(),[]( auto v ) { return v == std::numeric_limits<size_type>::max(); }) == d.end() );
 }
 
 template<typename node_type, typename size_type, typename value_type>
 void tree<node_type, size_type, value_type>::init(const std::string &s, const std::vector<value_type> &weights) {
     for ( n= s.size()/2, K= 0; (1<<K)<=n; ++K ) ;
     adj= std::make_unique<std::vector<node_type>[]>(n);
-    p= std::make_unique<node_type[]>(n);
-    d= std::make_unique<size_type[]>(n);
+    p.resize(n);
+    std::fill(p.begin(),p.end(),std::nullopt);
+    d.resize(n);
     w= std::make_unique<value_type[]>(n);
-    anc= std::make_unique<std::unique_ptr<node_type[]>[]>(n);
-    for ( auto x= 0; x < n; ++x )
-        anc[x]= std::make_unique<node_type[]>(K);
+    anc.resize(n);
     std::stack<node_type> st;
     size_type V= root;
     for ( auto ch: s ) {
         if ( ch == '(' ) {
+            d[V]= st.size();
             if ( not st.empty() )
-                adj[p[V]= st.top()].push_back(V);
+                adj[*(p[V]= st.top())].push_back(V);
             st.push(V++);
             continue ;
         }
         assert( ch == ')' );
         st.pop();
     }
+    for ( auto &v: anc ) v.resize(K+1);
+    for ( auto x= 0; x < n; ++x )
+        assert( anc[x].size() >= K );
     for ( auto i= 0; i < n; w[i]= weights[i], ++i ) ;
     preprocess();
 }
@@ -209,24 +232,23 @@ double tree<node_type, size_type, value_type>::size_in_bytes() const {
 */
 
 template<typename node_type, typename size_type, typename value_type>
-tree<node_type, size_type, value_type> &
-tree<node_type, size_type, value_type>::operator=(tree<node_type, size_type, value_type> &&other) noexcept {
-    if ( this != &other ) {
-        this->n= other.n, this->K= other.K;
-        this->p= nullptr, this->p= std::move(other.p);
-        this->w= nullptr, this->w= std::move(other.w);
-        this->d= nullptr, this->d= std::move(other.d);
-        for ( auto x= 0; x < n; ++x )
-            this->anc[x]= nullptr, (void)(this->adj[x]);
-        this->anc= nullptr, this->anc= std::move(other.anc);
-        this->adj= nullptr, this->adj= std::move(other.adj);
-    }
-    return *this;
+size_t tree<node_type, size_type, value_type>::size() const {
+    return n;
 }
 
 template<typename node_type, typename size_type, typename value_type>
-size_t tree<node_type, size_type, value_type>::size() const {
-    return n;
+std::optional<node_type> tree<node_type, size_type, value_type>::ancestor(node_type x, size_type i) const {
+    return std::nullopt;
+}
+
+template<typename node_type, typename size_type, typename value_type>
+std::vector<node_type> tree<node_type, size_type, value_type>::children(node_type x) const {
+    return adj != nullptr ? adj[x] : std::vector<node_type>();
+}
+
+template<typename node_type, typename size_type, typename value_type>
+bool tree<node_type, size_type, value_type>::is_ancestor(node_type p, node_type x) const {
+    return false;
 }
 
 template<typename node_type, typename size_type, typename value_type>

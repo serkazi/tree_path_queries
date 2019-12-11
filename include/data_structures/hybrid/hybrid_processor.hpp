@@ -7,6 +7,7 @@
 #include "heavy_path_decomp.hpp"
 #include "range_tree_simple.hpp"
 #include "wavelet_tree.hpp"
+#include "bender_farach_colton.hpp"
 // #include "succinct_container.hpp" <-- we'll worry about memory later
 #include "path_query_processor.hpp"
 #include <memory>
@@ -23,6 +24,7 @@ private:
     std::unique_ptr<wavelet_tree<size_type,value_type>> wt= nullptr;
     std::unique_ptr<range_tree_simple<size_type,value_type>> rt= nullptr;
     std::shared_ptr<tree<node_type,size_type,value_type>> T= nullptr;
+    std::shared_ptr<lca_processor<node_type,size_type>> lca_proc= nullptr;
     void init() ;
 public:
 
@@ -85,7 +87,7 @@ value_type hybrid_processor<node_type,size_type,value_type>::weight_of(const nod
 
 template <typename node_type,typename size_type,typename value_type>
 value_type hybrid_processor<node_type,size_type,value_type>::query(const node_type x, const node_type y) const {
-    auto z= T->lca(x,y);
+    auto z= (*lca_proc)(x,y);
     auto len= T->depth(x)+T->depth(y)+1-2*T->depth(z);
     auto path= h->decompose_path(x,y);
     return wt->range_quantile(path,len>>1);
@@ -94,7 +96,7 @@ value_type hybrid_processor<node_type,size_type,value_type>::query(const node_ty
 template <typename node_type,typename size_type,typename value_type>
 value_type hybrid_processor<node_type,size_type,value_type>::selection(
         const node_type x, const node_type y, const size_type qntl) const {
-    auto z= T->lca(x,y);
+    auto z= (*lca_proc)(x,y);
     auto len= T->depth(x)+T->depth(y)+1-2*T->depth(z);
     auto path= h->decompose_path(x,y);
     return wt->range_quantile(
@@ -121,7 +123,7 @@ void hybrid_processor<node_type,size_type,value_type>
     auto path= h->decompose_path(x,y);
     for ( const auto &pr: path ) {
         std::vector<std::pair<value_type,size_type>> tmp;
-        rt->range_2d_reporting_query(pr.first,pr.second,a,b,tmp);
+        rt->range_2d_reporting_query(pr.first,pr.second,a,b,&tmp);
         res.insert(res.end(),tmp.begin(),tmp.end());
     }
 }
@@ -149,7 +151,9 @@ hybrid_processor<node_type,size_type,value_type>
 template <typename node_type,typename size_type,typename value_type>
 void hybrid_processor<node_type,size_type,value_type>::init() {
     assert( T != nullptr );
-    h= std::make_unique<heavy_path_decomp<node_type,size_type,value_type>>(T);
+    lca_proc= std::make_shared<lca_processor<node_type,size_type>>(T.get());
+    h= std::make_unique<heavy_path_decomp<node_type,size_type,value_type>>(T,lca_proc);
+    T->shed_redundancy(); //delete the child-information, since we are going to traverse upwards only
     const auto &src= h->get_chain();
     wt= std::make_unique<wavelet_tree<size_type,value_type>>(src);
     std::vector<typename range_tree_simple<size_type,value_type>::point2d> points;
@@ -157,6 +161,6 @@ void hybrid_processor<node_type,size_type,value_type>::init() {
     for ( auto l= 0; l < src.size(); ++l )
         points.emplace_back(l,src[l]);
     rt= std::make_unique<range_tree_simple<size_type,value_type>>(points);
-    T->shed_redudancy(); //delete the child-information, since we are going to traverse upwards only
+    // delete also the O(nlog(n))-word LCA answering structure, since we have lca_proc object now
 }
 #endif //SPQ_HYBRID_PROCESSOR_HPP

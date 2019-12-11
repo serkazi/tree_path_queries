@@ -131,21 +131,18 @@ private:
     }
 
     void search_along_left_ridge(
-            bool report,
             size_type idx, size_type l, size_type r, size_type trg,
             std::optional<size_type> sc, std::optional<size_type> pr,
-            result_type &result,
+            std::optional<result_type*> result,
             size_type &cnt ) const ;
     void search_along_right_ridge(
-            bool report,
             size_type idx, size_type l, size_type r, size_type trg,
             std::optional<size_type> sc, std::optional<size_type> pr,
-            result_type &result,
+            std::optional<result_type*> result,
             size_type &cnt ) const ;
-    void search_2d_range( bool report,
-                          size_type qi, size_type qj,
+    void search_2d_range( size_type qi, size_type qj,
                           value_type a, value_type b,
-                          result_type *result,
+                          std::optional<result_type*> result,
                           size_type &cnt
     ) const ;
     void construct_im( const std::vector<point2d> &pts ) ;
@@ -166,7 +163,7 @@ public:
     virtual size_type range_2d_counting_query( size_type qi, size_type qj, value_type a, value_type b ) const ;
     virtual void range_2d_reporting_query( size_type qi, size_type qj,
                                            value_type a, value_type b,
-                                           result_type &result ) const ;
+                                           std::optional<result_type*> result ) const ;
     /*
     virtual double size_in_bytes() const ;
     */
@@ -177,10 +174,9 @@ public:
 template<typename size_type, typename value_type>
 void
 range_tree_simple<size_type, value_type>::search_2d_range(
-        bool report,
         size_type qi, size_type qj,
         value_type a, value_type b,
-        range_tree_simple::result_type *result,
+        std::optional<range_tree_simple::result_type*> result,
         size_type &cnt) const
 {
     /**
@@ -213,7 +209,7 @@ range_tree_simple<size_type, value_type>::search_2d_range(
     if ( l == r ) {
         if ( a <= original[sorted_list[offset[idx]]].second and original[sorted_list[offset[idx]]].second <= b ) {
             ++cnt;
-            if ( report ) result->push_back(original[sorted_list[offset[idx]]]);
+            if ( result ) (*result)->push_back(original[sorted_list[offset[idx]]]);
         }
         return ;
     }
@@ -229,8 +225,8 @@ range_tree_simple<size_type, value_type>::search_2d_range(
          rsc= bridge(_right,_succ,idx,*sc),
          rpr= bridge(_right,_pred,idx,*pr);
 
-    search_along_left_ridge(report,2*idx+1,l,(l+r)/2,qi,lsc,lpr,*result,cnt);
-    search_along_right_ridge(report,2*idx+2,(l+r)/2+1,r,qj,rsc,rpr,*result,cnt);
+    search_along_left_ridge(2*idx+1,l,(l+r)/2,qi,lsc,lpr,result,cnt);
+    search_along_right_ridge(2*idx+2,(l+r)/2+1,r,qj,rsc,rpr,result,cnt);
 }
 
 template<typename size_type, typename value_type>
@@ -239,7 +235,7 @@ size_type range_tree_simple<size_type, value_type>
                           value_type a, value_type b)
 const {
     size_type cnt= 0;
-    search_2d_range(false,qi,qj,a,b,nullptr,cnt);
+    search_2d_range(qi,qj,a,b,std::nullopt,cnt);
     return cnt;
 }
 
@@ -247,10 +243,10 @@ template<typename size_type, typename value_type>
 void range_tree_simple<size_type, value_type>
 ::range_2d_reporting_query(size_type qi, size_type qj,
                            value_type a, value_type b,
-                           range_tree_simple::result_type &result)
+                           std::optional<range_tree_simple::result_type*> result)
 const {
     size_type cnt= 0;
-    search_2d_range(true,qi,qj,a,b,&result,cnt);
+    search_2d_range(qi,qj,a,b,result,cnt);
 }
 
 // destructor
@@ -314,10 +310,10 @@ void range_tree_simple<size_type, value_type>
 
 template<typename size_type, typename value_type>
 void range_tree_simple<size_type, value_type>
-::search_along_left_ridge(bool report, size_type idx, size_type l, size_type r,
+::search_along_left_ridge( size_type idx, size_type l, size_type r,
                           size_type trg,
                           std::optional<size_type> sc, std::optional<size_type> pr,
-                          range_tree_simple::result_type &result, size_type &cnt)
+                          std::optional<range_tree_simple::result_type*> result, size_type &cnt)
 const {
     if ( not(pr.has_value() and sc.has_value()) or *sc > *pr )
         return ;
@@ -329,7 +325,7 @@ const {
         // assert( valid_nodes->test(idx) );
         if ( l == r ) {
             auto it = offset[idx], jt = offset[idx];
-            for ( cnt+= (jt-it+1); it <= jt and report; result.push_back(original[sorted_list[it++]]) );
+            for ( cnt+= (jt-it+1); it <= jt and result; (*result)->push_back(original[sorted_list[it++]]) );
             return ;
         }
         auto mid= (l+r)/2;
@@ -340,7 +336,7 @@ const {
                  jt = bridge(_right,_pred,idx,*pr);
             if ( it.has_value() and jt.has_value() ) {
                 auto kt= it.value();
-                for ( cnt+= (jt.value()-kt+1); kt <= jt.value() and report; result.push_back(original[sorted_list[kt++]]) ) ;
+                for ( cnt+= (jt.value()-kt+1); kt <= jt.value() and result; (*result)->push_back(original[sorted_list[kt++]]) ) ;
             }
         }
         else where_to_descend_next= _right;
@@ -355,10 +351,10 @@ const {
 
 template<typename size_type, typename value_type>
 void range_tree_simple<size_type, value_type>
-::search_along_right_ridge(bool report, size_type idx, size_type l, size_type r,
+::search_along_right_ridge(size_type idx, size_type l, size_type r,
                            size_type trg,
                            std::optional<size_type> sc, std::optional<size_type> pr,
-                           range_tree_simple::result_type &result, size_type &cnt)
+                           std::optional<range_tree_simple::result_type*> result, size_type &cnt)
 const {
     //std::cerr << "Entering" << std::endl;
     if ( not(pr.has_value() and sc.has_value()) or *sc > *pr )
@@ -368,7 +364,7 @@ const {
         // assert( valid_nodes->test(idx) );
         if ( l == r ) {
             auto it = offset[idx], jt = offset[idx];
-            for ( cnt += (jt - it + 1); it <= jt and report; result.push_back(original[sorted_list[it++]]) ) ;
+            for ( cnt += (jt - it + 1); it <= jt and result; (*result)->push_back(original[sorted_list[it++]]) ) ;
             return ;
         }
         auto mid= (l+r)/2;
@@ -378,7 +374,7 @@ const {
             auto it = bridge(_left,_succ,idx,*sc), jt = bridge(_left,_pred,idx,*pr);
             if ( it.has_value() and jt.has_value() ) {
                 auto kt= it.value();
-                for ( cnt += (jt.value()-kt+1); kt <= jt.value() and report; result.push_back(original[sorted_list[kt++]]) );
+                for ( cnt += (jt.value()-kt+1); kt <= jt.value() and result; (*result)->push_back(original[sorted_list[kt++]]) );
             }
         }
         else where_to_descend_next= _left;

@@ -12,6 +12,7 @@
 #include <cassert>
 #include <memory>
 #include <queue>
+#include <bender_farach_colton.hpp>
 
 template<typename node_type= int, typename size_type= int, typename value_type= int>
 class heavy_path_decomp {
@@ -37,12 +38,14 @@ private:
                         std::vector<std::pair<size_type,size_type>> &res,
                         bool inclusive= false ) const ;
 
+    std::shared_ptr<lca_processor<node_type,size_type>> lca_proc= nullptr;
+
 public:
 
     virtual std::vector<std::pair<size_type,size_type>> decompose_path( node_type x, node_type y ) ;
     // copy assignment
     heavy_path_decomp &operator = ( const heavy_path_decomp &other ) = delete;
-    // comy constructor
+    // copy constructor
     heavy_path_decomp( const heavy_path_decomp &other ) = delete;
 
     // move assignment
@@ -52,7 +55,7 @@ public:
 
     size_type which_chain( node_type x ) const ;
     explicit heavy_path_decomp<node_type,size_type,value_type>( std::istream &is ) ;
-    heavy_path_decomp( std::shared_ptr<tree<node_type,size_type,value_type>> T ) ;
+    heavy_path_decomp( std::shared_ptr<tree<node_type,size_type,value_type>> T, std::shared_ptr<lca_processor<node_type,size_type>> proc ) ;
     size_type node2pos( node_type x ) const ;
     virtual const std::vector<value_type> &get_chain() const ;
     // virtual double size_in_bytes() const ;
@@ -74,7 +77,7 @@ node_type heavy_path_decomp<node_type, size_type, value_type>::head_of(size_type
 
 template<typename node_type, typename size_type, typename value_type>
 node_type heavy_path_decomp<node_type, size_type, value_type>::parent(node_type x) const {
-    return T->parent(x);
+    return T->parent(x).value();
 }
 
 // HPD using explicit stack
@@ -189,7 +192,7 @@ template<typename node_type, typename size_type, typename value_type>
 std::vector<std::pair<size_type, size_type>> heavy_path_decomp<node_type, size_type, value_type>
 ::decompose_path(node_type x, node_type y) {
 
-    node_type z= T->lca(x,y);
+    node_type z= (*lca_proc)(x,y); //we can not use the tree, since we have shed its redundancy
     auto ik= how_many_segments(z,x)+1+how_many_segments(z,y);
     auto len= T->depth(x)+T->depth(y)+1-2*T->depth(z);
     std::vector<std::pair<size_type,size_type>> segments;
@@ -200,7 +203,9 @@ std::vector<std::pair<size_type, size_type>> heavy_path_decomp<node_type, size_t
 }
 
 template<typename node_type, typename size_type, typename value_type>
-heavy_path_decomp<node_type, size_type, value_type>::heavy_path_decomp(std::shared_ptr<tree<node_type, size_type, value_type>> t) : T(t) {
+heavy_path_decomp<node_type, size_type, value_type>
+::heavy_path_decomp(std::shared_ptr<tree<node_type, size_type, value_type>> t, std::shared_ptr<lca_processor<node_type,size_type>> proc ) : T(t) {
+    lca_proc= proc;
     global_position.resize(T->n), which.resize(T->n);
     perform_decomposition();
 }

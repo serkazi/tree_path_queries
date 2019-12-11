@@ -102,7 +102,7 @@ namespace {
             // cerr << "["<<qi << "," << qj<<"]x[" <<qa<<","<<qb<<"]\n";
             auto bfres = brute_force_2dsearch(w, qi, qj, qa, qb);
             std::vector <std::pair<int, int>> rt_res;
-            (*uptr).range_2d_reporting_query(qi, qj, qa, qb, rt_res);
+            (*uptr).range_2d_reporting_query(qi, qj, qa, qb, &rt_res);
             ASSERT_EQ(equal_vectors(rt_res, bfres), true);
         }
     }
@@ -135,7 +135,7 @@ namespace {
             // cerr << "["<<qi << "," << qj<<"]x[" <<qa<<","<<qb<<"]\n";
             auto bfres = brute_force_2dsearch(w, qi, qj, qa, qb);
             std::vector<std::pair<int, int>> rt_res;
-            (*uptr).range_2d_reporting_query(qi, qj, qa, qb, rt_res);
+            (*uptr).range_2d_reporting_query(qi, qj, qa, qb, &rt_res);
             ASSERT_EQ(equal_vectors(rt_res, bfres), true);
         }
     }

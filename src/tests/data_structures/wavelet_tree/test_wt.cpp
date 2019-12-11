@@ -16,8 +16,10 @@ namespace {
     int kthmultiple(const std::vector<int> &w, const std::vector<std::pair<int, int>> &vec, int k) {
         std::vector<int> s;
         for (const auto &pr: vec) {
-            for (int i = pr.first; i <= pr.second; ++i)
+            for (int i = pr.first; i <= pr.second; ++i) {
+                assert( 0 <= i and i < (int)w.size() );
                 s.push_back(w[i]);
+            }
         }
         sort(begin(s), end(s));
         return s[k];
@@ -63,7 +65,8 @@ namespace {
             for (int l = 0; l + 1 < out.size(); l += 2)
                 vec.emplace_back(out[l], out[l + 1]), len += out[l + 1] - out[l] + 1;
             auto k = std::uniform_int_distribution<int>(0, len - 1)(*generator);
-            ASSERT_EQ(wt->range_quantile(vec, k), kthmultiple(w, vec, k));
+            auto copy_vec(vec);
+            ASSERT_EQ(wt->range_quantile(vec, k), kthmultiple(w, copy_vec, k));
         }
     }
 
@@ -84,6 +87,7 @@ namespace {
         for (auto it = 0; it < 7; ++it) {
             std::vector<int> in, out;
             in.resize(n), iota(begin(in), end(in), 0);
+            assert( in.back() == n-1 );
             std::sample(in.begin(), in.end(), std::back_inserter(out), 26, std::mt19937{std::random_device{}()});
             std::vector<std::pair<int, int>> vec;
             // picking up some intervals along [0,n-1]
@@ -91,7 +95,8 @@ namespace {
             for (int l = 0; l < out.size(); ++l)
                 vec.emplace_back(out[l], out[l]), ++len;
             auto k = std::uniform_int_distribution<int>(0, len - 1)(*generator);
-            ASSERT_EQ(wt->range_quantile(vec, k), kthmultiple(w, vec, k));
+            auto copy_vec(vec);
+            ASSERT_EQ(wt->range_quantile(vec, k), kthmultiple(w, copy_vec, k));
         }
     }
 }

@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 project(tree_path_queries)
 
-# find_library(GTest REQUIRED)
 set(CMAKE_CXX_STANDARD 17)
 
 set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
@@ -17,11 +16,13 @@ message(WARNING "Gtest include dir: " ${GTEST_INCLUDE_DIR})
 message(WARNING "Gtest library dir: " ${GTEST_LIBRARIES})
 message(WARNING "Gtest main library dir: " ${GTEST_MAIN_LIBRARIES})
 
+set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=undefined -O1 -fsanitize=address")
+set (CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=undefined -fsanitize=address")
+
 set(BENCHMARK_ROOT ~/local/benchmark/build/src)
 set(BENCHMARK_INCLUDE_DIR ~/local/benchmark/include)
 # set(BENCHMARK_ROOT /usr/local/lib/)
 # set(BENCHMARK_INCLUDE_DIR /usr/local/local/include)
-
 
 # set the variable point to the cmake-finder of nlohmann::json
 set(nlohmann_json_DIR ~/local/lib/cmake/nlohmann_json)
