@@ -626,8 +626,9 @@ public:
 		return (*m_path_off)[1] >> 1;
 	}
 
-	std::optional<node_type> parent(const node_type x) const override {
+	std::optional<node_type> parent(node_type x) const override {
 		auto p= parent(0,x);
+		return p;
 	}
 
 	std::vector<node_type> children(const node_type x) const override {

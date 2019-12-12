@@ -60,6 +60,9 @@ public:
     virtual const std::vector<value_type> &get_chain() const ;
     // virtual double size_in_bytes() const ;
     virtual ~heavy_path_decomp() ;
+
+    // a method to check the sanity of HPD
+    size_type num_segments( node_type x, node_type y ) const ;
 };
 
 template<typename node_type, typename size_type, typename value_type>
@@ -230,6 +233,12 @@ size_t heavy_path_decomp<node_type, size_type, value_type>::how_many_segments(no
     size_t sz= 0;
     for ( auto px= head_of(which_chain(x)); px != pp; x= parent(px), px= head_of(which_chain(x)), ++sz ) ;
     return ++sz;
+}
+
+template<typename node_type, typename size_type, typename value_type>
+size_type heavy_path_decomp<node_type, size_type, value_type>::num_segments( node_type x, node_type y ) const {
+    auto z= (*lca_proc)(x,y);
+    return how_many_segments(z,x)+how_many_segments(z,y);
 }
 
 template<typename node_type, typename size_type, typename value_type>

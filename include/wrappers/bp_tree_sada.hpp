@@ -64,7 +64,7 @@ public:
 		bp_sada = sdsl::bp_support_sada<t_sml_blk,t_med_deg,t_rank,t_select>(m_bv.get());
 	}
 
-	node_type lca( node_type x, node_type y ) const {
+	node_type lca( node_type x, node_type y ) const override {
 		if ( is_ancestor(x,y) )
 			return x;
 		if ( is_ancestor(y,x) )
@@ -81,7 +81,7 @@ public:
 	}
 
 	// tree info
-	size_type size() const {
+	size_type size() const override {
 		return bp_sada.size()>>1;
 	}
 

@@ -263,5 +263,11 @@ public:
 	[[nodiscard]] bool is_leaf(node_type x) const override {
 		return original->is_leaf(x);
 	}
+
+	// a method to check the sanity of HPD
+	size_type num_segments( node_type x, node_type y ) const {
+        auto z = original->lca(x,y);
+        return how_many_segments(z,x)+1+how_many_segments(z,y);
+	}
 };
 #endif

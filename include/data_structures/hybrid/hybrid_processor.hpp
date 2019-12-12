@@ -56,6 +56,9 @@ public:
 
     //double bits_per_node() const override;
     virtual ~hybrid_processor() = default;
+
+    // a few methods to check the sanity of HPD
+    size_type num_segments( node_type x, node_type y ) const ;
 };
 
 // move ctor
@@ -163,4 +166,10 @@ void hybrid_processor<node_type,size_type,value_type>::init() {
     rt= std::make_unique<range_tree_simple<size_type,value_type>>(points);
     // delete also the O(nlog(n))-word LCA answering structure, since we have lca_proc object now
 }
+
+template<typename node_type, typename size_type, typename value_type>
+size_type hybrid_processor<node_type, size_type, value_type>::num_segments( node_type x, node_type y ) const {
+    return h->num_segments(x,y);
+}
+
 #endif //SPQ_HYBRID_PROCESSOR_HPP

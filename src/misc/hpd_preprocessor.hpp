@@ -88,7 +88,8 @@ private:
 	    std::stack<node_type> node_stack;
 	    std::stack<size_type> child_idx_stack;
 
-	    for (;not node_stack.empty(); node_stack.pop() ) ;
+	    for (;not node_stack.empty(); node_stack.pop() )
+	        ;
         for (;not child_idx_stack.empty(); child_idx_stack.pop() ) ;
 
         std::unique_ptr<bool[]> seen= std::make_unique<bool[]>(n);
@@ -145,7 +146,8 @@ private:
 	    std::stack<size_type> child_idx_stack;
 	    std::stack<bool> is_start;
 
-	    for (;not node_stack.empty(); node_stack.pop() ) ;
+	    for (;not node_stack.empty(); node_stack.pop() )
+	        ;
         for (;not child_idx_stack.empty(); child_idx_stack.pop() ) ;
         for (;not is_start.empty(); is_start.pop() ) ;
 
@@ -166,7 +168,8 @@ private:
 	        auto children= T->children(x);
 	        auto sz= children.size();
 
-	        for ( l= 0; l < (int)children.size() and seen[y= children[i]]; ++l, ++i, i%= sz ) ;
+	        for ( l= 0; l < (int)children.size() and seen[y= children[i]]; ++l, ++i, i%= sz )
+	            ;
             if ( l == (int)children.size() ) continue ;
 
             node_stack.push(x), child_idx_stack.push(0), is_start.push(false);
@@ -219,7 +222,8 @@ public:
 		auto B= sdsl::bit_vector(2*n,0);
 		for ( k= 0, x= 0; x < n; ++x ) {
 			B[k++]= 1, ch= which_chain[x];
-			if ( head_of_chain[ch] == x and (k+= len[ch]) ) ;
+			if ( head_of_chain[ch] == x and (k+= len[ch]) )
+			    ;
 		}
 
 		assert( k == 2*n );
