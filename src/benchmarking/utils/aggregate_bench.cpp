@@ -70,9 +70,82 @@ using tree_ext_sct_rrr  = tree_ext_sct<
 
 const std::string root= "/users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/";
 
+// having the structure "shared_info", we make sure our processors run the exact same query-set
+// and save some time into the bargain
 namespace experiment_settings {
     std::string dataset_path;
     int K, nq;
+
+    struct shared_info {
+        std::default_random_engine engine{};
+        std::unique_ptr<std::uniform_int_distribution<node_type>> distribution;
+        std::unique_ptr<std::uniform_int_distribution<value_type>> weight_distribution;
+        std::vector<path_queries::counting_query<node_type,size_type,value_type>> cnt_queries;
+        std::vector<path_queries::reporting_query<node_type,size_type,value_type>> rpt_queries;
+        std::vector<path_queries::median_query<node_type,size_type,value_type>> med_queries;
+
+        shared_info() {
+            size_type n;
+            std::cerr << "Reading dataset: " << dataset_path << std::endl;
+            std::ifstream is(experiment_settings::dataset_path);
+            std::string topology;
+            is >> topology;
+            std::vector<value_type> w(n= topology.size()/2);
+            for ( auto &x: w ) is >> x;
+
+            auto a= *(std::min_element(w.begin(),w.end()));
+            auto b= *(std::max_element(w.begin(),w.end()));
+            distribution= std::make_unique<std::uniform_int_distribution<node_type>>(0,n-1);
+            weight_distribution= std::make_unique<std::uniform_int_distribution<value_type>>(a,b);
+
+            // generate the queries using our builder
+            query_stream_builder<node_type,size_type,value_type> builder;
+            builder.set(path_queries::QUERY_TYPE::COUNTING,experiment_settings::nq)
+                    .set(path_queries::QUERY_TYPE::MEDIAN,experiment_settings::nq)
+                    .set(path_queries::QUERY_TYPE::REPORTING,experiment_settings::nq)
+                    .set_scaling_param(experiment_settings::K)
+                    .set_node_range(n)
+                    .set_weight_range(a,b)
+                    .build();
+
+            // insert all the queries into our internal storage, so that we can partition it
+            std::vector<path_queries::pq_request<node_type,size_type,value_type>> qrs(builder.begin(),builder.end());
+
+            // clear the builder to save space
+            builder.clear();
+
+            // partition the queries such that our filtered benchmarks can access only the relevant kind
+            auto counting_end= std::partition(qrs.begin(),qrs.end(),[&]( const auto &q ) {
+                return std::holds_alternative<
+                        path_queries::counting_query<node_type,size_type,value_type>>(q);
+            });
+            auto reporting_end= std::partition(counting_end,qrs.end(),[&]( const auto &q ) {
+                return std::holds_alternative<
+                        path_queries::reporting_query<node_type,size_type,value_type>>(q);
+            });
+            auto median_end= std::partition(reporting_end,qrs.end(),[&]( const auto &q ) {
+                return std::holds_alternative<
+                        path_queries::median_query<node_type,size_type,value_type>>(q);
+            });
+            // unpack the values, so that we don't have to unpack them during the benchmark runs
+            std::transform(qrs.begin(),counting_end,std::back_inserter(cnt_queries),[&]( const auto &qr ) {
+                return std::get<path_queries::counting_query<node_type,size_type,value_type>>(qr);
+            });
+            std::transform(counting_end,reporting_end,std::back_inserter(rpt_queries),[&]( const auto &qr ) {
+                return std::get<path_queries::reporting_query<node_type,size_type,value_type>>(qr);
+            });
+            std::transform(reporting_end,qrs.end(),std::back_inserter(med_queries),[&]( const auto &qr ) {
+                return std::get<path_queries::median_query<node_type,size_type,value_type>>(qr);
+            });
+            qrs.clear();
+        }
+
+        virtual ~shared_info() = default;
+
+    };
+
+    std::unique_ptr<shared_info> shared_info_obj= nullptr;
+
 }
 
 /**
@@ -88,12 +161,6 @@ class path_queries_benchmark: public benchmark::Fixture {
 protected:
     size_type n;
     std::unique_ptr<T> processor;
-    std::default_random_engine engine{};
-    std::unique_ptr<std::uniform_int_distribution<node_type>> distribution;
-    std::unique_ptr<std::uniform_int_distribution<value_type>> weight_distribution;
-    std::vector<path_queries::counting_query<node_type,size_type,value_type>> cnt_queries;
-    std::vector<path_queries::reporting_query<node_type,size_type,value_type>> rpt_queries;
-    std::vector<path_queries::median_query<node_type,size_type,value_type>> med_queries;
 public:
     void SetUp(const ::benchmark::State& state) {
         std::ifstream is(experiment_settings::dataset_path);
@@ -101,52 +168,8 @@ public:
         is >> topology;
         std::vector<value_type> w(n= topology.size()/2);
         for ( auto &x: w ) is >> x;
-        auto a= *(std::min_element(w.begin(),w.end()));
-        auto b= *(std::max_element(w.begin(),w.end()));
         processor= std::make_unique<T>(topology,w);
-        distribution= std::make_unique<std::uniform_int_distribution<node_type>>(0,n-1);
-        weight_distribution= std::make_unique<std::uniform_int_distribution<value_type>>(a,b);
 
-        // generate the queries using our builder
-        query_stream_builder<node_type,size_type,value_type> builder;
-        builder.set(path_queries::QUERY_TYPE::COUNTING,experiment_settings::nq)
-               .set(path_queries::QUERY_TYPE::MEDIAN,experiment_settings::nq)
-               .set(path_queries::QUERY_TYPE::REPORTING,experiment_settings::nq)
-               .set_scaling_param(experiment_settings::K)
-               .set_node_range(n)
-               .set_weight_range(a,b)
-               .build();
-
-        // insert all the queries into our internal storage, so that we can partition it
-        std::vector<path_queries::pq_request<node_type,size_type,value_type>> qrs(builder.begin(),builder.end());
-
-        // clear the builder to save space
-        builder.clear();
-
-        // partition the queries such that our filtered benchmarks can access only the relevant kind
-        auto counting_end= std::partition(qrs.begin(),qrs.end(),[&]( const auto &q ) {
-            return std::holds_alternative<
-                    path_queries::counting_query<node_type,size_type,value_type>>(q);
-        });
-        auto reporting_end= std::partition(counting_end,qrs.end(),[&]( const auto &q ) {
-            return std::holds_alternative<
-                    path_queries::reporting_query<node_type,size_type,value_type>>(q);
-        });
-        auto median_end= std::partition(reporting_end,qrs.end(),[&]( const auto &q ) {
-            return std::holds_alternative<
-                    path_queries::median_query<node_type,size_type,value_type>>(q);
-        });
-        // unpack the values, so that we don't have to unpack them during the benchmark runs
-        std::transform(qrs.begin(),counting_end,std::back_inserter(cnt_queries),[&]( const auto &qr ) {
-            return std::get<path_queries::counting_query<node_type,size_type,value_type>>(qr);
-        });
-        std::transform(counting_end,reporting_end,std::back_inserter(rpt_queries),[&]( const auto &qr ) {
-            return std::get<path_queries::reporting_query<node_type,size_type,value_type>>(qr);
-        });
-        std::transform(reporting_end,qrs.end(),std::back_inserter(med_queries),[&]( const auto &qr ) {
-            return std::get<path_queries::median_query<node_type,size_type,value_type>>(qr);
-        });
-        qrs.clear();
     }
     void TearDown(const ::benchmark::State& state) {
         //some clean-up
@@ -166,7 +189,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_median,nv)(benchmark::State &stat
     for ( auto _ : state ) {
         auto start = std::chrono::high_resolution_clock::now();
         // the code that gets measured
-        const auto &dict= med_queries;
+        const auto &dict= experiment_settings::shared_info_obj->med_queries;
         for ( const auto &qr: dict ) {
             auto res = median(qr.x_,qr.y_);
             benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
@@ -182,7 +205,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_lca_median,nv_lca)(benchmark::Sta
     for ( auto _ : state ) {
         auto start = std::chrono::high_resolution_clock::now();
         // the code that gets measured
-        const auto &dict= med_queries;
+        const auto &dict= experiment_settings::shared_info_obj->med_queries;
         for ( const auto &qr: dict ) {
             auto res = median(qr.x_,qr.y_);
             benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
@@ -198,7 +221,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,nsrs_median,nv_succ)(benchmark::Stat
     for ( auto _ : state ) {
         auto start = std::chrono::high_resolution_clock::now();
         // the code that gets measured
-        const auto &dict= med_queries;
+        const auto &dict= experiment_settings::shared_info_obj->med_queries;
         for ( const auto &qr: dict ) {
             auto res = median(qr.x_,qr.y_);
             benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
@@ -214,7 +237,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,hybrid_median,hybrid)(benchmark::Sta
     for ( auto _ : state ) {
         auto start = std::chrono::high_resolution_clock::now();
         // the code that gets measured
-        const auto &dict= med_queries;
+        const auto &dict= experiment_settings::shared_info_obj->med_queries;
         for ( const auto &qr: dict ) {
             auto res = median(qr.x_,qr.y_);
             benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
@@ -231,7 +254,8 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,tree_ext_ptr_median,tree_ext_ptr)(be
     for ( auto _ : state ) {
         auto start = std::chrono::high_resolution_clock::now();
         // the code that gets measured
-        const auto &dict= med_queries;
+        // const auto &dict= med_queries;
+        const auto &dict= experiment_settings::shared_info_obj->med_queries;
         for ( const auto &qr: dict ) {
             auto res = median(qr.x_,qr.y_);
             benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
@@ -248,7 +272,8 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,tree_ext_sct_un_median,tree_ext_sct_
     for ( auto _ : state ) {
         auto start = std::chrono::high_resolution_clock::now();
         // the code that gets measured
-        const auto &dict= med_queries;
+        // const auto &dict= med_queries;
+        const auto &dict= experiment_settings::shared_info_obj->med_queries;
         for ( const auto &qr: dict ) {
             auto res = median(qr.x_,qr.y_);
             benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
@@ -265,7 +290,8 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,tree_ext_sct_rrr_median,tree_ext_sct
     for ( auto _ : state ) {
         auto start = std::chrono::high_resolution_clock::now();
         // the code that gets measured
-        const auto &dict= med_queries;
+        // const auto &dict= med_queries;
+        const auto &dict= experiment_settings::shared_info_obj->med_queries;
         for ( const auto &qr: dict ) {
             auto res = median(qr.x_,qr.y_);
             benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
@@ -282,7 +308,8 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,wt_hpd_un_median,wt_hpd_uncompressed
     for ( auto _ : state ) {
         auto start = std::chrono::high_resolution_clock::now();
         // the code that gets measured
-        const auto &dict= med_queries;
+        // const auto &dict= med_queries;
+        const auto &dict= experiment_settings::shared_info_obj->med_queries;
         for ( const auto &qr: dict ) {
             auto res = median(qr.x_,qr.y_);
             benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
@@ -299,7 +326,8 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,wt_hpd_rrr_median,wt_hpd_rrr)(benchm
     for ( auto _ : state ) {
         auto start = std::chrono::high_resolution_clock::now();
         // the code that gets measured
-        const auto &dict= med_queries;
+        // const auto &dict= med_queries;
+        const auto &dict= experiment_settings::shared_info_obj->med_queries;
         for ( const auto &qr: dict ) {
             auto res = median(qr.x_,qr.y_);
             benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
@@ -314,7 +342,8 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,wt_hpd_rrr_median,wt_hpd_rrr)(benchm
 
 //=============================== Counting ==============================================/
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_counting,nv)(benchmark::State &state) {
-    const auto &dict= cnt_queries;
+    // const auto &dict= cnt_queries;
+    const auto &dict= experiment_settings::shared_info_obj->cnt_queries;
     for ( auto _ : state ) {
         auto start = std::chrono::high_resolution_clock::now();
         // the code that gets measured
@@ -330,7 +359,8 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_counting,nv)(benchmark::State &st
     }
 }
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_lca_counting,nv_lca)(benchmark::State &state) {
-    const auto &dict= cnt_queries;
+    // const auto &dict= cnt_queries;
+    const auto &dict= experiment_settings::shared_info_obj->cnt_queries;
     for ( auto _ : state ) {
         auto start = std::chrono::high_resolution_clock::now();
         // the code that gets measured
@@ -346,7 +376,8 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_lca_counting,nv_lca)(benchmark::S
     }
 }
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,nsrs_counting,nv_succ)(benchmark::State &state) {
-    const auto &dict= cnt_queries;
+    // const auto &dict= cnt_queries;
+    const auto &dict= experiment_settings::shared_info_obj->cnt_queries;
     for ( auto _ : state ) {
         auto start = std::chrono::high_resolution_clock::now();
         // the code that gets measured
@@ -362,7 +393,8 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,nsrs_counting,nv_succ)(benchmark::St
     }
 }
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,hybrid_counting,hybrid)(benchmark::State &state) {
-    const auto &dict= cnt_queries;
+    // const auto &dict= cnt_queries;
+    const auto &dict= experiment_settings::shared_info_obj->cnt_queries;
     for ( auto _ : state ) {
         auto start = std::chrono::high_resolution_clock::now();
         // the code that gets measured
@@ -378,7 +410,8 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,hybrid_counting,hybrid)(benchmark::S
     }
 }
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,tree_ext_ptr_counting,tree_ext_ptr)(benchmark::State &state) {
-    const auto &dict= cnt_queries;
+    // const auto &dict= cnt_queries;
+    const auto &dict= experiment_settings::shared_info_obj->cnt_queries;
     for ( auto _ : state ) {
         auto start = std::chrono::high_resolution_clock::now();
         // the code that gets measured
@@ -394,7 +427,8 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,tree_ext_ptr_counting,tree_ext_ptr)(
     }
 }
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,tree_ext_sct_un_counting,tree_ext_sct_un)(benchmark::State &state) {
-    const auto &dict= cnt_queries;
+    // const auto &dict= cnt_queries;
+    const auto &dict= experiment_settings::shared_info_obj->cnt_queries;
     for ( auto _ : state ) {
         auto start = std::chrono::high_resolution_clock::now();
         // the code that gets measured
@@ -410,7 +444,8 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,tree_ext_sct_un_counting,tree_ext_sc
     }
 }
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,tree_ext_sct_rrr_counting,tree_ext_sct_rrr)(benchmark::State &state) {
-    const auto &dict= cnt_queries;
+    // const auto &dict= cnt_queries;
+    const auto &dict= experiment_settings::shared_info_obj->cnt_queries;
     for ( auto _ : state ) {
         auto start = std::chrono::high_resolution_clock::now();
         // the code that gets measured
@@ -427,7 +462,8 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,tree_ext_sct_rrr_counting,tree_ext_s
 }
 
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,wt_hpd_uncompressed_counting,wt_hpd_uncompressed)(benchmark::State &state) {
-    const auto &dict= cnt_queries;
+    // const auto &dict= cnt_queries;
+    const auto &dict= experiment_settings::shared_info_obj->cnt_queries;
     for ( auto _ : state ) {
         auto start = std::chrono::high_resolution_clock::now();
         // the code that gets measured
@@ -444,7 +480,8 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,wt_hpd_uncompressed_counting,wt_hpd_
 }
 
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,wt_hpd_rrr_counting,wt_hpd_rrr)(benchmark::State &state) {
-    const auto &dict= cnt_queries;
+    // const auto &dict= cnt_queries;
+    const auto &dict= experiment_settings::shared_info_obj->cnt_queries;
     for ( auto _ : state ) {
         auto start = std::chrono::high_resolution_clock::now();
         // the code that gets measured
@@ -462,7 +499,8 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,wt_hpd_rrr_counting,wt_hpd_rrr)(benc
 
 //=============================== Reporting ==============================================/
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_reporting,nv)(benchmark::State &state) {
-    const auto &dict= rpt_queries;
+    // const auto &dict= rpt_queries;
+    const auto &dict= experiment_settings::shared_info_obj->rpt_queries;
     std::vector<std::pair<value_type,size_type>> res;
     for ( auto _ : state ) {
         auto start = std::chrono::high_resolution_clock::now();
@@ -480,7 +518,8 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_reporting,nv)(benchmark::State &s
     }
 }
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_lca_reporting,nv_lca)(benchmark::State &state) {
-    const auto &dict= rpt_queries;
+    // const auto &dict= rpt_queries;
+    const auto &dict= experiment_settings::shared_info_obj->rpt_queries;
     std::vector<std::pair<value_type,size_type>> res;
     for ( auto _ : state ) {
         auto start = std::chrono::high_resolution_clock::now();
@@ -498,7 +537,8 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_lca_reporting,nv_lca)(benchmark::
     }
 }
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,nsrs_reporting,nv_succ)(benchmark::State &state) {
-    const auto &dict= rpt_queries;
+    // const auto &dict= rpt_queries;
+    const auto &dict= experiment_settings::shared_info_obj->rpt_queries;
     std::vector<std::pair<value_type,size_type>> res;
     for ( auto _ : state ) {
         auto start = std::chrono::high_resolution_clock::now();
@@ -516,7 +556,8 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,nsrs_reporting,nv_succ)(benchmark::S
     }
 }
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,hybrid_reporting,hybrid)(benchmark::State &state) {
-    const auto &dict= rpt_queries;
+    // const auto &dict= rpt_queries;
+    const auto &dict= experiment_settings::shared_info_obj->rpt_queries;
     std::vector<std::pair<value_type,size_type>> res;
     for ( auto _ : state ) {
         auto start = std::chrono::high_resolution_clock::now();
@@ -535,7 +576,8 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,hybrid_reporting,hybrid)(benchmark::
 }
 
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,tree_ext_ptr_reporting,tree_ext_ptr)(benchmark::State &state) {
-    const auto &dict= rpt_queries;
+    // const auto &dict= rpt_queries;
+    const auto &dict= experiment_settings::shared_info_obj->rpt_queries;
     std::vector<std::pair<value_type,size_type>> res;
     for ( auto _ : state ) {
         auto start = std::chrono::high_resolution_clock::now();
@@ -554,7 +596,8 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,tree_ext_ptr_reporting,tree_ext_ptr)
 }
 
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,tree_ext_sct_un_reporting,tree_ext_sct_un)(benchmark::State &state) {
-    const auto &dict= rpt_queries;
+    // const auto &dict= rpt_queries;
+    const auto &dict= experiment_settings::shared_info_obj->rpt_queries;
     std::vector<std::pair<value_type,size_type>> res;
     for ( auto _ : state ) {
         auto start = std::chrono::high_resolution_clock::now();
@@ -572,7 +615,8 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,tree_ext_sct_un_reporting,tree_ext_s
     }
 }
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,tree_ext_sct_rrr_reporting,tree_ext_sct_rrr)(benchmark::State &state) {
-    const auto &dict= rpt_queries;
+    // const auto &dict= rpt_queries;
+    const auto &dict= experiment_settings::shared_info_obj->rpt_queries;
     std::vector<std::pair<value_type,size_type>> res;
     for ( auto _ : state ) {
         auto start = std::chrono::high_resolution_clock::now();
@@ -591,7 +635,8 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,tree_ext_sct_rrr_reporting,tree_ext_
 }
 
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,wt_hpd_uncompressed_reporting,wt_hpd_uncompressed)(benchmark::State &state) {
-    const auto &dict= rpt_queries;
+    // const auto &dict= rpt_queries;
+    const auto &dict= experiment_settings::shared_info_obj->rpt_queries;
     std::vector<std::pair<value_type,size_type>> res;
     for ( auto _ : state ) {
         auto start = std::chrono::high_resolution_clock::now();
@@ -610,7 +655,8 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,wt_hpd_uncompressed_reporting,wt_hpd
 }
 
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,wt_hpd_rrr_reporting,wt_hpd_rrr)(benchmark::State &state) {
-    const auto &dict= rpt_queries;
+    // const auto &dict= rpt_queries;
+    const auto &dict= experiment_settings::shared_info_obj->rpt_queries;
     std::vector<std::pair<value_type,size_type>> res;
     for ( auto _ : state ) {
         auto start = std::chrono::high_resolution_clock::now();
@@ -636,7 +682,7 @@ BENCHMARK(path_queries_benchmark<naive_processor_lca>)->Unit(benchmark::kMillise
 BENCHMARK(path_queries_benchmark<nsrs>)->Unit(benchmark::kMillisecond);
 BENCHMARK(path_queries_benchmark<hybrid_processor>)->Unit(benchmark::kMillisecond);
 BENCHMARK(path_queries_benchmark<tree_ext_sct_un>)->Unit(benchmark::kMillisecond);
- */
+*/
 
 static void CustomArguments(benchmark::internal::Benchmark* b) {
     for (int i = 0; i <= 10; ++i)
@@ -679,6 +725,9 @@ int main (int argc, char** argv)
     experiment_settings::dataset_path= std::string(argv[FULL_PATH]);
     experiment_settings::K           = strtol(argv[K_VAL],nullptr,10);
     experiment_settings::nq          = strtol(argv[NUM_QUERIES],nullptr,10);
+
+    // set up the shared object, such that the common set of queries is generated beforehand
+    experiment_settings::shared_info_obj= std::make_unique<experiment_settings::shared_info>();
 
     std::cerr << "Dataset path: " << experiment_settings::dataset_path << std::endl;
     ::benchmark::Initialize (&argc, argv);

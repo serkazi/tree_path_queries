@@ -57,6 +57,7 @@ public:
         auto b= *(std::max_element(w.begin(),w.end()));
         try {
             processor = std::make_unique<T>(topology, w);
+            std::cerr << "Data structure has been built" << std::endl;
         } catch ( std::exception &e ) {
             std::cerr << e.what() << std::endl;
         }
@@ -66,7 +67,7 @@ public:
     void TearDown(const ::benchmark::State& state) {
         //some clean-up
     }
-    auto num_semgnets( node_type x, node_type y ) {
+    auto num_segments(node_type x, node_type y ) {
         return processor->num_segments(x,y);
     }
 };
@@ -76,7 +77,7 @@ BENCHMARK_TEMPLATE_F(hpd_benchmark,hybrid,hybrid)(benchmark::State &state) {
     for ( auto _ : state ) {
         // the code that gets measured
         auto x= dice(), y= dice();
-        auto res= num_semgnets(x,y) ;
+        auto res= num_segments(x, y) ;
         benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
         benchmark::ClobberMemory(); // <-- took these lines from the documentation,
         // TODO: present this as a number of iterations
@@ -91,7 +92,7 @@ BENCHMARK_TEMPLATE_F(hpd_benchmark,wt_hpd,wt_hpd_uncompressed)(benchmark::State 
     for ( auto _ : state ) {
         // the code that gets measured
         auto x= dice(), y= dice();
-        auto res= num_semgnets(x,y) ;
+        auto res= num_segments(x, y) ;
         benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
         benchmark::ClobberMemory(); // <-- took these lines from the documentation,
         // TODO: present this as a number of iterations
@@ -107,7 +108,7 @@ BENCHMARK_TEMPLATE_F(hpd_benchmark,wt_hpd_rrr,wt_hpd_rrr)(benchmark::State &stat
         // the code that gets measured
         state.PauseTiming(); // <-- need to pause for a set up though
         auto x= dice(), y= dice();
-        auto res= num_semgnets(x,y) ;
+        auto res= num_segments(x, y) ;
         benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
         benchmark::ClobberMemory(); // <-- took these lines from the documentation,
         // TODO: present this as a number of iterations
