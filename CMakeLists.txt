@@ -6,7 +6,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
 set(THREADS_PREFER_PTHREAD_FLAG TRUE)
 
-add_compile_options(-mcmodel=large -g -O2)
+SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -mcmodel=large -O2 -g -DNDEBUG")
+# add_compile_options(-mcmodel=large -O2 -g -DNDEBUG)
 
 find_package(Threads REQUIRED)
 # adding gtest as a subproject
@@ -15,9 +16,11 @@ find_package(GTest REQUIRED)
 message(WARNING "Gtest include dir: " ${GTEST_INCLUDE_DIR})
 message(WARNING "Gtest library dir: " ${GTEST_LIBRARIES})
 message(WARNING "Gtest main library dir: " ${GTEST_MAIN_LIBRARIES})
+message(WARNING "CXX compiler used: " ${CMAKE_CXX_COMPILER_ID})
+message(WARNING "CXX compiler flags: " ${CMAKE_CXX_FLAGS})
 
-set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=undefined -O1 -fsanitize=address")
-set (CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=undefined -fsanitize=address")
+# set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=undefined -O1 -fsanitize=address")
+# set (CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=undefined -fsanitize=address")
 
 set(BENCHMARK_ROOT ~/local/benchmark/build/src)
 set(BENCHMARK_INCLUDE_DIR ~/local/benchmark/include)
@@ -29,16 +32,16 @@ set(nlohmann_json_DIR ~/local/lib/cmake/nlohmann_json)
 find_package(nlohmann_json 3.2.0 REQUIRED)
 
 # Qt5 inclusion
-# set(CMAKE_AUTOMOC ON)
-# set(CMAKE_AUTORCC ON)
-# set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOUIC ON)
 
-# if(CMAKE_VERSION VERSION_LESS "3.7.0")
-#     set(CMAKE_INCLUDE_CURRENT_DIR ON)
-# endif()
+if(CMAKE_VERSION VERSION_LESS "3.7.0")
+    set(CMAKE_INCLUDE_CURRENT_DIR ON)
+endif()
 
-# set(CMAKE_MODULE_PATH /users/grad/kazi/Qt)
-# find_package(Qt5 COMPONENTS Widgets REQUIRED)
+set(CMAKE_MODULE_PATH /usr/lib/qt5)
+find_package(Qt5 COMPONENTS Widgets REQUIRED)
 #end of Qt5 inclusion
 
 # find_package(sdsl REQUIRED)
