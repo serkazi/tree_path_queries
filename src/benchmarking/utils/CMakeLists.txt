@@ -27,7 +27,7 @@ target_link_libraries(
         PUBLIC
         benchmark benchmark_main pthread nlohmann_json::nlohmann_json naive
         hybrid wt_hpd ext_ptr tree_ext_sct)
-target_link_directories(hunch_bench PUBLIC ${BENCHMARK_ROOT})
+target_link_directories(aggregate_bench PUBLIC ${BENCHMARK_ROOT})
 target_include_directories(
         aggregate_bench
         PUBLIC

@@ -13,15 +13,21 @@
 #include <QtWidgets/QMenuBar>
 #include "qcustomplot.h"
 
+#include <iostream>
+#include "fixed_dataset_manager.hpp"
+
 class UserControls: public QWidget {
-// Q_OBJECT
+Q_OBJECT
+private:
+    std::vector<QCheckBox *> boxes;
+    const std::vector<std::string> &ds= experiments::hrnames;
 public:
     UserControls(QWidget *parent = nullptr): QWidget(parent) {
         QGridLayout *grid = new QGridLayout();
-        grid->addWidget(createFirstExclusiveGroup(), 0, 0);
-        grid->addWidget(createSecondExclusiveGroup(), 1, 0);
-        grid->addWidget(createNonExclusiveGroup(), 0, 1);
-        grid->addWidget(createPushButtonGroup(), 1, 1);
+        grid->addWidget(createFirstExclusiveGroup(), 0, 2);
+        grid->addWidget(createSecondExclusiveGroup(), 1, 2);
+        grid->addWidget(createNonExclusiveGroup(), 0, 3);
+        grid->addWidget(createPushButtonGroup(), 1, 3);
 
         QCustomPlot *customPlot= new QCustomPlot;
         QVector<double> x(101), y(101); // initialize with entries 0..100
@@ -40,7 +46,7 @@ public:
         customPlot->xAxis->setRange(-1, 1);
         customPlot->yAxis->setRange(0, 1);
         customPlot->replot();
-        grid->addWidget(customPlot,2,0,1,2);
+        grid->addWidget(customPlot,0,0,2,2);
         setLayout(grid);
         setWindowTitle(tr("Group Boxes"));
         resize(480, 320);
@@ -68,13 +74,13 @@ private:
         QRadioButton *radio2 = new QRadioButton(tr("medium"));
         QRadioButton *radio3 = new QRadioButton(tr("small"));
         radio1->setChecked(true);
-        QCheckBox *checkBox = new QCheckBox(tr("Ind&ependent checkbox"));
-        checkBox->setChecked(true);
+        //QCheckBox *checkBox = new QCheckBox(tr("Ind&ependent checkbox"));
+        //checkBox->setChecked(true);
         QVBoxLayout *vbox = new QVBoxLayout;
         vbox->addWidget(radio1);
         vbox->addWidget(radio2);
         vbox->addWidget(radio3);
-        vbox->addWidget(checkBox);
+        //vbox->addWidget(checkBox);
         vbox->addStretch(1);
         groupBox->setLayout(vbox);
         return groupBox;
@@ -82,14 +88,12 @@ private:
     QGroupBox *createNonExclusiveGroup() {
         QGroupBox *groupBox = new QGroupBox(tr("Data structures"));
         groupBox->setFlat(true);
-        std::vector<std::string> ds=
-                            {"naive","naive_lca","nsrs","hybrid","tree_ext_ptr",
-                           "tree_ext_sct (un)","tree_ext_sct (rrr)",
-                           "wt_hpd (un)", "wt_hpd (rrr)"};
-        std::vector<QCheckBox *> checkBoxes(ds.size());
+
+        boxes.resize(ds.size());
         for ( auto i= 0; i < ds.size(); ++i ) {
-            checkBoxes[i] = new QCheckBox(tr(ds[i].c_str()));
-            //checkBoxes[i]->setToolTip(tr("<h2><b><font color='red'>ds[i]</font></b></h2>"
+            boxes[i] = new QCheckBox(tr(ds[i].c_str()));
+            // TODO: set tooltips
+            //boxes[i]->setToolTip(tr("<h2><b><font color='red'>ds[i]</font></b></h2>"
             //                             "<ol>"
             //                             "<li>First</li>"
             //                             "<li>Second</li>"
@@ -99,16 +103,16 @@ private:
         // QCheckBox *tristateBox = new QCheckBox(tr("Tri-&state button"));
         // tristateBox->setTristate(true);
         QGridLayout *grid= new QGridLayout;
-        grid->addWidget(checkBoxes[0], 0, 0);
-        grid->addWidget(checkBoxes[1], 1, 0);
-        grid->addWidget(checkBoxes[2], 2, 0);
-        grid->addWidget(checkBoxes[3], 3, 0);
-        grid->addWidget(checkBoxes[4], 4, 0);
+        grid->addWidget(boxes[0], 0, 0);
+        grid->addWidget(boxes[1], 1, 0);
+        grid->addWidget(boxes[2], 2, 0);
+        grid->addWidget(boxes[3], 3, 0);
+        grid->addWidget(boxes[4], 4, 0);
 
-        grid->addWidget(checkBoxes[5], 0, 1);
-        grid->addWidget(checkBoxes[6], 1, 1);
-        grid->addWidget(checkBoxes[7], 2, 1);
-        grid->addWidget(checkBoxes[8], 3, 1);
+        grid->addWidget(boxes[5], 0, 1);
+        grid->addWidget(boxes[6], 1, 1);
+        grid->addWidget(boxes[7], 2, 1);
+        grid->addWidget(boxes[8], 3, 1);
 
         groupBox->setLayout(grid);
         return groupBox;
@@ -116,29 +120,44 @@ private:
 
     QGroupBox *createPushButtonGroup() {
         QGroupBox *groupBox = new QGroupBox(tr("&Push Buttons"));
-        groupBox->setCheckable(true);
-        groupBox->setChecked(true);
-        QPushButton *pushButton = new QPushButton(tr("&Normal Button"));
-        QPushButton *toggleButton = new QPushButton(tr("&Toggle Button"));
-        toggleButton->setCheckable(true);
-        toggleButton->setChecked(true);
-        QPushButton *flatButton = new QPushButton(tr("&Flat Button"));
-        flatButton->setFlat(true);
-        QPushButton *popupButton = new QPushButton(tr("Pop&up Button"));
-        QMenu *menu = new QMenu(this);
-        menu->addAction(tr("&First Item"));
-        menu->addAction(tr("&Second Item"));
-        menu->addAction(tr("&Third Item"));
-        menu->addAction(tr("F&ourth Item"));
-        popupButton->setMenu(menu);
+        //groupBox->setCheckable(true);
+        //groupBox->setChecked(true);
+        QPushButton *pushButton = new QPushButton(tr("Execute"));
+
+        QObject::connect(pushButton,SIGNAL(clicked()),this,SLOT(clickedSlot()));
+
+        QLineEdit *edit= new QLineEdit;
+        edit->setValidator(new QIntValidator(edit));
+        edit->setPlaceholderText("size of query-set");
+        //QPushButton *toggleButton = new QPushButton(tr("&Toggle Button"));
+        //toggleButton->setCheckable(true);
+        //toggleButton->setChecked(true);
+        //QPushButton *flatButton = new QPushButton(tr("&Flat Button"));
+        //flatButton->setFlat(true);
+        //QPushButton *popupButton = new QPushButton(tr("Pop&up Button"));
+        //QMenu *menu = new QMenu(this);
+        //menu->addAction(tr("&First Item"));
+        //menu->addAction(tr("&Second Item"));
+        //menu->addAction(tr("&Third Item"));
+        //menu->addAction(tr("F&ourth Item"));
+        //popupButton->setMenu(menu);
         QVBoxLayout *vbox = new QVBoxLayout;
+        vbox->addWidget(edit);
         vbox->addWidget(pushButton);
-        vbox->addWidget(toggleButton);
-        vbox->addWidget(flatButton);
-        vbox->addWidget(popupButton);
-        vbox->addStretch(1);
+        //vbox->addWidget(toggleButton);
+        //vbox->addWidget(flatButton);
+        //vbox->addWidget(popupButton);
+        //vbox->addStretch(1);
         groupBox->setLayout(vbox);
         return groupBox;
+    }
+public slots:
+    void clickedSlot() {
+        std::cerr << "Here" << std::endl;
+        for ( auto i= 0; i < boxes.size(); ++i )
+            if ( boxes[i]->isChecked() ) {
+                std::cerr << ds[i] << " is selected" << std::endl;
+            }
     }
 };
 #endif //TREE_PATH_QUERIES_USERCONTROLS_H

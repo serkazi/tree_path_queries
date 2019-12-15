@@ -39,9 +39,9 @@ namespace experiments {
     }
 
     // human-readable names
-    const std::string hrnames[]= {"nv","nvLca","nvSucc","hybrid",
-                                  "treeExtPtr","wtHpdUn","wtHpdRrr",
-                                  "treeExtSctUn","treeExtSctRrr"};
+    const std::vector<std::string> hrnames= {"nv","nv_lca","nsrs","hybrid",
+                                  "tree_ext_ptr","wt_hpd_un","wt_hpd_rrr",
+                                  "tree_ext_sct_un","tree_ext_sct_rrr"};
 
     template<
             typename node_type,
