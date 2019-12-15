@@ -348,6 +348,7 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/extern/qcustomplot)
 add_executable(mgui
         # ${my_qt_SRC}
         ${PROJECT_SOURCE_DIR}/gui/tpq_gui.cpp
+        ${PROJECT_SOURCE_DIR}/gui/main_gui.cpp
         ${PROJECT_SOURCE_DIR}/gui/main.cpp
         ${PROJECT_SOURCE_DIR}/extern/qcustomplot/qcustomplot.cpp)
 set_target_properties(mgui PROPERTIES LINKER_LANGUAGE CXX)

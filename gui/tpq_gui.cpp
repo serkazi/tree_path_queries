@@ -142,3 +142,66 @@ void tpq_gui::clickedSlot() {
             std::cerr << ds[i] << " is selected" << std::endl;
         }
 }
+
+void tpq_gui::saveToFileSlot() {
+    QString fileName = QFileDialog::getSaveFileName(this,
+                                                    tr("Save image"), "",
+                                                    tr("image type (*.jpg,*.png);;All Files (*)"));
+    if (fileName.isEmpty())
+        return;
+    else {
+        QFile file(fileName);
+        if (!file.open(QIODevice::WriteOnly)) {
+            QMessageBox::information(this, tr("Unable to open file"),
+                                     file.errorString());
+            return;
+        }
+        QDataStream out(&file);
+        out.setVersion(QDataStream::Qt_4_5);
+        //out << contacts;
+    }
+}
+
+void tpq_gui::loadFromFile() {
+    QString fileName = QFileDialog::getOpenFileName(this,
+                                                    tr("Weighted tree files"), "",
+                                                    tr("Trees (*.puu,*.txt);;All Files (*)"));
+    if (fileName.isEmpty())
+        return;
+    else {
+
+        QFile file(fileName);
+
+        if (!file.open(QIODevice::ReadOnly)) {
+            QMessageBox::information(this, tr("Unable to open file"),
+                                     file.errorString());
+            return;
+        }
+
+        QDataStream in(&file);
+        in.setVersion(QDataStream::Qt_4_5);
+        if (fileName.isEmpty())
+            return;
+        else {
+            QFile file(fileName);
+            if (!file.open(QIODevice::ReadOnly)) {
+                QMessageBox::information(this, tr("Unable to open file"),
+                                         file.errorString());
+                return;
+            }
+            QDataStream in(&file);
+            in.setVersion(QDataStream::Qt_4_5);
+            /*
+            if (contacts.isEmpty()) {
+                QMessageBox::information(this, tr("No contacts in file"),
+                                         tr("The file you are attempting to open contains no contacts."));
+            } else {
+                QMap<QString, QString>::iterator i = contacts.begin();
+                nameLine->setText(i.key());
+                addressText->setText(i.value());
+            }
+             */
+        }
+        //updateInterface(NavigationMode);
+    }
+}

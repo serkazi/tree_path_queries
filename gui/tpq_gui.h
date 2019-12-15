@@ -28,7 +28,9 @@ private:
     QGroupBox *createNonExclusiveGroup() ;
     QGroupBox *createPushButtonGroup() ;
 public slots:
-   void clickedSlot() ;
+    void clickedSlot() ;
+    void saveToFileSlot() ;
+    void loadFromFile() ;
 };
 
 

@@ -2,11 +2,16 @@
 #include <QApplication>
 #include <QPushButton>
 #include "tpq_gui.h"
+#include "main_gui.h"
 
 int main(int argc, char** argv) {
     QApplication app(argc, argv);
     tpq_gui userControls;
-    QPushButton button("Hello world !");
+    //main_gui mainWindow;
+    //mainWindow.setCentralWidget(&userControls);
+    //main_gui mg;
+    //userControls.show();
+    //mainWindow.show();
     userControls.show();
     return app.exec();
 }
