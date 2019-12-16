@@ -11,24 +11,6 @@ tpq_gui::tpq_gui( QWidget *parent ): QWidget(parent) {
     grid->addWidget(createSecondExclusiveGroup(), 1, 2);
     grid->addWidget(createNonExclusiveGroup(), 0, 3);
     grid->addWidget(createPushButtonGroup(), 1, 3);
-
-    QCustomPlot *customPlot = new QCustomPlot;
-    QVector<double> x(101), y(101); // initialize with entries 0..100
-    for (int i = 0; i < 101; ++i) {
-        x[i] = i / 50.0 - 1; // x goes from -1 to 1
-        y[i] = x[i] * x[i]; // let's plot a quadratic function
-    }
-    // create graph and assign data to it:
-    customPlot->addGraph();
-    customPlot->graph(0)->setData(x, y);
-    // give the axes some labels:
-    customPlot->xAxis->setLabel("x");
-    customPlot->yAxis->setLabel("y");
-    // set axes ranges, so we see all data:
-    customPlot->xAxis->setRange(-1, 1);
-    customPlot->yAxis->setRange(0, 1);
-    customPlot->replot();
-    grid->addWidget(customPlot, 0, 0, 2, 2);
     setLayout(grid);
     setWindowTitle(tr("Group Boxes"));
     resize(960, 640);
@@ -270,4 +252,70 @@ void tpq_gui::loadFromFile() {
 
 void tpq_gui::set_dataset(std::string pth) {
     dataset_full_path= pth;
+}
+
+void tpq_gui::plot_histogram(std::string pth) {
+    std::ifstream input(pth);
+    QCustomPlot *plot= plot_histogram_(input);
+    QWidget *w= new QWidget();
+    QGridLayout *grid= new QGridLayout();
+    grid->addWidget(plot, 0, 0, 2, 2);
+    w->setLayout(grid);
+    w->setWindowTitle(tr("Histogram"));
+    w->resize(480, 320);
+    w->show();
+}
+
+QCustomPlot *tpq_gui::plot_histogram_(std::istream &input) {
+
+    // first, read the incoming JSON
+    nlohmann::json obj; input >> obj;
+    nlohmann::json arr= obj["benchmarks"]; //FIXME: what if such a key is non-existent?
+
+    // secondly, parse the JSON and extract what we need
+    QVector<QString> labels;
+    QVector<double> ticks;
+    QVector<double> data;
+    for ( auto i= 0; i < arr.size(); ++i ) {
+        const auto &a= arr[i];
+        std::string dsname= [&a]()->std::string {
+            std::string text= a["name"];
+            auto pos= text.find('/');
+            text= text.substr(pos+1,std::string::npos);
+            auto rit= std::find_if(text.rbegin(),text.rend(),[](char ch) {
+                return ch == '_';
+            });
+            text.resize(std::distance(std::next(rit),text.rend()));
+            return text;
+        }();
+        ticks << i;
+        data.push_back(static_cast<double>(a["seconds"]));
+        labels << tr(dsname.c_str());
+    }
+
+    // finally, draw it
+    QCustomPlot *customPlot = new QCustomPlot;
+    QSharedPointer<QCPAxisTickerText> textTicker(new QCPAxisTickerText);
+    textTicker->addTicks(ticks, labels);
+    customPlot->xAxis->setTicker(textTicker);
+    customPlot->xAxis->setTickLabelRotation(60);
+    customPlot->xAxis->setSubTicks(false);
+
+    QCPBars *bars= new QCPBars(customPlot->xAxis,customPlot->yAxis);
+    bars->setName("Time to answer all queries (in seconds)");
+    bars->setData(ticks,data);
+
+    customPlot->addGraph();
+    // setup legend:
+    customPlot->legend->setVisible(true);
+    customPlot->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignTop|Qt::AlignHCenter);
+    customPlot->legend->setBrush(QColor(255, 255, 255, 100));
+    customPlot->legend->setBorderPen(Qt::NoPen);
+    QFont legendFont = font();
+    legendFont.setPointSize(10);
+    customPlot->legend->setFont(legendFont);
+    customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
+
+    return customPlot;
+
 }

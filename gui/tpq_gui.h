@@ -20,6 +20,7 @@
 #include <string>
 #include <cstdio>
 #include <cassert>
+#include "qcustomplot.h"
 
 class tpq_gui: public QWidget {
     Q_OBJECT
@@ -34,7 +35,9 @@ private:
 public:
     tpq_gui(QWidget *parent = nullptr) ;
     void set_dataset( std::string pth ) ;
+    void plot_histogram( std::string pth ) ;
 private:
+    QCustomPlot *plot_histogram_( std::istream &input ) ;
     std::string dataset_full_path;
     QGroupBox *createFirstExclusiveGroup() ;
     QGroupBox *createSecondExclusiveGroup() ;

@@ -344,6 +344,7 @@ void main_gui::plotHistogram() {
     if (dialog.exec())
         fileNames = dialog.selectedFiles();
     infoLabel->setText(fileNames[0]); //shows full path, which is good
+    central_widget->plot_histogram(fileNames[0].toStdString());
 }
 
 #endif // QT_NO_CONTEXTMENU
