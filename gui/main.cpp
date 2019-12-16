@@ -6,12 +6,12 @@
 
 int main(int argc, char** argv) {
     QApplication app(argc, argv);
-    tpq_gui userControls;
-    //main_gui mainWindow;
+    //tpq_gui userControls;
+    main_gui mainWindow;
     //mainWindow.setCentralWidget(&userControls);
     //main_gui mg;
     //userControls.show();
-    //mainWindow.show();
-    userControls.show();
+    mainWindow.show();
+    //userControls.show();
     return app.exec();
 }

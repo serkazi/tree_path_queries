@@ -1,5 +1,5 @@
 //
-// Created by kazi on 2019-12-09.
+// Created by kazi on 2019-12-16.
 //
 #include <sys/resource.h>
 // #include <benchmark/benchmark.h>
@@ -40,10 +40,10 @@ const std::string paths[]= {
 
 using nv                 = naive_processor<node_type,size_type,value_type>;
 using nv_lca             = naive_processor_lca<node_type,size_type,value_type>;
-using nv_succ            = nsrs<node_type,size_type,value_type>;
+using nv_sct            = nsrs<node_type,size_type,value_type>;
 using hybrid             = hybrid_processor<node_type,size_type,value_type>;
 using tree_ext_ptr       = ext_ptr<node_type,size_type,value_type>;
-using wt_hpd_uncompressed= wt_hpd<node_type,size_type,value_type,
+using wt_hpd_un= wt_hpd<node_type,size_type,value_type,
         bp_tree_sada<node_type,size_type>,
         sdsl::bit_vector,sdsl::rank_support_v5<>,
         sdsl::select_support_mcl<1,1>,
@@ -289,7 +289,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,tree_ext_sct_rrr_median,tree_ext_sct
     }
 }
 
-BENCHMARK_TEMPLATE_F(path_queries_benchmark,wt_hpd_un_median,wt_hpd_uncompressed)(benchmark::State &state) {
+BENCHMARK_TEMPLATE_F(path_queries_benchmark,wt_hpd_un_median,wt_hpd_un)(benchmark::State &state) {
     for ( auto _ : state ) {
         auto start = std::chrono::high_resolution_clock::now();
         // the code that gets measured
@@ -325,7 +325,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,wt_hpd_rrr_median,wt_hpd_rrr)(benchm
     }
 }
 
-BENCHMARK_TEMPLATE_F(path_queries_benchmark,nsrs_median,nv_succ)(benchmark::State &state) {
+BENCHMARK_TEMPLATE_F(path_queries_benchmark,nsrs_median,nv_sct)(benchmark::State &state) {
     for ( auto _ : state ) {
         auto start = std::chrono::high_resolution_clock::now();
         // the code that gets measured
@@ -447,7 +447,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,tree_ext_sct_rrr_counting,tree_ext_s
     }
 }
 
-BENCHMARK_TEMPLATE_F(path_queries_benchmark,wt_hpd_uncompressed_counting,wt_hpd_uncompressed)(benchmark::State &state) {
+BENCHMARK_TEMPLATE_F(path_queries_benchmark,wt_hpd_un_counting,wt_hpd_un)(benchmark::State &state) {
     // const auto &dict= cnt_queries;
     const auto &dict= experiment_settings::shared_info_obj->cnt_queries;
     for ( auto _ : state ) {
@@ -482,7 +482,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,wt_hpd_rrr_counting,wt_hpd_rrr)(benc
         // end of the code that gets measured
     }
 }
-BENCHMARK_TEMPLATE_F(path_queries_benchmark,nsrs_counting,nv_succ)(benchmark::State &state) {
+BENCHMARK_TEMPLATE_F(path_queries_benchmark,nsrs_counting,nv_sct)(benchmark::State &state) {
     // const auto &dict= cnt_queries;
     const auto &dict= experiment_settings::shared_info_obj->cnt_queries;
     for ( auto _ : state ) {
@@ -619,7 +619,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,tree_ext_sct_rrr_reporting,tree_ext_
     }
 }
 
-BENCHMARK_TEMPLATE_F(path_queries_benchmark,wt_hpd_uncompressed_reporting,wt_hpd_uncompressed)(benchmark::State &state) {
+BENCHMARK_TEMPLATE_F(path_queries_benchmark,wt_hpd_un_reporting,wt_hpd_un)(benchmark::State &state) {
     // const auto &dict= rpt_queries;
     const auto &dict= experiment_settings::shared_info_obj->rpt_queries;
     std::vector<std::pair<value_type,size_type>> res;
@@ -659,7 +659,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,wt_hpd_rrr_reporting,wt_hpd_rrr)(ben
     }
 }
 
-BENCHMARK_TEMPLATE_F(path_queries_benchmark,nsrs_reporting,nv_succ)(benchmark::State &state) {
+BENCHMARK_TEMPLATE_F(path_queries_benchmark,nsrs_reporting,nv_sct)(benchmark::State &state) {
     // const auto &dict= rpt_queries;
     const auto &dict= experiment_settings::shared_info_obj->rpt_queries;
     std::vector<std::pair<value_type,size_type>> res;
@@ -679,34 +679,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,nsrs_reporting,nv_succ)(benchmark::S
     }
 }
 
-/*
-BENCHMARK(path_queries_benchmark<wt_hpd>)->Unit(benchmark::kMillisecond);
-BENCHMARK(path_queries_benchmark<wt_hpd_rrr>)->Unit(benchmark::kMillisecond);
-BENCHMARK(path_queries_benchmark<naive_processor>)->Unit(benchmark::kMillisecond);
-BENCHMARK(path_queries_benchmark<naive_processor_lca>)->Unit(benchmark::kMillisecond);
-BENCHMARK(path_queries_benchmark<nsrs>)->Unit(benchmark::kMillisecond);
-BENCHMARK(path_queries_benchmark<hybrid_processor>)->Unit(benchmark::kMillisecond);
-BENCHMARK(path_queries_benchmark<tree_ext_sct_un>)->Unit(benchmark::kMillisecond);
-*/
-
-static void CustomArguments(benchmark::internal::Benchmark* b) {
-    for (int i = 0; i <= 10; ++i)
-        for (int j = 32; j <= 1024*1024; j *= 8)
-            b->Args({i, j});
-}
-
-// BENCHMARK(BM_SetInsert)->Apply(CustomArguments);
-// @see https://stackoverflow.com/questions/51519376/how-to-pass-arguments-to-a-google-benchmark-program
-
-// BENCHMARK_MAIN();
-// BENCHMARK(BM_test)->Unit(benchmark::kMillisecond);
-// BENCHMARK_MAIN() lives in benchmark_api.h
-// should be run like this:
-// perl benchmark_runner.pl count /users/grad/kazi/CLionProjects/tree_path_queries/data/testdata/linear_small_weights.txt
-// so essentially:
-// perl benchmark_aggregate_runner.pl <median|count|report|select> <full_path_to_dataset> <num_queries> <K>
-int main (int argc, char** argv)
-{
+void RunAllGiven( int argc, char **argv ) {
     const rlim_t kStackSize = 20 * 1024ll * 1024ll * 1024ll;   // min stack size = 20 GiB
     struct rlimit rl;
     int result;
@@ -722,10 +695,10 @@ int main (int argc, char** argv)
         }
     }
 
-    const int METHOD= 1,
-            FULL_PATH= 2,
-            NUM_QUERIES= 3,
-            K_VAL= 4;
+    const int
+            FULL_PATH= 0,
+            NUM_QUERIES= 1,
+            K_VAL= 2;
 
     // ".*nv_lca_counting\|.*tree_ext_ptr_counting"
 
@@ -740,3 +713,5 @@ int main (int argc, char** argv)
     ::benchmark::Initialize (&argc, argv);
     ::benchmark::RunSpecifiedBenchmarks ();
 }
+
+

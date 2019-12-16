@@ -3,6 +3,7 @@
 //
 
 #include "tpq_gui.h"
+#include "suites.cpp"
 
 tpq_gui::tpq_gui( QWidget *parent ): QWidget(parent) {
     QGridLayout *grid = new QGridLayout();
@@ -30,19 +31,18 @@ tpq_gui::tpq_gui( QWidget *parent ): QWidget(parent) {
     grid->addWidget(customPlot, 0, 0, 2, 2);
     setLayout(grid);
     setWindowTitle(tr("Group Boxes"));
-    resize(480, 320);
+    resize(960, 640);
 }
 
 QGroupBox *tpq_gui::createFirstExclusiveGroup() {
-    QGroupBox *groupBox = new QGroupBox(tr("Query types"));
-    QRadioButton *radio1 = new QRadioButton(tr("Path median"));
-    QRadioButton *radio2 = new QRadioButton(tr("Path counting"));
-    QRadioButton *radio3 = new QRadioButton(tr("Path reporting"));
-    radio1->setChecked(true);
+    auto *groupBox = new QGroupBox(tr("Query types"));
+    queryTypeButtons= {new QRadioButton(tr("median")), new QRadioButton(tr("counting")), new QRadioButton(tr("reporting"))};
     QVBoxLayout *vbox = new QVBoxLayout;
-    vbox->addWidget(radio1);
-    vbox->addWidget(radio2);
-    vbox->addWidget(radio3);
+    for ( auto x: queryTypeButtons ) {
+        x->setCheckable(true);
+        vbox->addWidget(x);
+    }
+    queryTypeButtons[0]->setChecked(true);
     vbox->addStretch(1);
     groupBox->setLayout(vbox);
     return groupBox;
@@ -52,16 +52,14 @@ QGroupBox *tpq_gui::createSecondExclusiveGroup() {
     QGroupBox *groupBox = new QGroupBox(tr("Configuration"));
     groupBox->setCheckable(true);
     groupBox->setChecked(false);
-    QRadioButton *radio1 = new QRadioButton(tr("large"));
-    QRadioButton *radio2 = new QRadioButton(tr("medium"));
-    QRadioButton *radio3 = new QRadioButton(tr("small"));
-    radio1->setChecked(true);
+    querySizeButtons= {new QRadioButton(tr("large(K=1)")), new QRadioButton(tr("medium(K=10)")), new QRadioButton(tr("small(K=100)"))};
+    queryTypeButtons.front()->setChecked(true);
     //QCheckBox *checkBox = new QCheckBox(tr("Ind&ependent checkbox"));
     //checkBox->setChecked(true);
     QVBoxLayout *vbox = new QVBoxLayout;
-    vbox->addWidget(radio1);
-    vbox->addWidget(radio2);
-    vbox->addWidget(radio3);
+    for ( auto x: querySizeButtons )
+        vbox->addWidget(x);
+    querySizeButtons[0]->setChecked(true);
     //vbox->addWidget(checkBox);
     vbox->addStretch(1);
     groupBox->setLayout(vbox);
@@ -109,9 +107,9 @@ QGroupBox *tpq_gui::createPushButtonGroup() {
 
     QObject::connect(pushButton,SIGNAL(clicked()),this,SLOT(clickedSlot()));
 
-    QLineEdit *edit= new QLineEdit;
-    edit->setValidator(new QIntValidator(edit));
-    edit->setPlaceholderText("size of query-set");
+    numQueriesQLineEdit= new QLineEdit;
+    numQueriesQLineEdit->setValidator(new QIntValidator(numQueriesQLineEdit));
+    numQueriesQLineEdit->setPlaceholderText("size of query-set");
     //QPushButton *toggleButton = new QPushButton(tr("&Toggle Button"));
     //toggleButton->setCheckable(true);
     //toggleButton->setChecked(true);
@@ -125,7 +123,7 @@ QGroupBox *tpq_gui::createPushButtonGroup() {
     //menu->addAction(tr("F&ourth Item"));
     //popupButton->setMenu(menu);
     QVBoxLayout *vbox = new QVBoxLayout;
-    vbox->addWidget(edit);
+    vbox->addWidget(numQueriesQLineEdit);
     vbox->addWidget(pushButton);
     //vbox->addWidget(toggleButton);
     //vbox->addWidget(flatButton);
@@ -136,11 +134,75 @@ QGroupBox *tpq_gui::createPushButtonGroup() {
 }
 
 void tpq_gui::clickedSlot() {
-    std::cerr << "Here" << std::endl;
+
+    QString selectedQueryType= [&]() {
+        for ( auto x: queryTypeButtons )
+            if ( x->isChecked() )
+                return x->text();
+        return QString();
+    }();
+
+    std::stringstream str;
+    bool is_first= true ;
     for ( auto i= 0; i < boxes.size(); ++i )
         if ( boxes[i]->isChecked() ) {
-            std::cerr << ds[i] << " is selected" << std::endl;
+            if ( not is_first )
+                str << "|";
+            str << ".*" << ds[i] << "_" << selectedQueryType.toStdString();
+            is_first= false;
         }
+
+    std::cerr << "The regex is: " << str.str() << std::endl;
+    // str now stores the regex with which we'll run benchmarks
+    // the intention: --benchmark_filter=str.str()
+
+    // The layout of our argv:
+    // <dataset_full_path> <-- 0
+    // <num_queries> <-- 1
+    // <K> <-- 2
+    // --benchmark_counters_tabular=true
+    // --benchmark_format=json
+    // --benchmark_out -- filename here; maybe to text area?
+    int num_queries= static_cast<int>(strtol(numQueriesQLineEdit->text().toStdString().c_str(),nullptr,10));
+    int K= [&]()->int {
+        int i= 0;
+        for ( ;i < querySizeButtons.size(); ++i )
+            if ( querySizeButtons[i]->isChecked() )
+                break ;
+        assert( i < querySizeButtons.size() );
+        std::regex r("(\\d+)");
+        std::smatch m;
+        std::string text= queryTypeButtons[i]->text().toStdString();
+        if ( std::regex_search(text,m,r) ) {
+            return strtol(m[1].str().c_str(),nullptr,10);
+        }
+        return 1;
+    }();
+
+    {
+        int argc = 7;
+        char **argv = new char *[argc];
+        for (auto l = 0; l < argc; ++l) {
+            argv[l] = new char[0x80];
+            memset(argv[l], '\0', 0x80 * sizeof(*(argv[l])));
+        }
+        strcpy(argv[0], dataset_full_path.c_str());
+        sprintf(argv[1], "%d", num_queries);
+        sprintf(argv[2], "%d", K);
+        sprintf(argv[3], "%s", "--benchmark_counters_tabular=true");
+        sprintf(argv[4], "%s", "--benchmark_format=json");
+        sprintf(argv[5], "%s", "--benchmark_out=sample_res.json");
+        sprintf(argv[6], "%s", (std::string("--benchmark_filter=") + str.str()).c_str());
+        RunAllGiven(argc, argv);
+
+        //for (auto l = 0; l < argc; delete[] argv[l++]);
+        //delete[] argv;
+    }
+    // /users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/aggregate_bench
+    // --benchmark_filter=.*nv_lca_counting\|.*tree_ext_ptr_counting
+    // /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.mst.osm.puu 1000000 1
+    // --benchmark_counters_tabular=true --benchmark_format=json
+    // --benchmark_out=/users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/run_results.json
 }
 
 void tpq_gui::saveToFileSlot() {
@@ -204,4 +266,8 @@ void tpq_gui::loadFromFile() {
         }
         //updateInterface(NavigationMode);
     }
+}
+
+void tpq_gui::set_dataset(std::string pth) {
+    dataset_full_path= pth;
 }

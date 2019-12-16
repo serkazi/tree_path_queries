@@ -347,6 +347,7 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/extern/qcustomplot)
 # qt5_wrap_cpp(my_qt_SRC ${PROJECT_SOURCE_DIR}/gui/UserControls.hpp)
 add_executable(mgui
         # ${my_qt_SRC}
+        # ${PROJECT_SOURCE_DIR}/src/benchmarking/utils/suites.cpp
         ${PROJECT_SOURCE_DIR}/gui/tpq_gui.cpp
         ${PROJECT_SOURCE_DIR}/gui/main_gui.cpp
         ${PROJECT_SOURCE_DIR}/gui/main.cpp
@@ -356,7 +357,10 @@ target_link_libraries(mgui
         PUBLIC
         Qt5::Core Qt5::Widgets qcustomplot nlohmann_json::nlohmann_json
         sdsl
-        sha512 hybrid wt_hpd)
+        sha512 hybrid wt_hpd
+        benchmark benchmark_main pthread
+        )
+target_link_directories(mgui PUBLIC ${BENCHMARK_ROOT})
 
 target_include_directories(mgui
         PUBLIC
@@ -373,6 +377,7 @@ target_include_directories(mgui
         ${PROJECT_SOURCE_DIR}/include/wrappers
         ${SDSL_INCLUDE_DIR}
         ${PROJECT_SOURCE_DIR}/extern/sha512
+        ${PROJECT_SOURCE_DIR}/src/benchmarking/utils/
         )
 
 #end of Qt5 inclusion

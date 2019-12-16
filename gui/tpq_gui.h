@@ -12,17 +12,30 @@
 #include <QtWidgets/QMenuBar>
 #include <iostream>
 #include "qcustomplot.h"
+#include <sstream>
+#include <fstream>
+#include <iosfwd>
+#include <ios>
+#include <regex>
+#include <string>
+#include <cstdio>
+#include <cassert>
 
 class tpq_gui: public QWidget {
     Q_OBJECT
 private:
-    std::vector<QCheckBox *> boxes;
-    const std::vector<std::string> ds= {"nv","nv_lca","nsrs","hybrid",
+    QLineEdit *numQueriesQLineEdit;
+    QVector<QRadioButton *> queryTypeButtons;
+    QVector<QRadioButton *> querySizeButtons;
+    QVector<QCheckBox *> boxes;
+    const std::vector<std::string> ds= {"nv","nv_lca","nv_sct","hybrid",
                                         "tree_ext_ptr","wt_hpd_un","wt_hpd_rrr",
                                         "tree_ext_sct_un","tree_ext_sct_rrr"};
 public:
     tpq_gui(QWidget *parent = nullptr) ;
+    void set_dataset( std::string pth ) ;
 private:
+    std::string dataset_full_path;
     QGroupBox *createFirstExclusiveGroup() ;
     QGroupBox *createSecondExclusiveGroup() ;
     QGroupBox *createNonExclusiveGroup() ;
