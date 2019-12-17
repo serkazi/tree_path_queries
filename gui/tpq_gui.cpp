@@ -6,6 +6,7 @@
 #include "suites.cpp"
 
 tpq_gui::tpq_gui( QWidget *parent ): QWidget(parent) {
+    textEdit= new QTextEdit;
     QGridLayout *grid = new QGridLayout();
     grid->addWidget(createFirstExclusiveGroup(), 0, 2);
     grid->addWidget(createSecondExclusiveGroup(), 1, 2);
@@ -161,6 +162,28 @@ void tpq_gui::clickedSlot() {
         return 1;
     }();
 
+    for ( result_filename= QString(tr("")); result_filename.isEmpty(); ) {
+        result_filename = [this]() {
+            QString fileName = QFileDialog::getSaveFileName(this,
+                                                            tr("Save result"), "",
+                                                            tr("JSON type (*.json);;All Files (*)"));
+            if (fileName.isEmpty())
+                return QString(tr(""));
+            else {
+                QFile file(fileName);
+                if (!file.open(QIODevice::WriteOnly)) {
+                    QMessageBox::information(this, tr("Unable to open file"),
+                                             file.errorString());
+                    return QString(tr(""));
+                }
+                // QDataStream out(&file);
+                return file.fileName();
+                //out.setVersion(QDataStream::Qt_4_5);
+                //out << contacts;
+            }
+        }();
+    }
+
     {
         int argc = 7;
         char **argv = new char *[argc];
@@ -173,7 +196,7 @@ void tpq_gui::clickedSlot() {
         sprintf(argv[2], "%d", K);
         sprintf(argv[3], "%s", "--benchmark_counters_tabular=true");
         sprintf(argv[4], "%s", "--benchmark_format=json");
-        sprintf(argv[5], "%s", "--benchmark_out=sample_res.json");
+        sprintf(argv[5], "%s", (std::string("--benchmark_out=")+result_filename.toStdString()).c_str());
         sprintf(argv[6], "%s", (std::string("--benchmark_filter=") + str.str()).c_str());
         RunAllGiven(argc, argv);
 
@@ -189,8 +212,8 @@ void tpq_gui::clickedSlot() {
 
 void tpq_gui::saveToFileSlot() {
     QString fileName = QFileDialog::getSaveFileName(this,
-                                                    tr("Save image"), "",
-                                                    tr("image type (*.jpg,*.png);;All Files (*)"));
+                                                    tr("Save result"), "",
+                                                    tr("JSON type (*.json);;All Files (*)"));
     if (fileName.isEmpty())
         return;
     else {
@@ -201,7 +224,7 @@ void tpq_gui::saveToFileSlot() {
             return;
         }
         QDataStream out(&file);
-        out.setVersion(QDataStream::Qt_4_5);
+        //out.setVersion(QDataStream::Qt_4_5);
         //out << contacts;
     }
 }
@@ -256,7 +279,7 @@ void tpq_gui::set_dataset(std::string pth) {
 
 void tpq_gui::plot_histogram(std::string pth) {
     std::ifstream input(pth);
-    QCustomPlot *plot= plot_histogram_(input);
+    plot= plot_histogram_(input);
     QWidget *w= new QWidget();
     QGridLayout *grid= new QGridLayout();
     grid->addWidget(plot, 0, 0, 2, 2);
@@ -295,19 +318,36 @@ QCustomPlot *tpq_gui::plot_histogram_(std::istream &input) {
 
     // finally, draw it
     QCustomPlot *customPlot = new QCustomPlot;
+    customPlot->setBackground(QBrush(EconLighter));
+
     QSharedPointer<QCPAxisTickerText> textTicker(new QCPAxisTickerText);
     textTicker->addTicks(ticks, labels);
+
+    customPlot->xAxis->grid()->setVisible(false);
+    customPlot->xAxis->setSubTicks(false);
+    customPlot->xAxis->setTickLength(0, 4);
+    customPlot->xAxis->setRange(0, ds.size());
     customPlot->xAxis->setTicker(textTicker);
     customPlot->xAxis->setTickLabelRotation(60);
-    customPlot->xAxis->setSubTicks(false);
+
+    customPlot->yAxis->setRange(0, *(std::max_element(data.begin(),data.end()))+3);
+    customPlot->yAxis->setPadding(5); // a bit more space to the left border
+    customPlot->yAxis->setLabel("Seconds to complete");
+    customPlot->yAxis->setBasePen(QPen(Qt::black));
+    customPlot->yAxis->setTickPen(QPen(Qt::black));
+    customPlot->yAxis->setSubTickPen(QPen(Qt::black));
+    customPlot->yAxis->grid()->setSubGridVisible(false);
+    customPlot->yAxis->grid()->setPen(QPen(Shadow.lighter(227),0,Qt::SolidLine));
 
     QCPBars *bars= new QCPBars(customPlot->xAxis,customPlot->yAxis);
     bars->setName("Time to answer all queries (in seconds)");
     bars->setData(ticks,data);
+    bars->setPen(QPen(Shadow.lighter(170)));
+    bars->setBrush(EconBlue);
 
     customPlot->addGraph();
     // setup legend:
-    customPlot->legend->setVisible(true);
+    customPlot->legend->setVisible(false);
     customPlot->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignTop|Qt::AlignHCenter);
     customPlot->legend->setBrush(QColor(255, 255, 255, 100));
     customPlot->legend->setBorderPen(Qt::NoPen);
@@ -316,6 +356,49 @@ QCustomPlot *tpq_gui::plot_histogram_(std::istream &input) {
     customPlot->legend->setFont(legendFont);
     customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
 
-    return customPlot;
+    //==========================
 
+//customPlot->xAxis->setBasePen(QPen(Qt::white));
+//customPlot->xAxis->setTickPen(QPen(Qt::white));
+// customPlot->xAxis->grid()->setPen(QPen(QColor(130, 130, 130), 0, Qt::DotLine));
+// customPlot->xAxis->setTickLabelColor(Qt::white);
+//customPlot->xAxis->setLabelColor(Qt::white);
+
+// prepare y axis:
+
+// make y-axis invisible
+//customPlot->yAxis->setTickLabelColor(Qt::white);
+//customPlot->yAxis->setLabelColor(Qt::white);
+//customPlot->yAxis->grid()->setPen(QPen(QColor(130, 130, 130), 0, Qt::SolidLine));
+//like Economist
+//customPlot->yAxis->grid()->setSubGridPen(LightGrey) //QPen(QColor(130, 130,130), 0, Qt::DotLine)); There is no subgrid in Economist
+
+// prepare the data
+    return customPlot;
+}
+
+void tpq_gui::save_plot( std::string pth ) {
+    // register the plot document object (only needed once, no matter how many plots will be in the QTextDocument):
+    QCPDocumentObject *plotObjectHandler = new QCPDocumentObject(this);
+    this->textEdit->document()->documentLayout()->registerHandler(QCPDocumentObject::PlotTextFormat, plotObjectHandler);
+    QTextCursor cursor = this->textEdit->textCursor();
+    // insert the current plot at the cursor position. QCPDocumentObject::generatePlotFormat creates a
+    // vectorized snapshot of the passed plot (with the specified width and height) which gets inserted
+    // into the text document.
+    double width = 0;
+    double height = 0;
+    cursor.insertText(
+            QString(QChar::ObjectReplacementCharacter),
+            QCPDocumentObject::generatePlotFormat(this->plot, width, height));
+    this->textEdit->setTextCursor(cursor);
+
+    // @see: https://wiki.qt.io/Exporting_a_document_to_PDF
+    QPrinter printer(QPrinter::PrinterResolution);
+    printer.setOutputFormat(QPrinter::PdfFormat);
+    printer.setPaperSize(QPrinter::A4);
+    std::string filename= pth;
+    printer.setOutputFileName(tr(filename.c_str()));
+
+    //this->textEdit->setPageSize(printer.pageRect().size()); // This is necessary if you want to hide the page number
+    this->textEdit->print(&printer);
 }

@@ -21,7 +21,7 @@ class ext_ptr:
         public succinct_tree<node_type,size_type>
 {
 public:
-    //inner class
+    // inner class
     // we are making this inner class, together with the constructor
     // that makes use of it, public so that unique_ptr can be created
     class weighted_tree {
@@ -46,6 +46,7 @@ public:
             return oid[x];
         }
         virtual ~weighted_tree() = default;
+        // FIXME: this place gives bad_alloc most of the time
         void add_arc( node_type p, node_type x ) { ++E, adj[(prnt[x]= p).value()].push_back(x); }
         value_type weight_of( node_type x ) const { return weights[x]; }
         const std::vector<node_type> &children( node_type x ) const {

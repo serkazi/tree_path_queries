@@ -58,7 +58,14 @@ void main_gui::open()
 
 void main_gui::save()
 {
-    infoLabel->setText(tr("Invoked <b>File|Save</b>"));
+    QString fileName = QFileDialog::getSaveFileName(this,
+                                                    tr("Save pdf"), "",
+                                                    tr("Pdf images (*.pdf);;All Files (*)"));
+    if (fileName.isEmpty())
+        return;
+    else {
+        central_widget->save_plot(fileName.toStdString());
+    }
 }
 
 void main_gui::print()
