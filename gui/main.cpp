@@ -3,11 +3,11 @@
 #include <QPushButton>
 #include "tpq_gui.h"
 #include "main_gui.h"
-//#include <QQuickStyle>
+#include <QQuickStyle>
 
 int main(int argc, char** argv) {
     QApplication app(argc, argv);
-    // QQuickStyle::setStyle("Material");
+    QQuickStyle::setStyle("Material");
     //tpq_gui userControls;
     main_gui mainWindow;
     //mainWindow.setCentralWidget(&userControls);

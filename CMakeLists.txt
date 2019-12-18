@@ -330,7 +330,7 @@ endif()
 
 set(CMAKE_MODULE_PATH /usr/lib/qt5)
 # @see: https://stackoverflow.com/questions/51994603/cmake-qt5-undefined-reference-to-qprinterqprinterqprinterprintermode
-SET(QT5_MODULES Core Widgets PrintSupport)
+SET(QT5_MODULES Core Quick QuickControls2 Widgets PrintSupport)
 find_package(Qt5 COMPONENTS ${QT5_MODULES} REQUIRED)
 
 set(CMAKE_AUTOMOC ON)
@@ -352,13 +352,14 @@ add_executable(mgui
         ${PROJECT_SOURCE_DIR}/gui/tpq_gui.cpp
         ${PROJECT_SOURCE_DIR}/gui/main_gui.cpp
         ${PROJECT_SOURCE_DIR}/gui/main.cpp
+        ${PROJECT_SOURCE_DIR}/gui/EconomistStyleQCPAxis.cpp
         ${PROJECT_SOURCE_DIR}/gui/qcpdocumentobject.cpp
         ${PROJECT_SOURCE_DIR}/extern/qcustomplot/qcustomplot.cpp)
 set_target_properties(mgui PROPERTIES LINKER_LANGUAGE CXX)
 target_link_libraries(mgui
         PUBLIC
         Qt5::Core Qt5::Widgets qcustomplot nlohmann_json::nlohmann_json
-        Qt5::Core
+        Qt5::QuickControls2
         sdsl
         sha512 hybrid wt_hpd
         benchmark benchmark_main pthread

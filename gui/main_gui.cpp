@@ -155,6 +155,7 @@ void main_gui::aboutQt()
 void main_gui::createActions()
 {
     histogramAct= new QAction(tr("&Plot"),this);
+    // newAct->setShortcuts(QKeySequence::); -- TODO: set a shortcut
     histogramAct->setStatusTip(tr("Plot histogram"));
     connect(histogramAct, &QAction::triggered, this, &main_gui::plotHistogram);
 //! [5]

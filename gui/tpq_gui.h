@@ -22,6 +22,7 @@
 #include <cassert>
 #include "qcustomplot.h"
 #include "qcpdocumentobject.h"
+#include "EconomistStyleQCPAxis.h"
 
 class tpq_gui: public QWidget {
     Q_OBJECT
@@ -60,7 +61,8 @@ public:
     void plot_histogram( std::string pth ) ;
     void save_plot( std::string pth ) ;
 private:
-    QCustomPlot *plot_histogram_( std::istream &input ) ;
+    QCustomPlot *plot_histogram_( std::string pth ) ;
+    QCustomPlot *plot_histogram_2( std::string pth ) ;
     std::string dataset_full_path;
     QTextEdit *textEdit;
     QString result_filename;
