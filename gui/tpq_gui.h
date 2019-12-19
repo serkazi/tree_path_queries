@@ -23,6 +23,7 @@
 #include "qcustomplot.h"
 #include "qcpdocumentobject.h"
 #include "EconomistStyleQCPAxis.h"
+#include "PlainLegendItem.h"
 
 class tpq_gui: public QWidget {
     Q_OBJECT
@@ -60,9 +61,12 @@ public:
     void set_dataset( std::string pth ) ;
     void plot_histogram( std::string pth ) ;
     void save_plot( std::string pth ) ;
+    void save_plot_2( std::string pth ) ;
 private:
+    QRadioButton *getSelectedQueryButton() ;
+    QCustomPlot *mainPlot;
     QCustomPlot *plot_histogram_( std::string pth ) ;
-    QCustomPlot *plot_histogram_2( std::string pth ) ;
+    QCustomPlot *plot_histogram_2( std::string pth );
     std::string dataset_full_path;
     QTextEdit *textEdit;
     QString result_filename;

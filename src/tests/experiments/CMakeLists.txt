@@ -40,4 +40,5 @@ target_include_directories(
         PUBLIC
         ${PROJECT_SOURCE_DIR}/src/tests/experiments
         ${PROJECT_SOURCE_DIR}/experiments/managers
+        ${PROJECT_SOURCE_DIR}/experiments/utils
 )

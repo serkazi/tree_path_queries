@@ -14,6 +14,7 @@ protected:
 };
 
 class EconomistStyleQCPAxis: public QCPAxis {
+public:
     EconomistStyleQCPAxis( QCPAxisRect *parent, AxisType type ) ;
 };
 

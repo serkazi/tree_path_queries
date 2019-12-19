@@ -1,4 +1,4 @@
-#include "experiments_container.hpp"
+//#include "experiments_container.hpp"
 #include "fixed_dataset_manager.hpp"
 
 // Note: since one global randomization mechanism is used, these queries
@@ -47,6 +47,21 @@ void instantiate_exp( uint16_t mask, experiments::IMPLS impl ) {
 // receives two command-line arguments: the full path of the input dataset
 // and a bitmask indicating which data structures to instantiate
 int main( int argc, char **argv ) {
+
+    const rlim_t kStackSize = 20 * 1024ll * 1024ll * 1024ll;   // min stack size = 20 GiB
+    struct rlimit rl;
+    int result;
+
+    result = getrlimit(RLIMIT_STACK, &rl);
+    if (result == 0) {
+        if (rl.rlim_cur < kStackSize) {
+            rl.rlim_cur = kStackSize;
+            result = setrlimit(RLIMIT_STACK, &rl);
+            if ( result != 0 ) {
+                std::cerr << "setrlimit returned result = " << result << std::endl;
+            }
+        }
+    }
 
     assert( argc >= 3 );
     std::cerr << "Reading from file " << argv[1] << std::endl;

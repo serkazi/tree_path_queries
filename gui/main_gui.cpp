@@ -59,12 +59,12 @@ void main_gui::open()
 void main_gui::save()
 {
     QString fileName = QFileDialog::getSaveFileName(this,
-                                                    tr("Save pdf"), "",
-                                                    tr("Pdf images (*.pdf);;All Files (*)"));
+                                                    tr("Save image"), "",
+                                                    tr("Images (*.jpg);;All Files (*)"));
     if (fileName.isEmpty())
         return;
     else {
-        central_widget->save_plot(fileName.toStdString());
+        central_widget->save_plot_2( fileName.toStdString() );
     }
 }
 
@@ -352,7 +352,7 @@ void main_gui::plotHistogram() {
     if (dialog.exec())
         fileNames = dialog.selectedFiles();
     infoLabel->setText(fileNames[0]); //shows full path, which is good
-    central_widget->plot_histogram(fileNames[0].toStdString());
+    central_widget->plot_histogram( fileNames[0].toStdString());
 }
 
 #endif // QT_NO_CONTEXTMENU

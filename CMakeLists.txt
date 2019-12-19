@@ -353,6 +353,7 @@ add_executable(mgui
         ${PROJECT_SOURCE_DIR}/gui/main_gui.cpp
         ${PROJECT_SOURCE_DIR}/gui/main.cpp
         ${PROJECT_SOURCE_DIR}/gui/EconomistStyleQCPAxis.cpp
+        ${PROJECT_SOURCE_DIR}/gui/PlainLegendItem.cpp
         ${PROJECT_SOURCE_DIR}/gui/qcpdocumentobject.cpp
         ${PROJECT_SOURCE_DIR}/extern/qcustomplot/qcustomplot.cpp)
 set_target_properties(mgui PROPERTIES LINKER_LANGUAGE CXX)

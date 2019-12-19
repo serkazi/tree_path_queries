@@ -6,9 +6,10 @@
 
 QPointF myQCPAxisPainterPrivate::getTickLabelDrawOffset(const QCPAxisPainterPrivate::TickLabelData &labelData) const {
     bool doRotation = !qFuzzyIsNull(tickLabelRotation);
-    if (type == QCPAxis::atRight && tickLabelSide == QCPAxis::lsInside && !doRotation)
+    if (type == QCPAxis::atLeft && tickLabelSide == QCPAxis::lsOutside && !doRotation)
     {
-        double x = -labelData.totalBounds.width();
+        // double x = -labelData.totalBounds.width()+26;
+        double x= 0;
         double y = -labelData.totalBounds.height();
         return QPointF(x, y);
     } else {

@@ -118,6 +118,7 @@ namespace experiments {
         } catch ( std::exception &e ) {
             throw e;
         }
+        return nullptr;
     }
 }
 

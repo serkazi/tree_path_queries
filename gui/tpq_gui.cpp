@@ -116,14 +116,24 @@ QGroupBox *tpq_gui::createPushButtonGroup() {
     return groupBox;
 }
 
+QRadioButton* tpq_gui::getSelectedQueryButton() {
+    for (auto x: this->queryTypeButtons)
+        if (x->isChecked())
+            return x;
+    return nullptr;
+}
+
 void tpq_gui::clickedSlot() {
 
+    /*
     QString selectedQueryType= [&]() {
         for ( auto x: queryTypeButtons )
             if ( x->isChecked() )
                 return x->text();
         return QString();
     }();
+     */
+    QString selectedQueryType= getSelectedQueryButton()->text();
 
     std::stringstream str;
     bool is_first= true ;
@@ -482,7 +492,15 @@ void tpq_gui::save_plot( std::string pth ) {
     this->textEdit->print(&printer);
 }
 
-QCustomPlot *tpq_gui::plot_histogram_2(std::string pth) {
+void tpq_gui::save_plot_2( std::string pth ) {
+    QString filename= QString(tr(pth.c_str()));
+    mainPlot->saveJpg(filename,0,0,1.0,100,1200,QCP::ResolutionUnit::ruDotsPerInch);
+}
+
+QCustomPlot *tpq_gui::plot_histogram_2( std::string pth  ) {
+
+    QCPTextElement *titleElement= nullptr;
+
     std::ifstream input(pth);
     // first, read the incoming JSON
     nlohmann::json obj; input >> obj;
@@ -526,9 +544,18 @@ QCustomPlot *tpq_gui::plot_histogram_2(std::string pth) {
     QFont fnt("Monospace");
     fnt.setStyleHint(QFont::TypeWriter);
 
-    // finally, draw it
     QCustomPlot *customPlot = new QCustomPlot;
+    mainPlot= customPlot;
     customPlot->setBackground(QBrush(EconLighter));
+
+    if ( auto tmp= getSelectedQueryButton() ) {
+        titleElement= new QCPTextElement(mainPlot);
+        titleElement->setText(tmp->text());
+        QFont titleFont= fnt;
+        titleFont.setBold(true);
+        titleElement->setFont(titleFont);
+        // customPlot->axisRect(0)->insetLayout()->addElement(titleElement,Qt::AlignTop|Qt::AlignLeading);
+    }
 
     QSharedPointer<QCPAxisTickerText> textTicker(new QCPAxisTickerText);
     textTicker->addTicks(ticks, labels);
@@ -539,21 +566,31 @@ QCustomPlot *tpq_gui::plot_histogram_2(std::string pth) {
     customPlot->xAxis->grid()->setVisible(false);
     customPlot->xAxis->setSubTicks(false);
     customPlot->xAxis->setTickLength(0, 4);
-    customPlot->xAxis->setRange(0, ds.size());
+    customPlot->xAxis->setRange(0, 1+labels.size());
     customPlot->xAxis->setTicker(textTicker);
-    customPlot->xAxis->setTickLabelRotation(60);
+    // customPlot->xAxis->setTickLabelRotation(60);
 
-    // customPlot->axisRect(0)->addAxis(QCPAxis::AxisType::atRight,EconomistStyleQCPAxis(customPlot->rect(),QCPAxis::AxisType::atRight));
+    // experimental features
+    customPlot->axisRect(0)->removeAxis(customPlot->yAxis);
+    customPlot->axisRect(0)->addAxis(QCPAxis::AxisType::atLeft,new EconomistStyleQCPAxis(customPlot->axisRect(),QCPAxis::AxisType::atLeft));
+    customPlot->yAxis->setBasePen(QPen(Qt::NoPen));
+    customPlot->yAxis->setTickPen(QPen(Qt::NoPen));
+    customPlot->yAxis->setSubTickPen(QPen(Qt::NoPen));
+    // end of experimental features
+
     customPlot->yAxis->setRange(0, *(std::max_element(data.begin(),data.end()))*1.13);
+    customPlot->yAxis->setLabelPadding(-15);
     customPlot->yAxis->setLabelFont(fnt);
-    customPlot->yAxis->setPadding(5); // a bit more space to the left border
+    customPlot->yAxis->setPadding(2); // a bit more space to the left border
     customPlot->yAxis->setNumberFormat(tr("gb"));
     // customPlot->yAxis->setTickLabelRotation(60);
     customPlot->yAxis->setLabel("Seconds to complete");
-    customPlot->yAxis->setBasePen(QPen(Qt::black));
-    customPlot->yAxis->setTickPen(QPen(Qt::black));
-    customPlot->yAxis->setSubTickPen(QPen(Qt::black));
+    //customPlot->yAxis->setOffset(-100);
+    // customPlot->yAxis->setBasePen(QPen(Qt::black));
+    // customPlot->yAxis->setTickPen(QPen(Qt::black));
+    // customPlot->yAxis->setSubTickPen(QPen(Qt::black));
     customPlot->yAxis->grid()->setSubGridVisible(false);
+    customPlot->yAxis->grid()->setVisible(true);
     customPlot->yAxis->grid()->setPen(QPen(Shadow.lighter(227),0,Qt::SolidLine));
 
     QVector<QCPBars *> bars;
@@ -575,10 +612,10 @@ QCustomPlot *tpq_gui::plot_histogram_2(std::string pth) {
             return x+": "+y;
         }();
         bar->setName(tr(myLabel.c_str()));
+        bar->setParent(customPlot);
         bars.push_back(bar);
     }
 
-    customPlot->addGraph();
 
     /*{
         QCPItemText *textLabel = new QCPItemText(customPlot);
@@ -616,13 +653,32 @@ QCustomPlot *tpq_gui::plot_histogram_2(std::string pth) {
     */
 
     //customPlot->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignTop|Qt::AlignHCenter);
-    customPlot->legend->setVisible(true);
-    customPlot->legend->setBrush(QColor(255, 255, 255, 100));
-    customPlot->legend->setBorderPen(Qt::NoPen);
+    //customPlot->legend->setVisible(true);
+
+    //customPlot->legend->setBrush(QColor(255, 255, 255, 100));
+    //customPlot->legend->setBorderPen(Qt::NoPen);
     // QFont legendFont = font();
-    QFont legendFont = fnt;
-    legendFont.setPointSize(10);
-    customPlot->legend->setFont(legendFont);
+    //QFont legendFont = fnt;
+    //legendFont.setPointSize(10);
+    //customPlot->legend->setFont(legendFont);
+
+    QCPLegend *legend= new QCPLegend;
+    legend->setParent(customPlot);
+    legend->setBrush(QBrush(EconLighter));
+    customPlot->axisRect(0)->insetLayout()->addElement(legend,Qt::AlignTop|Qt::AlignRight);
+    legend->setLayer(QLatin1String("legend"));
+    legend->setBorderPen(Qt::NoPen);
+    for ( auto i= 0; i < labels.size(); ++i ) {
+        PlainLegendItem *item= new PlainLegendItem(legend,bars[i]);
+        item->setParent(customPlot);
+        //std::string acc= labels[i].toStdString();
+        //acc+= " ", acc+= ticklabels[i].toStdString();
+        //item->setLayer(tr(acc.c_str()));
+        legend->addItem(item);
+    }
+
+    customPlot->addGraph();
+
     customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
 
     QVector<QCPItemText *> items;
