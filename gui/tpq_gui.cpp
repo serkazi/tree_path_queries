@@ -156,7 +156,9 @@ void tpq_gui::clickedSlot() {
     // --benchmark_counters_tabular=true
     // --benchmark_format=json
     // --benchmark_out -- filename here; maybe to text area?
-    int num_queries= static_cast<int>(strtol(numQueriesQLineEdit->text().toStdString().c_str(),nullptr,10));
+    int num_queries= static_cast<int>(
+            strtol(numQueriesQLineEdit->text().toStdString().c_str(),nullptr,10)
+            );
     int K= [&]()->int {
         int i= 0;
         for ( ;i < querySizeButtons.size(); ++i )
@@ -172,11 +174,27 @@ void tpq_gui::clickedSlot() {
         return 1;
     }();
 
-    for ( result_filename= QString(tr("")); result_filename.isEmpty(); ) {
-        result_filename = [this]() {
-            QString fileName = QFileDialog::getSaveFileName(this,
-                                                            tr("Save result"), "",
-                                                            tr("JSON type (*.json);;All Files (*)"));
+    QString method= getSelectedQueryButton()->text();
+    QString dts= [this]()-> QString {
+        std::regex r("([^/]+)$");
+        std::smatch m;
+        if ( std::regex_search(dataset_full_path,m,r) )
+            return QString(tr(m.str(1).c_str()));
+        return QString(tr("NO_DATASET"));
+    }();
+
+    QFileDialog dlg(nullptr,tr("Save result in..."),
+                    method+QString(tr(" "))+dts,
+                    tr("JSON type (*.json);;All Files (*)"));
+    dlg.setAcceptMode(QFileDialog::AcceptSave);
+    result_filename = [&]() {
+        /*
+        dlg.getSaveFileName(this,
+                            tr("Save result"), method+QString(tr(" "))+dts,
+                            tr("JSON type (*.json);;All Files (*)"));
+        */
+        if ( dlg.exec() ) {
+            QString fileName= dlg.selectedFiles().at(0);
             if (fileName.isEmpty())
                 return QString(tr(""));
             else {
@@ -191,8 +209,12 @@ void tpq_gui::clickedSlot() {
                 //out.setVersion(QDataStream::Qt_4_5);
                 //out << contacts;
             }
-        }();
-    }
+        }
+        else return QString(tr(""));
+    }();
+
+    if ( result_filename == QString(tr("")) )
+        return ;
 
     {
         int argc = 7;
@@ -584,7 +606,7 @@ QCustomPlot *tpq_gui::plot_histogram_2( std::string pth  ) {
     customPlot->yAxis->setPadding(2); // a bit more space to the left border
     customPlot->yAxis->setNumberFormat(tr("gb"));
     // customPlot->yAxis->setTickLabelRotation(60);
-    customPlot->yAxis->setLabel("Seconds to complete");
+    customPlot->yAxis->setLabel("Time to complete (seconds)");
     //customPlot->yAxis->setOffset(-100);
     // customPlot->yAxis->setBasePen(QPen(Qt::black));
     // customPlot->yAxis->setTickPen(QPen(Qt::black));

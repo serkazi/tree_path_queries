@@ -342,6 +342,7 @@ void main_gui::contextMenuEvent(QContextMenuEvent *event)
     menu.addAction(pasteAct);
     menu.exec(event->globalPos());
 }
+#endif // QT_NO_CONTEXTMENU
 
 void main_gui::plotHistogram() {
     QFileDialog dialog(this);
@@ -355,4 +356,3 @@ void main_gui::plotHistogram() {
     central_widget->plot_histogram( fileNames[0].toStdString());
 }
 
-#endif // QT_NO_CONTEXTMENU
