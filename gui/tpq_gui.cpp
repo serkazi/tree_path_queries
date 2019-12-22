@@ -372,8 +372,8 @@ QCustomPlot *tpq_gui::plot_histogram_( std::string pth ) {
     textTicker->addTicks(ticks, labels);
 
     QFont xLabelsFont= fnt;
-    xLabelsFont.setPointSize(10);
-    customPlot->xAxis->setLabelFont(fnt);
+    xLabelsFont.setPointSize(9);
+    customPlot->xAxis->setLabelFont(xLabelsFont);
     customPlot->xAxis->grid()->setVisible(false);
     customPlot->xAxis->setSubTicks(false);
     customPlot->xAxis->setTickLength(0, 4);
@@ -383,7 +383,7 @@ QCustomPlot *tpq_gui::plot_histogram_( std::string pth ) {
 
     // customPlot->axisRect(0)->addAxis(QCPAxis::AxisType::atRight,EconomistStyleQCPAxis(customPlot->rect(),QCPAxis::AxisType::atRight));
     customPlot->yAxis->setRange(0, *(std::max_element(data.begin(),data.end()))*1.13);
-    customPlot->yAxis->setLabelFont(fnt);
+    customPlot->yAxis->setLabelFont(QFont(fnt.family(),9));
     customPlot->yAxis->setPadding(5); // a bit more space to the left border
     customPlot->yAxis->setNumberFormat(tr("gb"));
     // customPlot->yAxis->setTickLabelRotation(60);
@@ -519,7 +519,7 @@ void tpq_gui::save_plot_2( std::string pth ) {
     mainPlot->saveJpg(filename,0,0,1.0,100,1200,QCP::ResolutionUnit::ruDotsPerInch);
 }
 
-QCustomPlot *tpq_gui::plot_histogram_2( std::string pth  ) {
+QCustomPlot *tpq_gui::plot_histogram_2( std::string pth ) {
 
     QCPTextElement *titleElement= nullptr;
 
@@ -584,7 +584,7 @@ QCustomPlot *tpq_gui::plot_histogram_2( std::string pth  ) {
 
     QFont xLabelsFont= fnt;
     xLabelsFont.setPointSize(10);
-    customPlot->xAxis->setLabelFont(fnt);
+    customPlot->xAxis->setLabelFont(xLabelsFont);
     customPlot->xAxis->grid()->setVisible(false);
     customPlot->xAxis->setSubTicks(false);
     customPlot->xAxis->setTickLength(0, 4);
@@ -602,15 +602,16 @@ QCustomPlot *tpq_gui::plot_histogram_2( std::string pth  ) {
 
     customPlot->yAxis->setRange(0, *(std::max_element(data.begin(),data.end()))*1.13);
     customPlot->yAxis->setLabelPadding(-15);
-    customPlot->yAxis->setLabelFont(fnt);
+    customPlot->yAxis->setLabelFont(xLabelsFont);
     customPlot->yAxis->setPadding(2); // a bit more space to the left border
     customPlot->yAxis->setNumberFormat(tr("gb"));
     // customPlot->yAxis->setTickLabelRotation(60);
-    customPlot->yAxis->setLabel("Time to complete (seconds)");
+    // customPlot->yAxis->setLabel("Time to complete (seconds)");
     //customPlot->yAxis->setOffset(-100);
     // customPlot->yAxis->setBasePen(QPen(Qt::black));
     // customPlot->yAxis->setTickPen(QPen(Qt::black));
     // customPlot->yAxis->setSubTickPen(QPen(Qt::black));
+    customPlot->yAxis->setOffset(0);
     customPlot->yAxis->grid()->setSubGridVisible(false);
     customPlot->yAxis->grid()->setVisible(true);
     customPlot->yAxis->grid()->setPen(QPen(Shadow.lighter(227),0,Qt::SolidLine));
@@ -741,5 +742,41 @@ QCustomPlot *tpq_gui::plot_histogram_2( std::string pth  ) {
 //customPlot->yAxis->grid()->setSubGridPen(LightGrey) //QPen(QColor(130, 130,130), 0, Qt::DotLine)); There is no subgrid in Economist
 
 // prepare the data
+
+
+    // QFont fnt("Monospace");
+    // fnt.setStyleHint(QFont::TypeWriter);
+
+    // form the title-string
+    auto header= getSelectedQueryButton()->text();
+    header.append(QString(tr(" queries for ")));
+    std::string path_= [&]() {
+        std::string x= obj["context"]["executable"];
+        std::regex r("([^/]+)$");
+        std::smatch m;
+        if ( std::regex_search(x,m,r) ) {
+            return std::regex_replace(m.str(1),std::regex(".txt$|.puu$"),""); //remove the extension
+        }
+        return std::string();
+    }();
+    header.append(QString(tr(path_.c_str())));
+
+    // set title
+    customPlot->plotLayout()->insertRow(0);
+    auto textElement= new QCPTextElement(customPlot,header);
+    QFont titleFont= QFont("Verdana",12);
+    titleFont.setBold(true);
+    textElement->setFont(titleFont);
+    customPlot->plotLayout()->addElement(0,0,textElement);
+    // customPlot->axisRect(0)->insetLayout()->addElement(textElement, Qt::AlignTop|Qt::AlignLeft);
+    {
+        customPlot->plotLayout()->insertRow(1);
+        QString subTitle(tr("time to complete, sec."));
+        auto subtitleTextElement = new QCPTextElement(customPlot, subTitle);
+        QFont subTitleFont = QFont(fnt.family(), 9);
+        subTitleFont.setItalic(true);
+        subtitleTextElement->setFont(subTitleFont);
+        customPlot->plotLayout()->addElement(1, 0, subtitleTextElement);
+    }
     return customPlot;
 }
