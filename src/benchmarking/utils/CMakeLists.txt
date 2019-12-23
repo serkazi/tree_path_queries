@@ -21,7 +21,7 @@ target_include_directories(
         ${PROJECT_SOURCE_DIR}/include/data_structures/hybrid
 )
 
-add_executable(aggregate_bench aggregate_bench.cpp)
+add_executable(aggregate_bench aggregate_bench_refactored.cpp)
 target_link_libraries(
         aggregate_bench
         PUBLIC
