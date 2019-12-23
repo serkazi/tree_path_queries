@@ -782,5 +782,82 @@ QCustomPlot *tpq_gui::plot_histogram_2( std::string pth ) {
 }
 
 void tpq_gui::plot_bars_group( QStringList filenames ) {
+    auto *customPlot = new QCustomPlot;
+    customPlot->setBackground(QBrush(EconLighter));
 
+    auto *group = new QCPBarsGroup(customPlot);
+    for ( auto i= 0; i < filenames.size(); ++i )
+        group->append(prepareBars(filenames[i],customPlot));
+
+    customPlot->addGraph();
+}
+
+QCPBars *tpq_gui::prepareBars( QString filename, QCustomPlot *customPlot ) {
+    QCPTextElement *titleElement= nullptr;
+
+    std::ifstream input(filename.toStdString());
+    // first, read the incoming JSON
+    nlohmann::json obj; input >> obj;
+    nlohmann::json arr= obj["benchmarks"]; //FIXME: what if such a key is non-existent?
+
+    // parse the JSON and extract what we need
+    QVector<QString> labels, ticklabels;
+    QVector<double> ticks;
+    QVector<double> data;
+    QVector<double> tops;
+    for ( auto i= 0; i < arr.size(); ++i ) {
+        const auto &a= arr[i];
+        std::string dsname= [&a]()->std::string {
+            std::string text= a["name"];
+            auto pos= text.find('/');
+            text= text.substr(pos+1,std::string::npos);
+            auto rit= std::find_if(text.rbegin(),text.rend(),[](char ch) {
+                return ch == '_';
+            });
+            text.resize(std::distance(std::next(rit),text.rend()));
+            return text;
+        }();
+        ticks << i+1;
+        data.push_back(static_cast<double>(a["seconds"]));
+        // labels << tr(dsname.c_str());
+        ticklabels << tr(dsname.c_str());
+        labels.push_back(QString::number(i+1));
+        tops.push_back(static_cast<double>(a["seconds"]));
+    }
+
+    QFont fnt("Monospace");
+    fnt.setStyleHint(QFont::TypeWriter);
+
+    auto *bars = new QCPBars(customPlot->xAxis, customPlot->yAxis);
+    for ( auto i= 0; i < arr.size(); ++i ) {
+        bars->addData(i+1.00,data[i]);
+        bars->setParent(customPlot);
+    }
+
+    // customPlot->addGraph();
+
+    // customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
+
+    QVector<QCPItemText *> items;
+    //Creating and configuring an item
+    double spacing= 300;
+    for ( auto i= 0; i < data.size(); ++i ) {
+        auto *textLabel = new QCPItemText(customPlot);
+        //customPlot->addItem(textLabel);
+        textLabel->setClipToAxisRect(false);
+        textLabel->position->setAxes(customPlot->xAxis, customPlot->yAxis);
+        textLabel->position->setType(QCPItemPosition::ptPlotCoords);
+        //placing the item over the bar with a spacing of 0.25
+        textLabel->position->setCoords(ticks[i],data[i]+spacing);
+        //Customizing the item
+        textLabel->setText(QString::number(data[i]));
+
+        // textLabel->setFont(QFont(font().family(), 9));
+        textLabel->setFont(QFont(fnt.family(), 9));
+        textLabel->setPen(QPen(Qt::black));
+        items.push_back(textLabel);
+    }
+    //==========================
+
+    return bars;
 }

@@ -68,6 +68,7 @@ private:
     QCustomPlot *mainPlot;
     QCustomPlot *plot_histogram_( std::string pth ) ;
     QCustomPlot *plot_histogram_2( std::string pth );
+    QCPBars *prepareBars( QString filename, QCustomPlot *customPlot ) ;
     std::string dataset_full_path;
     QTextEdit *textEdit;
     QString result_filename;

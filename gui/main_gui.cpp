@@ -300,6 +300,7 @@ void main_gui::createMenus()
     fileMenu = menuBar()->addMenu(tr("&File"));
     fileMenu->addAction(newAct);
     fileMenu->addAction(histogramAct);
+    fileMenu->addAction(barsGroupAct);
 //! [9]
     fileMenu->addAction(openAct);
 //! [10]
@@ -363,7 +364,7 @@ void main_gui::plotHistogram() {
 
 void main_gui::plotBarsGroup() {
     QFileDialog dialog(this);
-    dialog.setFileMode(QFileDialog::AnyFile);
+    dialog.setFileMode(QFileDialog::ExistingFiles);
     dialog.setNameFilter(tr("Json files (*.json)"));
     dialog.setViewMode(QFileDialog::Detail); //also try List
     QStringList fileNames;
