@@ -325,6 +325,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,wt_hpd_rrr_median,wt_hpd_rrr)(benchm
     }
 }
 
+/*
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,nsrs_median,nv_sct)(benchmark::State &state) {
     for ( auto _ : state ) {
         auto start = std::chrono::high_resolution_clock::now();
@@ -341,6 +342,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,nsrs_median,nv_sct)(benchmark::State
         // end of the code that gets measured
     }
 }
+ */
 
 //=============================== Counting ==============================================/
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_counting,nv)(benchmark::State &state) {
@@ -482,6 +484,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,wt_hpd_rrr_counting,wt_hpd_rrr)(benc
         // end of the code that gets measured
     }
 }
+/*
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,nsrs_counting,nv_sct)(benchmark::State &state) {
     // const auto &dict= cnt_queries;
     const auto &dict= experiment_settings::shared_info_obj->cnt_queries;
@@ -499,7 +502,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,nsrs_counting,nv_sct)(benchmark::Sta
         // end of the code that gets measured
     }
 }
-
+*/
 //=============================== Reporting ==============================================/
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_reporting,nv)(benchmark::State &state) {
     // const auto &dict= rpt_queries;
@@ -659,6 +662,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,wt_hpd_rrr_reporting,wt_hpd_rrr)(ben
     }
 }
 
+/*
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,nsrs_reporting,nv_sct)(benchmark::State &state) {
     // const auto &dict= rpt_queries;
     const auto &dict= experiment_settings::shared_info_obj->rpt_queries;
@@ -678,6 +682,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,nsrs_reporting,nv_sct)(benchmark::St
         // end of the code that gets measured
     }
 }
+ */
 
 void RunAllGiven( int argc, char **argv ) {
     const rlim_t kStackSize = 20 * 1024ll * 1024ll * 1024ll;   // min stack size = 20 GiB
@@ -710,8 +715,7 @@ void RunAllGiven( int argc, char **argv ) {
     experiment_settings::shared_info_obj= std::make_unique<experiment_settings::shared_info>();
 
     std::cerr << "Dataset path: " << experiment_settings::dataset_path << std::endl;
+    std::cerr << "K= " << experiment_settings::K << std::endl;
     ::benchmark::Initialize (&argc, argv);
     ::benchmark::RunSpecifiedBenchmarks ();
 }
-
-

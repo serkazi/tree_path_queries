@@ -42,16 +42,18 @@ private slots:
     void about();
     void aboutQt();
     void plotHistogram();
+    void plotBarsGroup() ;
 private:
     tpq_gui *central_widget;
+    QActionGroup *alignmentGroup;
     void createActions();
     void createMenus();
     QMenu *fileMenu;
     QMenu *editMenu;
     QMenu *formatMenu;
     QMenu *helpMenu;
-    QActionGroup *alignmentGroup;
     QAction *histogramAct;
+    QAction *barsGroupAct;
     QAction *newAct;
     QAction *openAct;
     QAction *saveAct;

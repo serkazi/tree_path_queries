@@ -780,3 +780,7 @@ QCustomPlot *tpq_gui::plot_histogram_2( std::string pth ) {
     }
     return customPlot;
 }
+
+void tpq_gui::plot_bars_group( QStringList filenames ) {
+
+}

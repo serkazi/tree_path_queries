@@ -62,6 +62,7 @@ public:
     void plot_histogram( std::string pth ) ;
     void save_plot( std::string pth ) ;
     void save_plot_2( std::string pth ) ;
+    void plot_bars_group( QStringList filenames ) ;
 private:
     QRadioButton *getSelectedQueryButton() ;
     QCustomPlot *mainPlot;

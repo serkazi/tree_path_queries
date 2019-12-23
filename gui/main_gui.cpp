@@ -154,6 +154,11 @@ void main_gui::aboutQt()
 //! [4]
 void main_gui::createActions()
 {
+    barsGroupAct= new QAction(tr("&Group bars"),this);
+    // newAct->setShortcuts(QKeySequence::); -- TODO: set a shortcut
+    barsGroupAct->setStatusTip(tr("Plot bars group"));
+    connect(barsGroupAct, &QAction::triggered, this, &main_gui::plotBarsGroup);
+
     histogramAct= new QAction(tr("&Plot"),this);
     // newAct->setShortcuts(QKeySequence::); -- TODO: set a shortcut
     histogramAct->setStatusTip(tr("Plot histogram"));
@@ -354,5 +359,19 @@ void main_gui::plotHistogram() {
         fileNames = dialog.selectedFiles();
     infoLabel->setText(fileNames[0]); //shows full path, which is good
     central_widget->plot_histogram( fileNames[0].toStdString());
+}
+
+void main_gui::plotBarsGroup() {
+    QFileDialog dialog(this);
+    dialog.setFileMode(QFileDialog::AnyFile);
+    dialog.setNameFilter(tr("Json files (*.json)"));
+    dialog.setViewMode(QFileDialog::Detail); //also try List
+    QStringList fileNames;
+    if (dialog.exec()) {
+        fileNames = dialog.selectedFiles();
+        if ( fileNames.empty() ) return ;
+        infoLabel->setText(fileNames[0]); //shows full path, which is good
+        central_widget->plot_bars_group(fileNames);
+    }
 }
 

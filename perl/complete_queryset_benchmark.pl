@@ -17,7 +17,8 @@ my $executable = $target_path."aggregate_bench";
 
 my $command_to_run=
     "$executable ".
-    "--benchmark_filter=$queries_to_filter $data_path $num_queries $K_val ".
-    "--benchmark_counters_tabular=true --benchmark_format=json --benchmark_out=${res}";
+    "$data_path $num_queries $K_val ".
+    "--benchmark_counters_tabular=true --benchmark_format=json --benchmark_out=${res} ".
+    "--benchmark_filter=$queries_to_filter";
 printf("Running: %s\n",$command_to_run);
 system($command_to_run);
