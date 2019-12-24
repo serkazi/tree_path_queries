@@ -1,0 +1,930 @@
+Running: /users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/aggregate_bench /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu 10000000 1 --benchmark_counters_tabular=true --benchmark_format=json --benchmark_out=/users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/resfile_counting_K_1_eu.d.mst.dimacs.puu.json --benchmark_filter=counting
+Reading dataset: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu
+Dataset path: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu
+K= 1
+{
+  "context": {
+    "date": "2019-12-24 00:56:44",
+    "host_name": "saga",
+    "executable": "/users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu",
+    "num_cpus": 16,
+    "mhz_per_cpu": 3301,
+    "cpu_scaling_enabled": true,
+    "caches": [
+      {
+        "type": "Data",
+        "level": 1,
+        "size": 32000,
+        "num_sharing": 2
+      },
+      {
+        "type": "Instruction",
+        "level": 1,
+        "size": 32000,
+        "num_sharing": 2
+      },
+      {
+        "type": "Unified",
+        "level": 2,
+        "size": 1024000,
+        "num_sharing": 2
+      },
+      {
+        "type": "Unified",
+        "level": 3,
+        "size": 25344000,
+        "num_sharing": 16
+      }
+    ],
+    "load_avg": [0.28,0.13,0.08],
+    "library_build_type": "release"
+  },
+  "benchmarks": [
+    {
+      "name": "path_queries_benchmark<nv>/nv_counting",
+      "run_name": "path_queries_benchmark<nv>/nv_counting",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 2.0888861488588154e+12,
+      "cpu_time": 2.0883472071820002e+12,
+      "time_unit": "ns",
+      "seconds": 2.0880000000000000e+03
+    },
+    {
+      "name": "path_queries_benchmark<nv_lca>/nv_lca_counting",
+      "run_name": "path_queries_benchmark<nv_lca>/nv_lca_counting",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 1.2238937160652131e+12,
+      "cpu_time": 1.2236778161370002e+12,
+      "time_unit": "ns",
+      "seconds": 1.2230000000000000e+03
+    },
+    {
+      "name": "path_queries_benchmark<hybrid>/hybrid_counting",
+      "run_name": "path_queries_benchmark<hybrid>/hybrid_counting",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 3.8273609744384888e+10,
+      "cpu_time": 3.8267231897999863e+10,
+      "time_unit": "ns",
+      "seconds": 3.8000000000000000e+01
+    },
+    {
+      "name": "path_queries_benchmark<tree_ext_ptr>/tree_ext_ptr_counting",
+      "run_name": "path_queries_benchmark<tree_ext_ptr>/tree_ext_ptr_counting",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 1.3808915514498949e+10,
+      "cpu_time": 1.3806949898999847e+10,
+      "time_unit": "ns",
+      "seconds": 1.3000000000000000e+01
+    },
+    {
+      "name": "path_queries_benchmark<tree_ext_sct_un>/tree_ext_sct_un_counting",
+      "run_name": "path_queries_benchmark<tree_ext_sct_un>/tree_ext_sct_un_counting",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 2.0455612277612091e+11,
+      "cpu_time": 2.0451631327199994e+11,
+      "time_unit": "ns",
+      "seconds": 2.0400000000000000e+02
+    },
+    {
+      "name": "path_queries_benchmark<tree_ext_sct_rrr>/tree_ext_sct_rrr_counting",
+      "run_name": "path_queries_benchmark<tree_ext_sct_rrr>/tree_ext_sct_rrr_counting",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 2.7277708999067545e+11,
+      "cpu_time": 2.7271276623900031e+11,
+      "time_unit": "ns",
+      "seconds": 2.7200000000000000e+02
+    },
+    {
+      "name": "path_queries_benchmark<wt_hpd_un>/wt_hpd_un_counting",
+      "run_name": "path_queries_benchmark<wt_hpd_un>/wt_hpd_un_counting",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 3.3560669561475513e+11,
+      "cpu_time": 3.3554557865200012e+11,
+      "time_unit": "ns",
+      "seconds": 3.3500000000000000e+02
+    },
+    {
+      "name": "path_queries_benchmark<wt_hpd_rrr>/wt_hpd_rrr_counting",
+      "run_name": "path_queries_benchmark<wt_hpd_rrr>/wt_hpd_rrr_counting",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 5.3073509604670105e+11,
+      "cpu_time": 5.3063586021900031e+11,
+      "time_unit": "ns",
+      "seconds": 5.3000000000000000e+02
+    }
+  ]
+}
+Running: /users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/aggregate_bench /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu 10000000 10 --benchmark_counters_tabular=true --benchmark_format=json --benchmark_out=/users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/resfile_counting_K_10_eu.d.mst.dimacs.puu.json --benchmark_filter=counting
+Reading dataset: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu
+Dataset path: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu
+K= 10
+{
+  "context": {
+    "date": "2019-12-24 02:19:07",
+    "host_name": "saga",
+    "executable": "/users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu",
+    "num_cpus": 16,
+    "mhz_per_cpu": 3301,
+    "cpu_scaling_enabled": true,
+    "caches": [
+      {
+        "type": "Data",
+        "level": 1,
+        "size": 32000,
+        "num_sharing": 2
+      },
+      {
+        "type": "Instruction",
+        "level": 1,
+        "size": 32000,
+        "num_sharing": 2
+      },
+      {
+        "type": "Unified",
+        "level": 2,
+        "size": 1024000,
+        "num_sharing": 2
+      },
+      {
+        "type": "Unified",
+        "level": 3,
+        "size": 25344000,
+        "num_sharing": 16
+      }
+    ],
+    "load_avg": [1,1,1],
+    "library_build_type": "release"
+  },
+  "benchmarks": [
+    {
+      "name": "path_queries_benchmark<nv>/nv_counting",
+      "run_name": "path_queries_benchmark<nv>/nv_counting",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 2.0816216299999504e+12,
+      "cpu_time": 2.0811124127240000e+12,
+      "time_unit": "ns",
+      "seconds": 2.0810000000000000e+03
+    },
+    {
+      "name": "path_queries_benchmark<nv_lca>/nv_lca_counting",
+      "run_name": "path_queries_benchmark<nv_lca>/nv_lca_counting",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 1.2157337540462612e+12,
+      "cpu_time": 1.2154245646440000e+12,
+      "time_unit": "ns",
+      "seconds": 1.2150000000000000e+03
+    },
+    {
+      "name": "path_queries_benchmark<hybrid>/hybrid_counting",
+      "run_name": "path_queries_benchmark<hybrid>/hybrid_counting",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 3.7902259854599831e+10,
+      "cpu_time": 3.7895917506999924e+10,
+      "time_unit": "ns",
+      "seconds": 3.7000000000000000e+01
+    },
+    {
+      "name": "path_queries_benchmark<tree_ext_ptr>/tree_ext_ptr_counting",
+      "run_name": "path_queries_benchmark<tree_ext_ptr>/tree_ext_ptr_counting",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 1.3315452497452497e+10,
+      "cpu_time": 1.3313430721999794e+10,
+      "time_unit": "ns",
+      "seconds": 1.3000000000000000e+01
+    },
+    {
+      "name": "path_queries_benchmark<tree_ext_sct_un>/tree_ext_sct_un_counting",
+      "run_name": "path_queries_benchmark<tree_ext_sct_un>/tree_ext_sct_un_counting",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 2.0369321666657925e+11,
+      "cpu_time": 2.0365327284300018e+11,
+      "time_unit": "ns",
+      "seconds": 2.0300000000000000e+02
+    },
+    {
+      "name": "path_queries_benchmark<tree_ext_sct_rrr>/tree_ext_sct_rrr_counting",
+      "run_name": "path_queries_benchmark<tree_ext_sct_rrr>/tree_ext_sct_rrr_counting",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 2.7214156762324274e+11,
+      "cpu_time": 2.7208305539799994e+11,
+      "time_unit": "ns",
+      "seconds": 2.7200000000000000e+02
+    },
+    {
+      "name": "path_queries_benchmark<wt_hpd_un>/wt_hpd_un_counting",
+      "run_name": "path_queries_benchmark<wt_hpd_un>/wt_hpd_un_counting",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 3.3734004064835608e+11,
+      "cpu_time": 3.3726254297300055e+11,
+      "time_unit": "ns",
+      "seconds": 3.3700000000000000e+02
+    },
+    {
+      "name": "path_queries_benchmark<wt_hpd_rrr>/wt_hpd_rrr_counting",
+      "run_name": "path_queries_benchmark<wt_hpd_rrr>/wt_hpd_rrr_counting",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 5.3147074223123492e+11,
+      "cpu_time": 5.3136725071399994e+11,
+      "time_unit": "ns",
+      "seconds": 5.3100000000000000e+02
+    }
+  ]
+}
+Running: /users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/aggregate_bench /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu 10000000 100 --benchmark_counters_tabular=true --benchmark_format=json --benchmark_out=/users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/resfile_counting_K_100_eu.d.mst.dimacs.puu.json --benchmark_filter=counting
+Reading dataset: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu
+Dataset path: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu
+K= 100
+{
+  "context": {
+    "date": "2019-12-24 03:41:14",
+    "host_name": "saga",
+    "executable": "/users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu",
+    "num_cpus": 16,
+    "mhz_per_cpu": 3301,
+    "cpu_scaling_enabled": true,
+    "caches": [
+      {
+        "type": "Data",
+        "level": 1,
+        "size": 32000,
+        "num_sharing": 2
+      },
+      {
+        "type": "Instruction",
+        "level": 1,
+        "size": 32000,
+        "num_sharing": 2
+      },
+      {
+        "type": "Unified",
+        "level": 2,
+        "size": 1024000,
+        "num_sharing": 2
+      },
+      {
+        "type": "Unified",
+        "level": 3,
+        "size": 25344000,
+        "num_sharing": 16
+      }
+    ],
+    "load_avg": [1,1,1],
+    "library_build_type": "release"
+  },
+  "benchmarks": [
+    {
+      "name": "path_queries_benchmark<nv>/nv_counting",
+      "run_name": "path_queries_benchmark<nv>/nv_counting",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 2.0966750390809028e+12,
+      "cpu_time": 2.0961411351960000e+12,
+      "time_unit": "ns",
+      "seconds": 2.0960000000000000e+03
+    },
+    {
+      "name": "path_queries_benchmark<nv_lca>/nv_lca_counting",
+      "run_name": "path_queries_benchmark<nv_lca>/nv_lca_counting",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 1.2292937308158726e+12,
+      "cpu_time": 1.2290750608039998e+12,
+      "time_unit": "ns",
+      "seconds": 1.2290000000000000e+03
+    },
+    {
+      "name": "path_queries_benchmark<hybrid>/hybrid_counting",
+      "run_name": "path_queries_benchmark<hybrid>/hybrid_counting",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 3.8080995716154572e+10,
+      "cpu_time": 3.8074510870999802e+10,
+      "time_unit": "ns",
+      "seconds": 3.8000000000000000e+01
+    },
+    {
+      "name": "path_queries_benchmark<tree_ext_ptr>/tree_ext_ptr_counting",
+      "run_name": "path_queries_benchmark<tree_ext_ptr>/tree_ext_ptr_counting",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 1.3553883785381912e+10,
+      "cpu_time": 1.3552016563000051e+10,
+      "time_unit": "ns",
+      "seconds": 1.3000000000000000e+01
+    },
+    {
+      "name": "path_queries_benchmark<tree_ext_sct_un>/tree_ext_sct_un_counting",
+      "run_name": "path_queries_benchmark<tree_ext_sct_un>/tree_ext_sct_un_counting",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 2.0332846860773862e+11,
+      "cpu_time": 2.0329042009200021e+11,
+      "time_unit": "ns",
+      "seconds": 2.0300000000000000e+02
+    },
+    {
+      "name": "path_queries_benchmark<tree_ext_sct_rrr>/tree_ext_sct_rrr_counting",
+      "run_name": "path_queries_benchmark<tree_ext_sct_rrr>/tree_ext_sct_rrr_counting",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 2.7232790609821677e+11,
+      "cpu_time": 2.7227308699100012e+11,
+      "time_unit": "ns",
+      "seconds": 2.7200000000000000e+02
+    },
+    {
+      "name": "path_queries_benchmark<wt_hpd_un>/wt_hpd_un_counting",
+      "run_name": "path_queries_benchmark<wt_hpd_un>/wt_hpd_un_counting",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 3.3447753804363312e+11,
+      "cpu_time": 3.3441743463099963e+11,
+      "time_unit": "ns",
+      "seconds": 3.3400000000000000e+02
+    },
+    {
+      "name": "path_queries_benchmark<wt_hpd_rrr>/wt_hpd_rrr_counting",
+      "run_name": "path_queries_benchmark<wt_hpd_rrr>/wt_hpd_rrr_counting",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 5.2549198584444818e+11,
+      "cpu_time": 5.2539430567500037e+11,
+      "time_unit": "ns",
+      "seconds": 5.2500000000000000e+02
+    }
+  ]
+}
+Running: /users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/aggregate_bench /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu 1000000 1 --benchmark_counters_tabular=true --benchmark_format=json --benchmark_out=/users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/resfile_reporting_K_1_eu.d.mst.dimacs.puu.json --benchmark_filter=reporting
+Reading dataset: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu
+Dataset path: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu
+K= 1
+{
+  "context": {
+    "date": "2019-12-24 05:03:33",
+    "host_name": "saga",
+    "executable": "/users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu",
+    "num_cpus": 16,
+    "mhz_per_cpu": 3301,
+    "cpu_scaling_enabled": true,
+    "caches": [
+      {
+        "type": "Data",
+        "level": 1,
+        "size": 32000,
+        "num_sharing": 2
+      },
+      {
+        "type": "Instruction",
+        "level": 1,
+        "size": 32000,
+        "num_sharing": 2
+      },
+      {
+        "type": "Unified",
+        "level": 2,
+        "size": 1024000,
+        "num_sharing": 2
+      },
+      {
+        "type": "Unified",
+        "level": 3,
+        "size": 25344000,
+        "num_sharing": 16
+      }
+    ],
+    "load_avg": [1,1,1],
+    "library_build_type": "release"
+  },
+  "benchmarks": [
+    {
+      "name": "path_queries_benchmark<nv>/nv_reporting",
+      "run_name": "path_queries_benchmark<nv>/nv_reporting",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 2.0301695981062949e+11,
+      "cpu_time": 2.0296759916099997e+11,
+      "time_unit": "ns",
+      "seconds": 2.0300000000000000e+02
+    },
+    {
+      "name": "path_queries_benchmark<nv_lca>/nv_lca_reporting",
+      "run_name": "path_queries_benchmark<nv_lca>/nv_lca_reporting",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 1.1801269336976111e+11,
+      "cpu_time": 1.1799073059800000e+11,
+      "time_unit": "ns",
+      "seconds": 1.1800000000000000e+02
+    },
+    {
+      "name": "path_queries_benchmark<hybrid>/hybrid_reporting",
+      "run_name": "path_queries_benchmark<hybrid>/hybrid_reporting",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 4.0105511173605919e+09,
+      "cpu_time": 4.0098945369999795e+09,
+      "time_unit": "ns",
+      "seconds": 4.0000000000000000e+00
+    },
+    {
+      "name": "path_queries_benchmark<tree_ext_ptr>/tree_ext_ptr_reporting",
+      "run_name": "path_queries_benchmark<tree_ext_ptr>/tree_ext_ptr_reporting",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 1.5546994749456644e+09,
+      "cpu_time": 1.5544707409999888e+09,
+      "time_unit": "ns",
+      "seconds": 1.0000000000000000e+00
+    },
+    {
+      "name": "path_queries_benchmark<tree_ext_sct_un>/tree_ext_sct_un_reporting",
+      "run_name": "path_queries_benchmark<tree_ext_sct_un>/tree_ext_sct_un_reporting",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 2.9751397596672176e+10,
+      "cpu_time": 2.9746184970000000e+10,
+      "time_unit": "ns",
+      "seconds": 2.9000000000000000e+01
+    },
+    {
+      "name": "path_queries_benchmark<tree_ext_sct_rrr>/tree_ext_sct_rrr_reporting",
+      "run_name": "path_queries_benchmark<tree_ext_sct_rrr>/tree_ext_sct_rrr_reporting",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 7.9174611486494537e+10,
+      "cpu_time": 7.9162256488000031e+10,
+      "time_unit": "ns",
+      "seconds": 7.9000000000000000e+01
+    },
+    {
+      "name": "path_queries_benchmark<wt_hpd_un>/wt_hpd_un_reporting",
+      "run_name": "path_queries_benchmark<wt_hpd_un>/wt_hpd_un_reporting",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 6.7086849743500351e+10,
+      "cpu_time": 6.7075235671000084e+10,
+      "time_unit": "ns",
+      "seconds": 6.7000000000000000e+01
+    },
+    {
+      "name": "path_queries_benchmark<wt_hpd_rrr>/wt_hpd_rrr_reporting",
+      "run_name": "path_queries_benchmark<wt_hpd_rrr>/wt_hpd_rrr_reporting",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 1.2083474352024495e+11,
+      "cpu_time": 1.2081360811000002e+11,
+      "time_unit": "ns",
+      "seconds": 1.2000000000000000e+02
+    }
+  ]
+}
+Running: /users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/aggregate_bench /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu 1000000 10 --benchmark_counters_tabular=true --benchmark_format=json --benchmark_out=/users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/resfile_reporting_K_10_eu.d.mst.dimacs.puu.json --benchmark_filter=reporting
+Reading dataset: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu
+Dataset path: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu
+K= 10
+{
+  "context": {
+    "date": "2019-12-24 05:17:37",
+    "host_name": "saga",
+    "executable": "/users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu",
+    "num_cpus": 16,
+    "mhz_per_cpu": 3301,
+    "cpu_scaling_enabled": true,
+    "caches": [
+      {
+        "type": "Data",
+        "level": 1,
+        "size": 32000,
+        "num_sharing": 2
+      },
+      {
+        "type": "Instruction",
+        "level": 1,
+        "size": 32000,
+        "num_sharing": 2
+      },
+      {
+        "type": "Unified",
+        "level": 2,
+        "size": 1024000,
+        "num_sharing": 2
+      },
+      {
+        "type": "Unified",
+        "level": 3,
+        "size": 25344000,
+        "num_sharing": 16
+      }
+    ],
+    "load_avg": [1,1,1],
+    "library_build_type": "release"
+  },
+  "benchmarks": [
+    {
+      "name": "path_queries_benchmark<nv>/nv_reporting",
+      "run_name": "path_queries_benchmark<nv>/nv_reporting",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 2.0577203190699219e+11,
+      "cpu_time": 2.0571409676900000e+11,
+      "time_unit": "ns",
+      "seconds": 2.0500000000000000e+02
+    },
+    {
+      "name": "path_queries_benchmark<nv_lca>/nv_lca_reporting",
+      "run_name": "path_queries_benchmark<nv_lca>/nv_lca_reporting",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 1.1986891762726009e+11,
+      "cpu_time": 1.1984601354299997e+11,
+      "time_unit": "ns",
+      "seconds": 1.1900000000000000e+02
+    },
+    {
+      "name": "path_queries_benchmark<hybrid>/hybrid_reporting",
+      "run_name": "path_queries_benchmark<hybrid>/hybrid_reporting",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 4.0828159041702747e+09,
+      "cpu_time": 4.0820655989999752e+09,
+      "time_unit": "ns",
+      "seconds": 4.0000000000000000e+00
+    },
+    {
+      "name": "path_queries_benchmark<tree_ext_ptr>/tree_ext_ptr_reporting",
+      "run_name": "path_queries_benchmark<tree_ext_ptr>/tree_ext_ptr_reporting",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 1.5699911154806614e+09,
+      "cpu_time": 1.5697517510000126e+09,
+      "time_unit": "ns",
+      "seconds": 1.0000000000000000e+00
+    },
+    {
+      "name": "path_queries_benchmark<tree_ext_sct_un>/tree_ext_sct_un_reporting",
+      "run_name": "path_queries_benchmark<tree_ext_sct_un>/tree_ext_sct_un_reporting",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 2.9807827789336441e+10,
+      "cpu_time": 2.9802063102000034e+10,
+      "time_unit": "ns",
+      "seconds": 2.9000000000000000e+01
+    },
+    {
+      "name": "path_queries_benchmark<tree_ext_sct_rrr>/tree_ext_sct_rrr_reporting",
+      "run_name": "path_queries_benchmark<tree_ext_sct_rrr>/tree_ext_sct_rrr_reporting",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 7.9033990614116196e+10,
+      "cpu_time": 7.9020708879999969e+10,
+      "time_unit": "ns",
+      "seconds": 7.9000000000000000e+01
+    },
+    {
+      "name": "path_queries_benchmark<wt_hpd_un>/wt_hpd_un_reporting",
+      "run_name": "path_queries_benchmark<wt_hpd_un>/wt_hpd_un_reporting",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 6.7086570812389252e+10,
+      "cpu_time": 6.7051077599000107e+10,
+      "time_unit": "ns",
+      "seconds": 6.7000000000000000e+01
+    },
+    {
+      "name": "path_queries_benchmark<wt_hpd_rrr>/wt_hpd_rrr_reporting",
+      "run_name": "path_queries_benchmark<wt_hpd_rrr>/wt_hpd_rrr_reporting",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 1.2083276290446519e+11,
+      "cpu_time": 1.2077169309400006e+11,
+      "time_unit": "ns",
+      "seconds": 1.2000000000000000e+02
+    }
+  ]
+}
+Running: /users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/aggregate_bench /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu 1000000 100 --benchmark_counters_tabular=true --benchmark_format=json --benchmark_out=/users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/resfile_reporting_K_100_eu.d.mst.dimacs.puu.json --benchmark_filter=reporting
+Reading dataset: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu
+Dataset path: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu
+K= 100
+{
+  "context": {
+    "date": "2019-12-24 05:31:46",
+    "host_name": "saga",
+    "executable": "/users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu",
+    "num_cpus": 16,
+    "mhz_per_cpu": 3301,
+    "cpu_scaling_enabled": true,
+    "caches": [
+      {
+        "type": "Data",
+        "level": 1,
+        "size": 32000,
+        "num_sharing": 2
+      },
+      {
+        "type": "Instruction",
+        "level": 1,
+        "size": 32000,
+        "num_sharing": 2
+      },
+      {
+        "type": "Unified",
+        "level": 2,
+        "size": 1024000,
+        "num_sharing": 2
+      },
+      {
+        "type": "Unified",
+        "level": 3,
+        "size": 25344000,
+        "num_sharing": 16
+      }
+    ],
+    "load_avg": [1,1,1],
+    "library_build_type": "release"
+  },
+  "benchmarks": [
+    {
+      "name": "path_queries_benchmark<nv>/nv_reporting",
+      "run_name": "path_queries_benchmark<nv>/nv_reporting",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 2.0660999665781854e+11,
+      "cpu_time": 2.0655689482399997e+11,
+      "time_unit": "ns",
+      "seconds": 2.0600000000000000e+02
+    },
+    {
+      "name": "path_queries_benchmark<nv_lca>/nv_lca_reporting",
+      "run_name": "path_queries_benchmark<nv_lca>/nv_lca_reporting",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 1.2031990438885986e+11,
+      "cpu_time": 1.2029536730799998e+11,
+      "time_unit": "ns",
+      "seconds": 1.2000000000000000e+02
+    },
+    {
+      "name": "path_queries_benchmark<hybrid>/hybrid_reporting",
+      "run_name": "path_queries_benchmark<hybrid>/hybrid_reporting",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 4.0328648407012224e+09,
+      "cpu_time": 4.0321250179999881e+09,
+      "time_unit": "ns",
+      "seconds": 4.0000000000000000e+00
+    },
+    {
+      "name": "path_queries_benchmark<tree_ext_ptr>/tree_ext_ptr_reporting",
+      "run_name": "path_queries_benchmark<tree_ext_ptr>/tree_ext_ptr_reporting",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 1.5399975478649139e+09,
+      "cpu_time": 1.5397410620000186e+09,
+      "time_unit": "ns",
+      "seconds": 1.0000000000000000e+00
+    },
+    {
+      "name": "path_queries_benchmark<tree_ext_sct_un>/tree_ext_sct_un_reporting",
+      "run_name": "path_queries_benchmark<tree_ext_sct_un>/tree_ext_sct_un_reporting",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 2.9545617474243046e+10,
+      "cpu_time": 2.9540208124000004e+10,
+      "time_unit": "ns",
+      "seconds": 2.9000000000000000e+01
+    },
+    {
+      "name": "path_queries_benchmark<tree_ext_sct_rrr>/tree_ext_sct_rrr_reporting",
+      "run_name": "path_queries_benchmark<tree_ext_sct_rrr>/tree_ext_sct_rrr_reporting",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 7.7071589309722183e+10,
+      "cpu_time": 7.7059009080000061e+10,
+      "time_unit": "ns",
+      "seconds": 7.7000000000000000e+01
+    },
+    {
+      "name": "path_queries_benchmark<wt_hpd_un>/wt_hpd_un_reporting",
+      "run_name": "path_queries_benchmark<wt_hpd_un>/wt_hpd_un_reporting",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 6.6842170327901840e+10,
+      "cpu_time": 6.6830054897999954e+10,
+      "time_unit": "ns",
+      "seconds": 6.6000000000000000e+01
+    },
+    {
+      "name": "path_queries_benchmark<wt_hpd_rrr>/wt_hpd_rrr_reporting",
+      "run_name": "path_queries_benchmark<wt_hpd_rrr>/wt_hpd_rrr_reporting",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 1.1892423676326871e+11,
+      "cpu_time": 1.1890307737199998e+11,
+      "time_unit": "ns",
+      "seconds": 1.1800000000000000e+02
+    }
+  ]
+}
+Running: /users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/aggregate_bench /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu 10000000 1 --benchmark_counters_tabular=true --benchmark_format=json --benchmark_out=/users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/resfile_median_eu.d.mst.dimacs.puu.json --benchmark_filter=median
+Reading dataset: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu
+Dataset path: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu
+K= 1
+{
+  "context": {
+    "date": "2019-12-24 05:46:05",
+    "host_name": "saga",
+    "executable": "/users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu",
+    "num_cpus": 16,
+    "mhz_per_cpu": 3301,
+    "cpu_scaling_enabled": true,
+    "caches": [
+      {
+        "type": "Data",
+        "level": 1,
+        "size": 32000,
+        "num_sharing": 2
+      },
+      {
+        "type": "Instruction",
+        "level": 1,
+        "size": 32000,
+        "num_sharing": 2
+      },
+      {
+        "type": "Unified",
+        "level": 2,
+        "size": 1024000,
+        "num_sharing": 2
+      },
+      {
+        "type": "Unified",
+        "level": 3,
+        "size": 25344000,
+        "num_sharing": 16
+      }
+    ],
+    "load_avg": [1,1,1],
+    "library_build_type": "release"
+  },
+  "benchmarks": [

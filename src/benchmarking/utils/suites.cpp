@@ -172,7 +172,7 @@ public:
 
     }
     void TearDown(const ::benchmark::State& state) {
-        //some clean-up
+		processor.reset(), processor= nullptr;
     }
     auto median( node_type x, node_type y ) {
         return processor->query(x,y);
