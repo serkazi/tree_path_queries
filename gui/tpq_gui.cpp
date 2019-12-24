@@ -782,14 +782,131 @@ QCustomPlot *tpq_gui::plot_histogram_2( std::string pth ) {
 }
 
 void tpq_gui::plot_bars_group( QStringList filenames ) {
+
+    QCPTextElement *titleElement= nullptr;
+
     auto *customPlot = new QCustomPlot;
+    mainPlot= customPlot;
     customPlot->setBackground(QBrush(EconLighter));
 
-    auto *group = new QCPBarsGroup(customPlot);
-    for ( auto i= 0; i < filenames.size(); ++i )
-        group->append(prepareBars(filenames[i],customPlot));
+    customPlot->axisRect(0)->removeAxis(customPlot->yAxis);
+    customPlot->axisRect(0)->addAxis(QCPAxis::AxisType::atLeft,new EconomistStyleQCPAxis(customPlot->axisRect(),QCPAxis::AxisType::atLeft));
+    customPlot->yAxis->setBasePen(QPen(Qt::NoPen));
+    customPlot->yAxis->setTickPen(QPen(Qt::NoPen));
+    customPlot->yAxis->setSubTickPen(QPen(Qt::NoPen));
+    customPlot->yAxis->setLabelPadding(-15);
+    //customPlot->yAxis->setLabelFont(xLabelsFont);
+    customPlot->yAxis->setPadding(2); // a bit more space to the left border
+    customPlot->yAxis->setNumberFormat(tr("gb"));
+    // customPlot->yAxis->setTickLabelRotation(60);
+    // customPlot->yAxis->setLabel("Time to complete (seconds)");
+    //customPlot->yAxis->setOffset(-100);
+    // customPlot->yAxis->setBasePen(QPen(Qt::black));
+    // customPlot->yAxis->setTickPen(QPen(Qt::black));
+    // customPlot->yAxis->setSubTickPen(QPen(Qt::black));
+    customPlot->yAxis->setOffset(0);
+    customPlot->yAxis->grid()->setSubGridVisible(false);
+    customPlot->yAxis->grid()->setVisible(true);
+    customPlot->yAxis->grid()->setPen(QPen(Shadow.lighter(227),0,Qt::SolidLine));
 
-    customPlot->addGraph();
+    customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
+
+    double low= std::numeric_limits<double>::max(),
+            high= std::numeric_limits<double>::min(),
+            key_max= std::numeric_limits<double>::min();
+
+    auto *group = new QCPBarsGroup(customPlot);
+    QVector<Qt::BrushStyle> styles= {Qt::SolidPattern,Qt::Dense1Pattern,Qt::Dense2Pattern,Qt::Dense3Pattern};
+    QVector<QString> qnames= {QString(tr("large")),QString(tr("medium")),QString(tr("small"))};
+    for ( auto i= 0; i < filenames.size(); ++i ) {
+        auto *bar= prepareBars(filenames[i], customPlot);
+        auto qcprng= bar->dataValueRange(0);
+        low= std::min(low,qcprng.lower);
+        high= std::max(high,qcprng.upper);
+        bar->setWidth(0.15);
+        QBrush brush(EconBlue,styles[i]);
+        bar->setName(qnames[i]);
+        bar->setBrush(brush);
+        group->append(bar);
+        key_max= std::max(key_max, bar->dataCount()+0.00);
+        // customPlot->addGraph();
+    }
+
+    QVector<QString> labels;
+    QVector<double> ticks;
+    for ( auto i= 0; i < key_max; ++i ) {
+        ticks << i+1;
+        labels.push_back(QString::number(i+1));
+    }
+
+    QFont fnt("Monospace");
+    fnt.setStyleHint(QFont::TypeWriter);
+
+    if ( auto tmp= getSelectedQueryButton() ) {
+        titleElement= new QCPTextElement(mainPlot);
+        titleElement->setText(tmp->text());
+        QFont titleFont= fnt;
+        titleFont.setBold(true);
+        titleElement->setFont(titleFont);
+        // customPlot->axisRect(0)->insetLayout()->addElement(titleElement,Qt::AlignTop|Qt::AlignLeading);
+    }
+
+    QFont xLabelsFont= fnt;
+    xLabelsFont.setPointSize(10);
+    customPlot->xAxis->setLabelFont(xLabelsFont);
+    customPlot->xAxis->grid()->setVisible(false);
+    customPlot->xAxis->setSubTicks(false);
+    customPlot->xAxis->setTickLength(0, 4);
+    customPlot->xAxis->setRange(0,key_max+2);
+    QSharedPointer<QCPAxisTickerText> textTicker(new QCPAxisTickerText);
+    textTicker->addTicks(ticks, labels);
+    customPlot->xAxis->setTicker(textTicker);
+
+    customPlot->yAxis->setRange(0.00,high*1.13);
+    customPlot->yAxis->setLabelFont(xLabelsFont);
+    customPlot->legend->setVisible(true);
+    customPlot->legend->setFont(xLabelsFont);
+
+    auto header= getSelectedQueryButton()->text();
+    header.append(QString(tr(" queries for ")));
+    std::ifstream input(filenames[0].toStdString());
+    nlohmann::json obj; input >> obj;
+    std::string path_= [&]() {
+        std::string x= obj["context"]["executable"];
+        std::regex r("([^/]+)$");
+        std::smatch m;
+        if ( std::regex_search(x,m,r) ) {
+            return std::regex_replace(m.str(1),std::regex(".txt$|.puu$"),""); //remove the extension
+        }
+        return std::string();
+    }();
+    header.append(QString(tr(path_.c_str())));
+
+    // set title
+    customPlot->plotLayout()->insertRow(0);
+    auto textElement= new QCPTextElement(customPlot,header);
+    QFont titleFont= QFont("Verdana",12);
+    titleFont.setBold(true);
+    textElement->setFont(titleFont);
+    customPlot->plotLayout()->addElement(0,0,textElement);
+    // customPlot->axisRect(0)->insetLayout()->addElement(textElement, Qt::AlignTop|Qt::AlignLeft);
+    {
+        customPlot->plotLayout()->insertRow(1);
+        QString subTitle(tr("time to complete, sec."));
+        auto subtitleTextElement = new QCPTextElement(customPlot, subTitle);
+        QFont subTitleFont = QFont(fnt.family(), 9);
+        subTitleFont.setItalic(true);
+        subtitleTextElement->setFont(subTitleFont);
+        customPlot->plotLayout()->addElement(1, 0, subtitleTextElement);
+    }
+
+    auto *w= new QWidget();
+    auto *grid= new QGridLayout();
+    grid->addWidget(customPlot, 0, 0, 2, 2);
+    w->setLayout(grid);
+    w->setWindowTitle(tr("Bars group"));
+    w->resize(480, 320);
+    w->show();
 }
 
 QCPBars *tpq_gui::prepareBars( QString filename, QCustomPlot *customPlot ) {
@@ -833,31 +950,5 @@ QCPBars *tpq_gui::prepareBars( QString filename, QCustomPlot *customPlot ) {
         bars->addData(i+1.00,data[i]);
         bars->setParent(customPlot);
     }
-
-    // customPlot->addGraph();
-
-    // customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
-
-    QVector<QCPItemText *> items;
-    //Creating and configuring an item
-    double spacing= 300;
-    for ( auto i= 0; i < data.size(); ++i ) {
-        auto *textLabel = new QCPItemText(customPlot);
-        //customPlot->addItem(textLabel);
-        textLabel->setClipToAxisRect(false);
-        textLabel->position->setAxes(customPlot->xAxis, customPlot->yAxis);
-        textLabel->position->setType(QCPItemPosition::ptPlotCoords);
-        //placing the item over the bar with a spacing of 0.25
-        textLabel->position->setCoords(ticks[i],data[i]+spacing);
-        //Customizing the item
-        textLabel->setText(QString::number(data[i]));
-
-        // textLabel->setFont(QFont(font().family(), 9));
-        textLabel->setFont(QFont(fnt.family(), 9));
-        textLabel->setPen(QPen(Qt::black));
-        items.push_back(textLabel);
-    }
-    //==========================
-
     return bars;
 }
