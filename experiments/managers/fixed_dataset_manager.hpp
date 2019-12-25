@@ -13,7 +13,7 @@
 #include "fixed_processor_manager.hpp"
 #include "nsrs.hpp"
 #include "tree_ext_sct.hpp"
-#include "hybrid_processor.hpp"
+#include "wt_hpd_ptr.hpp"
 
 namespace experiments {
 
@@ -40,8 +40,8 @@ namespace experiments {
     }
 
     // human-readable names
-    const std::vector<std::string> hrnames= {"nv","nv_lca","nsrs","hybrid",
-                                  "tree_ext_ptr","wt_hpd_un","wt_hpd_rrr",
+    const std::vector<std::string> hrnames= {"nv","nv_lca","nsrs",
+                                  "tree_ext_ptr", "wt_hpd_rrr", "wt_hpd_un","wt_hpd_rrr",
                                   "tree_ext_sct_un","tree_ext_sct_rrr"};
 
     template<
@@ -56,7 +56,7 @@ namespace experiments {
         using nv                 = naive_processor<node_type,size_type,value_type>;
         using nv_lca             = naive_processor_lca<node_type,size_type,value_type>;
         using nv_succ            = nsrs<node_type,size_type,value_type>;
-        using hybrid             = hybrid_processor<node_type,size_type,value_type>;
+        using wt_hp_ptr          = wt_hpd_ptr<node_type,size_type,value_type>;
         using tree_ext_ptr       = ext_ptr<node_type,size_type,value_type>;
         using wt_hpd_uncompressed= wt_hpd<
                 node_type,size_type,value_type,
@@ -96,7 +96,7 @@ namespace experiments {
                     return std::move(std::make_unique<nv_succ>(topology, w));
                 }
                 case static_cast<int>(experiments::IMPLS::WT_HPD_PTR ): {
-                    return std::move(std::make_unique<hybrid>(topology, w));
+                    return std::move(std::make_unique<wt_hp_ptr>(topology, w));
                 }
                 case static_cast<int>(experiments::IMPLS::TREE_EXT_PTR): {
                     return std::move(std::make_unique<tree_ext_ptr>(topology, w));
@@ -138,7 +138,7 @@ private:
     using nv                 = naive_processor<node_type,size_type,value_type>;
     using nv_lca             = naive_processor_lca<node_type,size_type,value_type>;
     using nv_succ            = nsrs<node_type,size_type,value_type>;
-    using hybrid             = hybrid_processor<node_type,size_type,value_type>;
+    using wt_hp              = wt_hpd_ptr<node_type,size_type,value_type>;
     using tree_ext_ptr       = ext_ptr<node_type,size_type,value_type>;
     using wt_hpd_uncompressed= wt_hpd<
                                         node_type,size_type,value_type,

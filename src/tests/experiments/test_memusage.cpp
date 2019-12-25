@@ -39,6 +39,7 @@ void instantiate_exp( uint16_t mask, experiments::IMPLS impl ) {
             processor.reset();
             processor = nullptr;
         } catch ( std::exception &e ) {
+            std::cerr << e.what() << std::endl;
             throw e;
         }
     }
