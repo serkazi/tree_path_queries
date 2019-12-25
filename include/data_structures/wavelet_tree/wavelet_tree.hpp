@@ -1,7 +1,6 @@
 //
 // Created by sj on 01/11/19.
 //
-
 #ifndef SPQ_WAVELET_TREE_HPP
 #define SPQ_WAVELET_TREE_HPP
 #include <vector>
@@ -10,11 +9,17 @@
 #include <queue>
 #include <cassert>
 #include <memory>
-#include "simple_bitset.hpp"
+#include <optional>
+#include <functional>
 
 template <typename size_type= int, typename value_type= int>
 class wavelet_tree {
+public:
+    using point2d= std::pair<size_type,value_type>;
+    using result_type= std::vector<std::pair<value_type,size_type>>;
 private:
+
+    const std::vector<value_type> &original_weights;
 
     static std::pair<size_type,size_type> get_config( value_type n ) {
         auto max_node_id= std::numeric_limits<size_type>::min();
@@ -44,26 +49,29 @@ private:
     };
     size_type n, num_nodes, length;
     size_type *backbone= nullptr;
-    std::unique_ptr<size_type[]> shifts= nullptr;
     value_type sigma;
-    std::unique_ptr<simple_bitset> valid_nodes= nullptr;
+    std::unique_ptr<size_type[]> shifts= nullptr;
 
     void construct_im( std::unique_ptr<value_type[]> w ) ;
     inline size_type rank0( size_type i ) const ;
     inline size_type rank1( size_type i ) const ;
-    // removed these, since we needed explicit instantiation
-    // we don't need select queries anyway, unless
-    // we want to recover stuff
-    //template <typename Func>
-    //size_type srch( size_type j, Func f ) ;
-    //inline size_type select0( size_type j ) const ;
-    //inline size_type select1( size_type j ) const ;
+    size_type srch( size_type j, std::function<size_type(size_type)> f ) ;
+    inline size_type select0( size_type j ) const ;
+    inline size_type select1( size_type j ) const ;
 
     value_type _range_quantile( size_type idx, size_type i, size_type j,
                                 value_type a, value_type b, size_type k ) const ;
     value_type _range_quantile( size_type idx, std::vector<std::pair<size_type,size_type>> &vec,
                                 value_type a, value_type b, size_type k ) const ;
-    void mark_valid_nodes() ;
+    void _range_2d_search( size_type idx,
+                std::optional<std::vector<std::pair<size_type,size_type>> *> vec,
+                value_type a, value_type b,
+                std::optional<size_type> i, std::optional<size_type> j,
+                value_type qa, value_type qb,
+                size_type &cnt
+            ) const ;
+
+    std::pair<value_type,size_type> recover( size_type idx, size_type i ) const ;
 
 public:
     virtual double size_in_bytes() const ;
@@ -75,8 +83,12 @@ public:
     wavelet_tree( wavelet_tree<size_type,value_type> &&rhs ) noexcept ;
     explicit wavelet_tree( const std::vector<value_type> &w, bool make_power_of_two= true ) ;
     virtual ~wavelet_tree() ;
-    virtual value_type range_quantile( size_type i, size_type j, size_type k ) const ;
-    virtual value_type range_quantile(
+    size_type range_2d_counting_query( size_type qi, size_type qj, value_type qa, value_type qb ) const ;
+    void range_2d_reporting_query( size_type qi, size_type qj,
+                                           value_type qa, value_type qb,
+                                           std::optional<result_type*> result ) const ;
+    value_type range_quantile( size_type i, size_type j, size_type k ) const ;
+    value_type range_quantile(
             std::vector<std::pair<size_type,size_type>> &segments, size_type k
     ) const ;
 };
@@ -212,14 +224,14 @@ value_type wavelet_tree<size_type,value_type>::_range_quantile(
 
 // ctor
 template <typename size_type,typename value_type>
-wavelet_tree<size_type,value_type>::wavelet_tree( const std::vector<value_type> &w, bool make_power_of_two ) {
+wavelet_tree<size_type,value_type>::wavelet_tree( const std::vector<value_type> &w, bool make_power_of_two ):
+original_weights(w) {
     sigma= *(std::max_element(begin(w),end(w)))+1;
     for (;make_power_of_two and (sigma & (sigma-1)); ++sigma ) ;
     // making sigma to be closest power of two
     n= w.size();
     auto pr= get_config(sigma);
     num_nodes= pr.first+1;
-    // valid_nodes= std::make_unique<simple_bitset>(num_nodes);
     auto num_levels= static_cast<size_type>(floor(log(sigma)/log(2)+1+(1e-7)));
     length= num_levels*n+1;
     // std::cerr << "n*num_levels+1 = " << n*num_levels+1 << ", sigma= " << sigma << std::endl;
@@ -346,22 +358,126 @@ double wavelet_tree<size_type, value_type>::size_in_bytes() const {
 }
 
 template<typename size_type, typename value_type>
-void wavelet_tree<size_type, value_type>::mark_valid_nodes() {
-    valid_nodes->clear_all();
-    std::queue<std::tuple<size_t,size_t,size_t>> q;
-    for ( q.push({0,0,sigma-1}); not q.empty(); ) {
-        auto tpl= q.front(); q.pop();
-        auto idx= std::get<0>(tpl), l= std::get<1>(tpl), r= std::get<2>(tpl);
-        assert( l <= r );
-        valid_nodes->set(idx);
-        if ( l == r and 2*idx+1 < num_nodes )
-            valid_nodes->clr(2*idx+1);
-        if ( l == r and 2*idx+2 < num_nodes )
-            valid_nodes->clr(2*idx+2);
-        auto mid= (l+r)/2;
-        if ( l < r ) {
-            q.push({2*idx+1,l,mid}), q.push({2*idx+2,mid+1,r});
-        }
+size_type wavelet_tree<size_type, value_type>::srch( size_type j, std::function<size_type(size_type)> f ) {
+    size_type low= 0, high= length;
+    assert( f(high) >= j );
+    if ( f(low) == j )
+        return low;
+    assert( f(low) < j );
+    for ( ;low+1 < high; ) {
+        auto mid= (low+high)>>1;
+        f(mid)<j?(low= mid):(high= mid);
     }
+    assert( low+1 == high );
+    assert( f(low) < j );
+    assert( f(high) == j );
+    return high;
 }
+
+// we'll first go for a logarithmic select
+template<typename size_type, typename value_type>
+size_type wavelet_tree<size_type, value_type>::select0( size_type j ) const {
+    // return the position i s.t. rank_0[i] == j, and rank_0[i-1] == j-1
+    size_type low= 0, high= length;
+    assert( rank0(high) >= j );
+    if ( rank0(low) == j )
+        return low;
+    assert( rank0(low) < j );
+    for ( ;low+1 < high; ) {
+        auto mid= (low+high)>>1;
+        rank0(mid)<j?(low= mid):(high= mid);
+    }
+    assert( low+1 == high );
+    assert( rank0(low) < j );
+    assert( rank0(high) == j );
+    return high;
+    // return srch(j,rank0());
+}
+
+template<typename size_type, typename value_type>
+size_type wavelet_tree<size_type, value_type>::select1(size_type j) const {
+    size_type low= 0, high= length;
+    assert( rank1(high) >= j );
+    if ( rank1(low) == j )
+        return low;
+    assert( rank1(low) < j );
+    for ( ;low+1 < high; ) {
+        auto mid= (low+high)>>1;
+        rank0(mid)<j?(low= mid):(high= mid);
+    }
+    assert( low+1 == high );
+    assert( rank1(low) < j );
+    assert( rank1(high) == j );
+    return high;
+    // return srch(j,rank1());
+}
+
+template<typename size_type, typename value_type>
+void
+wavelet_tree<size_type, value_type>::_range_2d_search(
+        size_type idx,
+        std::optional<std::vector<std::pair<size_type, size_type>> *> vec,
+        value_type a, value_type b,
+        std::optional<size_type> qi, std::optional<size_type> qj,
+        value_type qa, value_type qb,
+        size_type &cnt ) const {
+
+    if ( (not qi) or (not qj) or *qi > *qj ) return ;
+    if ( qb < a or b < qa ) return ;
+
+    // base case
+    if ( qa <= a and b <= qb ) {
+        cnt+= (*qj)-(*qi)+1;
+        for ( auto t= *qi; vec and t <= *qj; (*vec)->push_back(recover(idx,t++)) )
+            ;
+        return ;
+    }
+
+    auto mid= (a+b)>>1;
+
+    auto _left= 2*idx+1, _right= _left+1;
+    std::optional<size_type> li= (rank0(*qi)-rank0(shifts[idx]))+shifts[2*idx+1];
+    std::optional<size_type> lj= [&]() {
+        auto x= (rank0(*qj+1)-rank0(shifts[idx]))+shifts[2*idx+1];
+        return x<1?std::nullopt:std::optional<size_type>(x-1);
+    }();
+    std::optional<size_type> ri= (rank1(*qi)-rank1(shifts[idx]))+shifts[2*idx+2];
+    std::optional<size_type> rj= [&]() {
+        auto x= (rank1(*qj+1)-rank1(shifts[idx]))+shifts[2*idx+2];
+        return x<1?std::nullopt:std::optional<size_type>(x-1);
+    }();
+
+    _range_2d_search(2*idx+1,vec,a,mid,li,lj,qa,qb,cnt);
+    _range_2d_search(2*idx+2,vec,mid+1,b,ri,rj,qa,qb,cnt);
+
+}
+
+template<typename size_type, typename value_type>
+size_type wavelet_tree<size_type, value_type>::range_2d_counting_query(
+        size_type qi, size_type qj, value_type qa, value_type qb) const {
+    size_type cnt= 0;
+    _range_2d_search(0,std::nullopt,0,sigma-1,
+            std::optional<size_type>(qi),std::optional<size_type>(qj),
+                    qa,qb,cnt);
+    return cnt;
+}
+
+template<typename size_type, typename value_type>
+std::pair<value_type,size_type> wavelet_tree<size_type, value_type>::recover(size_type idx, size_type i) const {
+    if ( idx == 0 ) return {original_weights[i],i};
+    auto parent_id= (idx>>1);
+    auto pos= i-shifts[idx];
+    return (idx&1)?\
+           recover(parent_id,select0(rank0(shifts[parent_id])+pos+1)):\
+           recover(parent_id,select1(rank1(shifts[parent_id])+pos+1));
+}
+
+template<typename size_type, typename value_type>
+void wavelet_tree<size_type, value_type>::range_2d_reporting_query( size_type qi, size_type qj,
+                               value_type qa, value_type qb,
+                               std::optional<std::vector<std::pair<value_type,size_type>> *> result ) const {
+    size_type cnt= 0;
+    _range_2d_search(0,result,0,sigma-1,qi,qj,qa,qb,cnt);
+}
+
 #endif //SPQ_WAVELET_TREE_HPP

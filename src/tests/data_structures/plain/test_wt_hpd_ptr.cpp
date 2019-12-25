@@ -1,8 +1,11 @@
+//
+// 25/12/19.
+//
 #include <random>
 #include <fstream>
 #include "gtest/gtest.h"
 #include "raw_processor.hpp"
-#include "ext_ptr.hpp"
+#include "wt_hpd_ptr.hpp"
 #include "pq_types.hpp"
 #include <functional>
 
@@ -23,9 +26,9 @@ namespace {
             std::string("us.rd.d.dfs.dimacs.puu")
     };
 
-    using holder= std::unique_ptr<ext_ptr<node_type,size_type,value_type>>;
+    using holder= std::unique_ptr<wt_hpd_ptr<node_type,size_type,value_type>>;
 
-    class ext_ptr_test: public testing::Test {
+    class wt_hpd_ptr_test: public testing::Test {
     protected:
         size_type n;
         std::vector<value_type> w;
@@ -44,7 +47,7 @@ namespace {
                 is >> x;
             n= s.size()/2;
             processor=
-                    std::make_unique<ext_ptr<node_type,size_type,value_type>>(s,w);
+                    std::make_unique<wt_hpd_ptr<node_type,size_type,value_type>>(s,w);
             raw= std::make_unique<raw_processor<node_type,size_type,value_type>>(s,w);
             nodes_distr= std::make_unique<std::uniform_int_distribution<node_type>>(0,n-1);
             qntl_distr= std::make_unique<std::uniform_int_distribution<size_type>>(1,100);
@@ -54,7 +57,7 @@ namespace {
         void TearDown() override {};
     };
 
-    TEST_F(ext_ptr_test,counting_correct) {
+    TEST_F(wt_hpd_ptr_test,counting_correct) {
         auto nodes_dice= std::bind(*(this->nodes_distr),this->gen_nodes);
         auto weights_dice= std::bind(*(this->weights_distr),this->gen_weights);
         for ( auto it= 0; it < ITERS; ++it ) {
@@ -68,7 +71,7 @@ namespace {
         }
     }
 
-    TEST_F( ext_ptr_test, median_is_correct ) {
+    TEST_F( wt_hpd_ptr_test, median_is_correct ) {
         auto nodes_dice= std::bind(*(this->nodes_distr),this->gen_nodes);
         for ( auto it= 0; it < ITERS; ++it ) {
             auto x= nodes_dice(), y= nodes_dice();
@@ -79,7 +82,7 @@ namespace {
         }
     };
 
-    TEST_F( ext_ptr_test, selection_is_correct ) {
+    TEST_F( wt_hpd_ptr_test, selection_is_correct ) {
         auto nodes_dice= std::bind(*(this->nodes_distr),this->gen_nodes);
         auto qntl_dice= std::bind(*(this->qntl_distr),this->gen_qntl);
         for ( auto it= 0; it < ITERS; ++it ) {

@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
 set(THREADS_PREFER_PTHREAD_FLAG TRUE)
 
-SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -mcmodel=large -O2 -g -DNDEBUG")
+set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -mcmodel=large -O2 -g -DNDEBUG")
 # add_compile_options(-mcmodel=large -O2 -g -DNDEBUG)
 
 find_package(Threads REQUIRED)
@@ -249,6 +249,21 @@ target_include_directories(
         ext_ptr
         PUBLIC
         ${PROJECT_SOURCE_DIR}/include/data_structures/plain
+        ${PROJECT_SOURCE_DIR}/include/interfaces
+)
+
+# adding library for plain pointer-based wt_hpd
+add_library(
+        wt_hpd_ptr
+        ${PROJECT_SOURCE_DIR}/include/data_structures/plain/wt_hpd_ptr.hpp
+)
+set_target_properties(wt_hpd_ptr PROPERTIES LINKER_LANGUAGE CXX)
+target_include_directories(
+        wt_hpd_ptr
+        PUBLIC
+        ${PROJECT_SOURCE_DIR}/include/data_structures/plain
+        ${PROJECT_SOURCE_DIR}/include/data_structures/wavelet_tree
+        ${PROJECT_SOURCE_DIR}/include/data_structures/hpd
         ${PROJECT_SOURCE_DIR}/include/interfaces
 )
 
