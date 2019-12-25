@@ -95,7 +95,7 @@ namespace experiments {
                 case static_cast<int>(experiments::IMPLS::NV_SUCC): {
                     return std::move(std::make_unique<nv_succ>(topology, w));
                 }
-                case static_cast<int>(experiments::IMPLS::WT_HPD_PTR): {
+                case static_cast<int>(experiments::IMPLS::WT_HPD_PTR ): {
                     return std::move(std::make_unique<hybrid>(topology, w));
                 }
                 case static_cast<int>(experiments::IMPLS::TREE_EXT_PTR): {
