@@ -16,12 +16,13 @@
 #include "hybrid_processor.hpp"
 
 namespace experiments {
+
     enum class IMPLS {
         NV=                 1 << 0,
         NV_LCA=             1 << 1,
         NV_SUCC=            1 << 2,
-        HYBRID=             1 << 3,
-        TREE_EXT_PTR=       1 << 4,
+        TREE_EXT_PTR=       1 << 3,
+        WT_HPD_PTR=         1 << 4,
         WT_HPD_UN=          1 << 5,
         WT_HPD_RRR=         1 << 6,
         TREE_EXT_SCT_UN=    1 << 7,
@@ -94,7 +95,7 @@ namespace experiments {
                 case static_cast<int>(experiments::IMPLS::NV_SUCC): {
                     return std::move(std::make_unique<nv_succ>(topology, w));
                 }
-                case static_cast<int>(experiments::IMPLS::HYBRID): {
+                case static_cast<int>(experiments::IMPLS::WT_HPD_PTR): {
                     return std::move(std::make_unique<hybrid>(topology, w));
                 }
                 case static_cast<int>(experiments::IMPLS::TREE_EXT_PTR): {

@@ -2,7 +2,7 @@
 #include "fixed_dataset_manager.hpp"
 
 // Note: since one global randomization mechanism is used, these queries
-// may obviously return different results, just because the queires are different --
+// may obviously return different results, just because the queries are different --
 // every time dice() is thrown, a different number shows up
 #define run_some_random_queries {for( auto it= 0; it < ITERATIONS; ++it ) {  \
     arr[it]= processor->query(distribution(engine),distribution(engine));}   \
@@ -15,7 +15,7 @@ using value_type= pq_types::value_type;
 std::default_random_engine engine;
 std::unique_ptr<std::uniform_int_distribution<node_type>> distribution;
 std::unique_ptr<path_query_processor<node_type,size_type,value_type>> processor;
-const int ITERATIONS= (1 << 17);
+const int ITERATIONS= (1ul << 17);
 std::array<value_type,16> arr{};
 std::string topology;
 std::vector<value_type> w;
@@ -34,7 +34,7 @@ void instantiate_exp( uint16_t mask, experiments::IMPLS impl ) {
             for (auto it = 0; it < ITERATIONS; ++it) {
                 arr[it & 0xf] = processor->query((*distribution)(engine), (*distribution)(engine));
             }
-            std::cerr << std::accumulate(arr.begin(), arr.end(), 0) << std::endl;
+            std::cerr << std::accumulate(arr.begin(), arr.end(), 0ul) << std::endl;
             // delete the object owned by the processor pointer
             processor.reset();
             processor = nullptr;
@@ -79,13 +79,12 @@ int main( int argc, char **argv ) {
 
     instantiate_exp(mask,experiments::IMPLS::NV);
     instantiate_exp(mask,experiments::IMPLS::NV_LCA);
+    instantiate_exp(mask,experiments::IMPLS::TREE_EXT_PTR);
+    instantiate_exp(mask,experiments::IMPLS::WT_HPD_PTR);
     instantiate_exp(mask,experiments::IMPLS::NV_SUCC);
-    instantiate_exp(mask,experiments::IMPLS::WT_HPD_UN);
-    instantiate_exp(mask,experiments::IMPLS::WT_HPD_RRR);
     instantiate_exp(mask,experiments::IMPLS::TREE_EXT_SCT_UN);
     instantiate_exp(mask,experiments::IMPLS::TREE_EXT_SCT_RRR);
-    instantiate_exp(mask,experiments::IMPLS::HYBRID);
-    instantiate_exp(mask,experiments::IMPLS::TREE_EXT_PTR);
-
+    instantiate_exp(mask,experiments::IMPLS::WT_HPD_UN);
+    instantiate_exp(mask,experiments::IMPLS::WT_HPD_RRR);
     return 0;
 }

@@ -13,7 +13,7 @@
 #include "pq_request.hpp"
 #include "naive_processor.hpp"
 #include "wt_hpd.hpp"
-#include "hybrid_processor.hpp"
+#include "wt_hpd_ptr.hpp"
 #include <random>
 #include <functional>
 #include <algorithm>
@@ -41,7 +41,7 @@ const std::string paths[]= {
 using nv                 = naive_processor<node_type,size_type,value_type>;
 using nv_lca             = naive_processor_lca<node_type,size_type,value_type>;
 using nv_sct            = nsrs<node_type,size_type,value_type>;
-using hybrid             = hybrid_processor<node_type,size_type,value_type>;
+using wt_hp_ptr             = wt_hpd_ptr<node_type,size_type,value_type>;
 using tree_ext_ptr       = ext_ptr<node_type,size_type,value_type>;
 using wt_hpd_un= wt_hpd<node_type,size_type,value_type,
         bp_tree_sada<node_type,size_type>,
@@ -218,10 +218,12 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_lca_median,nv_lca)(benchmark::Sta
     }
 }
 
-BENCHMARK_TEMPLATE_F(path_queries_benchmark,hybrid_median,hybrid)(benchmark::State &state) {
+
+BENCHMARK_TEMPLATE_F(path_queries_benchmark,tree_ext_ptr_median,tree_ext_ptr)(benchmark::State &state) {
     for ( auto _ : state ) {
         auto start = std::chrono::high_resolution_clock::now();
         // the code that gets measured
+        // const auto &dict= med_queries;
         const auto &dict= experiment_settings::shared_info_obj->med_queries;
         for ( const auto &qr: dict ) {
             auto res = median(qr.x_,qr.y_);
@@ -235,11 +237,10 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,hybrid_median,hybrid)(benchmark::Sta
     }
 }
 
-BENCHMARK_TEMPLATE_F(path_queries_benchmark,tree_ext_ptr_median,tree_ext_ptr)(benchmark::State &state) {
+BENCHMARK_TEMPLATE_F(path_queries_benchmark,wt_hpd_ptr_median,wt_hp_ptr)(benchmark::State &state) {
     for ( auto _ : state ) {
         auto start = std::chrono::high_resolution_clock::now();
         // the code that gets measured
-        // const auto &dict= med_queries;
         const auto &dict= experiment_settings::shared_info_obj->med_queries;
         for ( const auto &qr: dict ) {
             auto res = median(qr.x_,qr.y_);
@@ -380,23 +381,6 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_lca_counting,nv_lca)(benchmark::S
     }
 }
 
-BENCHMARK_TEMPLATE_F(path_queries_benchmark,hybrid_counting,hybrid)(benchmark::State &state) {
-    // const auto &dict= cnt_queries;
-    const auto &dict= experiment_settings::shared_info_obj->cnt_queries;
-    for ( auto _ : state ) {
-        auto start = std::chrono::high_resolution_clock::now();
-        // the code that gets measured
-        for ( const auto &qr: dict ) {
-            auto res = counting(qr.x_,qr.y_,qr.a_,qr.b_);
-            benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
-            benchmark::ClobberMemory(); // <-- took these lines from the documentation,
-        }
-        auto end = std::chrono::high_resolution_clock::now();
-        state.counters["seconds"]+= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
-        // @see https://github.com/google/benchmark#user-guide
-        // end of the code that gets measured
-    }
-}
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,tree_ext_ptr_counting,tree_ext_ptr)(benchmark::State &state) {
     // const auto &dict= cnt_queries;
     const auto &dict= experiment_settings::shared_info_obj->cnt_queries;
@@ -414,6 +398,25 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,tree_ext_ptr_counting,tree_ext_ptr)(
         // end of the code that gets measured
     }
 }
+
+BENCHMARK_TEMPLATE_F(path_queries_benchmark,wt_hpd_ptr_counting,wt_hp_ptr)(benchmark::State &state) {
+    // const auto &dict= cnt_queries;
+    const auto &dict= experiment_settings::shared_info_obj->cnt_queries;
+    for ( auto _ : state ) {
+        auto start = std::chrono::high_resolution_clock::now();
+        // the code that gets measured
+        for ( const auto &qr: dict ) {
+            auto res = counting(qr.x_,qr.y_,qr.a_,qr.b_);
+            benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
+            benchmark::ClobberMemory(); // <-- took these lines from the documentation,
+        }
+        auto end = std::chrono::high_resolution_clock::now();
+        state.counters["seconds"]+= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
+        // @see https://github.com/google/benchmark#user-guide
+        // end of the code that gets measured
+    }
+}
+
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,tree_ext_sct_un_counting,tree_ext_sct_un)(benchmark::State &state) {
     // const auto &dict= cnt_queries;
     const auto &dict= experiment_settings::shared_info_obj->cnt_queries;
@@ -431,6 +434,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,tree_ext_sct_un_counting,tree_ext_sc
         // end of the code that gets measured
     }
 }
+
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,tree_ext_sct_rrr_counting,tree_ext_sct_rrr)(benchmark::State &state) {
     // const auto &dict= cnt_queries;
     const auto &dict= experiment_settings::shared_info_obj->cnt_queries;
@@ -543,7 +547,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_lca_reporting,nv_lca)(benchmark::
     }
 }
 
-BENCHMARK_TEMPLATE_F(path_queries_benchmark,hybrid_reporting,hybrid)(benchmark::State &state) {
+BENCHMARK_TEMPLATE_F(path_queries_benchmark,tree_ext_ptr_reporting,tree_ext_ptr)(benchmark::State &state) {
     // const auto &dict= rpt_queries;
     const auto &dict= experiment_settings::shared_info_obj->rpt_queries;
     std::vector<std::pair<value_type,size_type>> res;
@@ -563,7 +567,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,hybrid_reporting,hybrid)(benchmark::
     }
 }
 
-BENCHMARK_TEMPLATE_F(path_queries_benchmark,tree_ext_ptr_reporting,tree_ext_ptr)(benchmark::State &state) {
+BENCHMARK_TEMPLATE_F(path_queries_benchmark,wt_hpd_ptr_reporting,wt_hp_ptr)(benchmark::State &state) {
     // const auto &dict= rpt_queries;
     const auto &dict= experiment_settings::shared_info_obj->rpt_queries;
     std::vector<std::pair<value_type,size_type>> res;
@@ -602,6 +606,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,tree_ext_sct_un_reporting,tree_ext_s
         // end of the code that gets measured
     }
 }
+
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,tree_ext_sct_rrr_reporting,tree_ext_sct_rrr)(benchmark::State &state) {
     // const auto &dict= rpt_queries;
     const auto &dict= experiment_settings::shared_info_obj->rpt_queries;
@@ -700,10 +705,7 @@ void RunAllGiven( int argc, char **argv ) {
         }
     }
 
-    const int
-            FULL_PATH= 0,
-            NUM_QUERIES= 1,
-            K_VAL= 2;
+    const int FULL_PATH= 0, NUM_QUERIES= 1, K_VAL= 2;
 
     // ".*nv_lca_counting\|.*tree_ext_ptr_counting"
 
