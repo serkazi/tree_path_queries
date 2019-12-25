@@ -117,6 +117,7 @@ namespace experiments {
                     assert(false);
             }
         } catch ( std::exception &e ) {
+            std::cerr << e.what() << std::endl;
             throw e;
         }
         return nullptr;
