@@ -7,7 +7,8 @@ use warnings;
 my $R="1000000";
 my $N="10000000";
 
-my @qtypes = ('counting','reporting','median');
+# my @qtypes = ('counting','reporting','median');
+my @qtypes = ('counting','median');
 my @ks= ('1','10','100');
 my $executable = "complete_queryset_benchmark.pl";
 

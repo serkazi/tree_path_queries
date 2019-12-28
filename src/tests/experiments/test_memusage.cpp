@@ -49,7 +49,7 @@ void instantiate_exp( uint16_t mask, experiments::IMPLS impl ) {
 // and a bitmask indicating which data structures to instantiate
 int main( int argc, char **argv ) {
 
-    const rlim_t kStackSize = 20 * 1024ll * 1024ll * 1024ll;   // min stack size = 20 GiB
+    const rlim_t kStackSize = 42 * 1024ll * 1024ll * 1024ll;   // min stack size = 42 GiB
     struct rlimit rl;
     int result;
 

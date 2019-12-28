@@ -10,7 +10,7 @@ if ( $data_path =~ /([^\/]+)$/ ) {
    $dataset= "$1";
 }
 
-my $target_path = "/users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/tests/experiments/";
+my $target_path = "../cmake-build-debug/src/tests/experiments/";
 my $executable = $target_path."observe_memusage";
 
 # my $valgrind_command= "valgrind --tool=massif --heap=yes --stacks=no --depth=3 --time-unit=ms --detailed-freq=5 --massif-out-file=outfile ".$executable ." ".$data_path."input";

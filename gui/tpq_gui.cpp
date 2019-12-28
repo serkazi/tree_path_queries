@@ -770,8 +770,13 @@ QCustomPlot *tpq_gui::plot_histogram_2( std::string pth ) {
     customPlot->plotLayout()->addElement(0,0,textElement);
     // customPlot->axisRect(0)->insetLayout()->addElement(textElement, Qt::AlignTop|Qt::AlignLeft);
     {
+        int num_queries= static_cast<int>(
+                strtol(numQueriesQLineEdit->text().toStdString().c_str(),nullptr,10)
+        );
+        char t[0x40];
+        sprintf(t,"time to complete 10%s queries, sec.",num_queries==1000000?"\u2076":"\u2077");
         customPlot->plotLayout()->insertRow(1);
-        QString subTitle(tr("time to complete, sec."));
+        QString subTitle(QString::fromUtf8(t));
         auto subtitleTextElement = new QCPTextElement(customPlot, subTitle);
         QFont subTitleFont = QFont(fnt.family(), 9);
         subTitleFont.setItalic(true);
@@ -891,8 +896,13 @@ void tpq_gui::plot_bars_group( QStringList filenames ) {
     customPlot->plotLayout()->addElement(0,0,textElement);
     // customPlot->axisRect(0)->insetLayout()->addElement(textElement, Qt::AlignTop|Qt::AlignLeft);
     {
+        int num_queries= static_cast<int>(
+                strtol(numQueriesQLineEdit->text().toStdString().c_str(),nullptr,10)
+        );
+        char t[0x40];
+        sprintf(t,"time to complete 10%s queries, sec.",num_queries==1000000?"\u2076":"\u2077");
         customPlot->plotLayout()->insertRow(1);
-        QString subTitle(tr("time to complete, sec."));
+        QString subTitle(QString::fromUtf8(t));
         auto subtitleTextElement = new QCPTextElement(customPlot, subTitle);
         QFont subTitleFont = QFont(fnt.family(), 9);
         subTitleFont.setItalic(true);
