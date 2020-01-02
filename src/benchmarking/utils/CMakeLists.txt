@@ -41,6 +41,24 @@ target_include_directories(
         ${PROJECT_SOURCE_DIR}/experiments/utils
 )
 
+add_executable(aggregate_bench_sct aggregate_bench_refactored_sct.cpp)
+target_link_libraries(
+        aggregate_bench_sct
+        PUBLIC
+        benchmark benchmark_main pthread nlohmann_json::nlohmann_json naive
+        tree_ext_sct)
+target_link_directories(aggregate_bench_sct PUBLIC ${BENCHMARK_ROOT})
+target_include_directories(
+        aggregate_bench_sct
+        PUBLIC
+        ${BENCHMARK_INCLUDE_DIR}
+        ${PROJECT_SOURCE_DIR}/include/interfaces
+        ${PROJECT_SOURCE_DIR}/include/requests
+        ${PROJECT_SOURCE_DIR}/src/misc
+        ${PROJECT_SOURCE_DIR}/include/data_structures/succinct
+        ${PROJECT_SOURCE_DIR}/experiments/utils
+)
+
 add_executable(hpd_bench hpd_bench.cpp)
 target_link_libraries(
         hpd_bench
