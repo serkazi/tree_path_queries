@@ -690,7 +690,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,nsrs_reporting,nv_sct)(benchmark::St
  */
 
 void RunAllGiven( int argc, char **argv ) {
-    const rlim_t kStackSize = 42 * 1024ll * 1024ll * 1024ll;   // min stack size = 42 GiB
+    const rlim_t kStackSize = 20 * 1024ll * 1024ll * 1024ll;
     struct rlimit rl;
     int result;
 
