@@ -33,6 +33,7 @@ target_link_libraries(
         hybrid
         naive
         experiment_utils
+        malloc_count
 )
 target_compile_options(observe_memusage PUBLIC -g -O2)
 target_include_directories(
@@ -41,4 +42,5 @@ target_include_directories(
         ${PROJECT_SOURCE_DIR}/src/tests/experiments
         ${PROJECT_SOURCE_DIR}/experiments/managers
         ${PROJECT_SOURCE_DIR}/experiments/utils
+        ${PROJECT_SOURCE_DIR}/extern/malloc_count
 )

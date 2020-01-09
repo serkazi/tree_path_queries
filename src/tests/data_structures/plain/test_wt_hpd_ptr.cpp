@@ -28,6 +28,28 @@ namespace {
 
     using holder= std::unique_ptr<wt_hpd_ptr<node_type,size_type,value_type>>;
 
+    bool equal_multisets(
+            const std::vector<std::pair<value_type,size_type>> &a,
+            const std::vector<std::pair<value_type,size_type>> &b )
+    {
+        std::multiset<size_type> s,t;
+        std::for_each(a.begin(),a.end(),[&s]( const auto &z ) {
+            s.insert(z.second);
+        });
+        std::for_each(b.begin(),b.end(),[&t]( const auto &z ) {
+            t.insert(z.second);
+        });
+        if ( s != t ) {
+            for ( auto &it: s )
+                std::cerr << it << ", ";
+            std::cerr << std::endl;
+            for ( auto &it: t )
+                std::cerr << it << ", ";
+            std::cerr << std::endl;
+        }
+        return s == t;
+    }
+
     class wt_hpd_ptr_test: public testing::Test {
     protected:
         size_type n;
@@ -56,6 +78,21 @@ namespace {
         }
         void TearDown() override {};
     };
+
+    TEST_F(wt_hpd_ptr_test,reporting_correct) {
+        auto nodes_dice= std::bind(*(this->nodes_distr),this->gen_nodes);
+        auto weights_dice= std::bind(*(this->weights_distr),this->gen_weights);
+        for ( auto it= 0; it < ITERS; ++it ) {
+            assert( this->w.size() >= this->n );
+            auto x= nodes_dice(), y= nodes_dice();
+            auto vl= weights_dice(), vr= weights_dice();
+            if ( vl > vr ) std::swap(vl,vr);
+            std::vector<std::pair<value_type,size_type>> answer1, answer2;
+            this->processor->report(x,y,static_cast<value_type>(vl),static_cast<value_type>(vr),answer1);
+            this->raw->report((node_type)x,(node_type)y,vl,vr,answer2);
+            ASSERT_EQ(equal_multisets(answer1,answer2),true);
+        }
+    }
 
     TEST_F(wt_hpd_ptr_test,counting_correct) {
         auto nodes_dice= std::bind(*(this->nodes_distr),this->gen_nodes);

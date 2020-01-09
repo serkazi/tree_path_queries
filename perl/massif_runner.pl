@@ -14,7 +14,7 @@ my $target_path = "../cmake-build-debug/src/tests/experiments/";
 my $executable = $target_path."observe_memusage";
 
 # my $valgrind_command= "valgrind --tool=massif --heap=yes --stacks=no --depth=3 --time-unit=ms --detailed-freq=5 --massif-out-file=outfile ".$executable ." ".$data_path."input";
-my $valgrind_command= "valgrind --tool=massif --heap=yes --stacks=no --depth=3 --max-snapshots=1000 ".
+my $valgrind_command= "valgrind --tool=massif --main-stacksize=2048 --heap=yes --stacks=no --depth=3 --max-snapshots=1000 ".
                       "--time-unit=ms --detailed-freq=100 --massif-out-file=outfile ".$executable.
                       " input bitmask";
 

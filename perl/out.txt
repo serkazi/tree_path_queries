@@ -1,10 +1,10 @@
-Running: /users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/aggregate_bench /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu 10000000 1 --benchmark_counters_tabular=true --benchmark_format=json --benchmark_out=/users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/resfile_counting_K_1_eu.d.mst.dimacs.puu.json --benchmark_filter=counting
+Running: /users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/aggregate_bench_sct /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu 10000000 1 --benchmark_counters_tabular=true --benchmark_format=json --benchmark_out=/users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/resfile_counting_K_1_eu.d.mst.dimacs.puu.json --benchmark_filter=counting
 Reading dataset: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu
 Dataset path: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu
 K= 1
 {
   "context": {
-    "date": "2019-12-28 06:52:55",
+    "date": "2020-01-05 16:41:03",
     "host_name": "saga",
     "executable": "/users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu",
     "num_cpus": 16,
@@ -36,123 +36,32 @@ K= 1
         "num_sharing": 16
       }
     ],
-    "load_avg": [0.33,0.17,0.06],
+    "load_avg": [0.31,0.32,0.2],
     "library_build_type": "release"
   },
   "benchmarks": [
     {
-      "name": "path_queries_benchmark<nv>/nv_counting",
-      "run_name": "path_queries_benchmark<nv>/nv_counting",
+      "name": "path_queries_benchmark<nv_sct>/nsrs_counting",
+      "run_name": "path_queries_benchmark<nv_sct>/nsrs_counting",
       "run_type": "iteration",
       "repetitions": 0,
       "repetition_index": 0,
       "threads": 1,
       "iterations": 1,
-      "real_time": 2.1042172529045493e+12,
-      "cpu_time": 2.1036606060330000e+12,
+      "real_time": 3.2803856446389109e+13,
+      "cpu_time": 3.2798790738170000e+13,
       "time_unit": "ns",
-      "seconds": 2.1040000000000000e+03
-    },
-    {
-      "name": "path_queries_benchmark<nv_lca>/nv_lca_counting",
-      "run_name": "path_queries_benchmark<nv_lca>/nv_lca_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 1.2329860375728457e+12,
-      "cpu_time": 1.2327461641900000e+12,
-      "time_unit": "ns",
-      "seconds": 1.2320000000000000e+03
-    },
-    {
-      "name": "path_queries_benchmark<tree_ext_ptr>/tree_ext_ptr_counting",
-      "run_name": "path_queries_benchmark<tree_ext_ptr>/tree_ext_ptr_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 1.3917696734890343e+10,
-      "cpu_time": 1.3915833159000158e+10,
-      "time_unit": "ns",
-      "seconds": 1.3000000000000000e+01
-    },
-    {
-      "name": "path_queries_benchmark<wt_hp_ptr>/wt_hpd_ptr_counting",
-      "run_name": "path_queries_benchmark<wt_hp_ptr>/wt_hpd_ptr_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 3.5203467587009071e+10,
-      "cpu_time": 3.5198577036000191e+10,
-      "time_unit": "ns",
-      "seconds": 3.5000000000000000e+01
-    },
-    {
-      "name": "path_queries_benchmark<tree_ext_sct_un>/tree_ext_sct_un_counting",
-      "run_name": "path_queries_benchmark<tree_ext_sct_un>/tree_ext_sct_un_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 2.0425098050013184e+11,
-      "cpu_time": 2.0421280403899982e+11,
-      "time_unit": "ns",
-      "seconds": 2.0400000000000000e+02
-    },
-    {
-      "name": "path_queries_benchmark<tree_ext_sct_rrr>/tree_ext_sct_rrr_counting",
-      "run_name": "path_queries_benchmark<tree_ext_sct_rrr>/tree_ext_sct_rrr_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 2.7153508742712439e+11,
-      "cpu_time": 2.7148304378700003e+11,
-      "time_unit": "ns",
-      "seconds": 2.7100000000000000e+02
-    },
-    {
-      "name": "path_queries_benchmark<wt_hpd_un>/wt_hpd_un_counting",
-      "run_name": "path_queries_benchmark<wt_hpd_un>/wt_hpd_un_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 3.3364553564041852e+11,
-      "cpu_time": 3.3358293101999969e+11,
-      "time_unit": "ns",
-      "seconds": 3.3300000000000000e+02
-    },
-    {
-      "name": "path_queries_benchmark<wt_hpd_rrr>/wt_hpd_rrr_counting",
-      "run_name": "path_queries_benchmark<wt_hpd_rrr>/wt_hpd_rrr_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 5.2957221081480383e+11,
-      "cpu_time": 5.2947404255200037e+11,
-      "time_unit": "ns",
-      "seconds": 5.2900000000000000e+02
+      "seconds": 3.2803000000000000e+04
     }
   ]
 }
-Running: /users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/aggregate_bench /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu 10000000 10 --benchmark_counters_tabular=true --benchmark_format=json --benchmark_out=/users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/resfile_counting_K_10_eu.d.mst.dimacs.puu.json --benchmark_filter=counting
+Running: /users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/aggregate_bench_sct /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu 10000000 10 --benchmark_counters_tabular=true --benchmark_format=json --benchmark_out=/users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/resfile_counting_K_10_eu.d.mst.dimacs.puu.json --benchmark_filter=counting
 Reading dataset: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu
 Dataset path: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu
 K= 10
 {
   "context": {
-    "date": "2019-12-28 08:15:04",
+    "date": "2020-01-06 01:48:03",
     "host_name": "saga",
     "executable": "/users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu",
     "num_cpus": 16,
@@ -189,118 +98,27 @@ K= 10
   },
   "benchmarks": [
     {
-      "name": "path_queries_benchmark<nv>/nv_counting",
-      "run_name": "path_queries_benchmark<nv>/nv_counting",
+      "name": "path_queries_benchmark<nv_sct>/nsrs_counting",
+      "run_name": "path_queries_benchmark<nv_sct>/nsrs_counting",
       "run_type": "iteration",
       "repetitions": 0,
       "repetition_index": 0,
       "threads": 1,
       "iterations": 1,
-      "real_time": 2.0550582189504058e+12,
-      "cpu_time": 2.0545631260940000e+12,
+      "real_time": 3.2809484670834617e+13,
+      "cpu_time": 3.2804476132350000e+13,
       "time_unit": "ns",
-      "seconds": 2.0550000000000000e+03
-    },
-    {
-      "name": "path_queries_benchmark<nv_lca>/nv_lca_counting",
-      "run_name": "path_queries_benchmark<nv_lca>/nv_lca_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 1.2018611850962043e+12,
-      "cpu_time": 1.2016660084240002e+12,
-      "time_unit": "ns",
-      "seconds": 1.2010000000000000e+03
-    },
-    {
-      "name": "path_queries_benchmark<tree_ext_ptr>/tree_ext_ptr_counting",
-      "run_name": "path_queries_benchmark<tree_ext_ptr>/tree_ext_ptr_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 1.3820708146318794e+10,
-      "cpu_time": 1.3818845818000227e+10,
-      "time_unit": "ns",
-      "seconds": 1.3000000000000000e+01
-    },
-    {
-      "name": "path_queries_benchmark<wt_hp_ptr>/wt_hpd_ptr_counting",
-      "run_name": "path_queries_benchmark<wt_hp_ptr>/wt_hpd_ptr_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 3.4701094465330246e+10,
-      "cpu_time": 3.4696457899000053e+10,
-      "time_unit": "ns",
-      "seconds": 3.4000000000000000e+01
-    },
-    {
-      "name": "path_queries_benchmark<tree_ext_sct_un>/tree_ext_sct_un_counting",
-      "run_name": "path_queries_benchmark<tree_ext_sct_un>/tree_ext_sct_un_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 2.0242573765479028e+11,
-      "cpu_time": 2.0238919685099973e+11,
-      "time_unit": "ns",
-      "seconds": 2.0200000000000000e+02
-    },
-    {
-      "name": "path_queries_benchmark<tree_ext_sct_rrr>/tree_ext_sct_rrr_counting",
-      "run_name": "path_queries_benchmark<tree_ext_sct_rrr>/tree_ext_sct_rrr_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 2.7177829211018979e+11,
-      "cpu_time": 2.7172767671100018e+11,
-      "time_unit": "ns",
-      "seconds": 2.7100000000000000e+02
-    },
-    {
-      "name": "path_queries_benchmark<wt_hpd_un>/wt_hpd_un_counting",
-      "run_name": "path_queries_benchmark<wt_hpd_un>/wt_hpd_un_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 3.3264900065585968e+11,
-      "cpu_time": 3.3258976099099982e+11,
-      "time_unit": "ns",
-      "seconds": 3.3200000000000000e+02
-    },
-    {
-      "name": "path_queries_benchmark<wt_hpd_rrr>/wt_hpd_rrr_counting",
-      "run_name": "path_queries_benchmark<wt_hpd_rrr>/wt_hpd_rrr_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 5.2981141460128131e+11,
-      "cpu_time": 5.2971658033300079e+11,
-      "time_unit": "ns",
-      "seconds": 5.2900000000000000e+02
+      "seconds": 3.2809000000000000e+04
     }
   ]
 }
-Running: /users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/aggregate_bench /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu 10000000 100 --benchmark_counters_tabular=true --benchmark_format=json --benchmark_out=/users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/resfile_counting_K_100_eu.d.mst.dimacs.puu.json --benchmark_filter=counting
+Running: /users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/aggregate_bench_sct /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu 10000000 100 --benchmark_counters_tabular=true --benchmark_format=json --benchmark_out=/users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/resfile_counting_K_100_eu.d.mst.dimacs.puu.json --benchmark_filter=counting
 Reading dataset: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu
 Dataset path: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu
 K= 100
 {
   "context": {
-    "date": "2019-12-28 09:35:50",
+    "date": "2020-01-06 10:55:09",
     "host_name": "saga",
     "executable": "/users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu",
     "num_cpus": 16,
@@ -337,118 +155,27 @@ K= 100
   },
   "benchmarks": [
     {
-      "name": "path_queries_benchmark<nv>/nv_counting",
-      "run_name": "path_queries_benchmark<nv>/nv_counting",
+      "name": "path_queries_benchmark<nv_sct>/nsrs_counting",
+      "run_name": "path_queries_benchmark<nv_sct>/nsrs_counting",
       "run_type": "iteration",
       "repetitions": 0,
       "repetition_index": 0,
       "threads": 1,
       "iterations": 1,
-      "real_time": 2.0725196406934409e+12,
-      "cpu_time": 2.0720004904510002e+12,
+      "real_time": 3.2805188544807957e+13,
+      "cpu_time": 3.2800130670006000e+13,
       "time_unit": "ns",
-      "seconds": 2.0720000000000000e+03
-    },
-    {
-      "name": "path_queries_benchmark<nv_lca>/nv_lca_counting",
-      "run_name": "path_queries_benchmark<nv_lca>/nv_lca_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 1.2144381373617798e+12,
-      "cpu_time": 1.2142197509560000e+12,
-      "time_unit": "ns",
-      "seconds": 1.2140000000000000e+03
-    },
-    {
-      "name": "path_queries_benchmark<tree_ext_ptr>/tree_ext_ptr_counting",
-      "run_name": "path_queries_benchmark<tree_ext_ptr>/tree_ext_ptr_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 1.3165073521435261e+10,
-      "cpu_time": 1.3163270522999937e+10,
-      "time_unit": "ns",
-      "seconds": 1.3000000000000000e+01
-    },
-    {
-      "name": "path_queries_benchmark<wt_hp_ptr>/wt_hpd_ptr_counting",
-      "run_name": "path_queries_benchmark<wt_hp_ptr>/wt_hpd_ptr_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 3.5209599018096924e+10,
-      "cpu_time": 3.5204817499000000e+10,
-      "time_unit": "ns",
-      "seconds": 3.5000000000000000e+01
-    },
-    {
-      "name": "path_queries_benchmark<tree_ext_sct_un>/tree_ext_sct_un_counting",
-      "run_name": "path_queries_benchmark<tree_ext_sct_un>/tree_ext_sct_un_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 2.0442265154235065e+11,
-      "cpu_time": 2.0438425388099994e+11,
-      "time_unit": "ns",
-      "seconds": 2.0400000000000000e+02
-    },
-    {
-      "name": "path_queries_benchmark<tree_ext_sct_rrr>/tree_ext_sct_rrr_counting",
-      "run_name": "path_queries_benchmark<tree_ext_sct_rrr>/tree_ext_sct_rrr_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 2.7229098835401236e+11,
-      "cpu_time": 2.7223878621699988e+11,
-      "time_unit": "ns",
-      "seconds": 2.7200000000000000e+02
-    },
-    {
-      "name": "path_queries_benchmark<wt_hpd_un>/wt_hpd_un_counting",
-      "run_name": "path_queries_benchmark<wt_hpd_un>/wt_hpd_un_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 3.3247679427079858e+11,
-      "cpu_time": 3.3241427397800000e+11,
-      "time_unit": "ns",
-      "seconds": 3.3200000000000000e+02
-    },
-    {
-      "name": "path_queries_benchmark<wt_hpd_rrr>/wt_hpd_rrr_counting",
-      "run_name": "path_queries_benchmark<wt_hpd_rrr>/wt_hpd_rrr_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 5.2463859922066333e+11,
-      "cpu_time": 5.2453788001700012e+11,
-      "time_unit": "ns",
-      "seconds": 5.2400000000000000e+02
+      "seconds": 3.2805000000000000e+04
     }
   ]
 }
-Running: /users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/aggregate_bench /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu 10000000 1 --benchmark_counters_tabular=true --benchmark_format=json --benchmark_out=/users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/resfile_median_eu.d.mst.dimacs.puu.json --benchmark_filter=median
+Running: /users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/aggregate_bench_sct /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu 1000000 1 --benchmark_counters_tabular=true --benchmark_format=json --benchmark_out=/users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/resfile_reporting_K_1_eu.d.mst.dimacs.puu.json --benchmark_filter=reporting
 Reading dataset: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu
 Dataset path: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu
 K= 1
 {
   "context": {
-    "date": "2019-12-28 10:57:03",
+    "date": "2020-01-06 20:01:58",
     "host_name": "saga",
     "executable": "/users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu",
     "num_cpus": 16,
@@ -485,120 +212,29 @@ K= 1
   },
   "benchmarks": [
     {
-      "name": "path_queries_benchmark<nv>/nv_median",
-      "run_name": "path_queries_benchmark<nv>/nv_median",
+      "name": "path_queries_benchmark<nv_sct>/nsrs_reporting",
+      "run_name": "path_queries_benchmark<nv_sct>/nsrs_reporting",
       "run_type": "iteration",
       "repetitions": 0,
       "repetition_index": 0,
       "threads": 1,
       "iterations": 1,
-      "real_time": 5.6094066316280518e+12,
-      "cpu_time": 5.6081459456160000e+12,
+      "real_time": 3.2765707540512085e+12,
+      "cpu_time": 3.2760660654250000e+12,
       "time_unit": "ns",
-      "seconds": 5.6090000000000000e+03
-    },
-    {
-      "name": "path_queries_benchmark<nv_lca>/nv_lca_median",
-      "run_name": "path_queries_benchmark<nv_lca>/nv_lca_median",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 4.0952691538184883e+12,
-      "cpu_time": 4.0946089141260000e+12,
-      "time_unit": "ns",
-      "seconds": 4.0950000000000000e+03
-    },
-    {
-      "name": "path_queries_benchmark<tree_ext_ptr>/tree_ext_ptr_median",
-      "run_name": "path_queries_benchmark<tree_ext_ptr>/tree_ext_ptr_median",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 4.9234733372926712e+10,
-      "cpu_time": 4.9227387146000183e+10,
-      "time_unit": "ns",
-      "seconds": 4.9000000000000000e+01
-    },
-    {
-      "name": "path_queries_benchmark<wt_hp_ptr>/wt_hpd_ptr_median",
-      "run_name": "path_queries_benchmark<wt_hp_ptr>/wt_hpd_ptr_median",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 6.6803842557594177e+10,
-      "cpu_time": 6.6791476639999016e+10,
-      "time_unit": "ns",
-      "seconds": 6.6000000000000000e+01
-    },
-    {
-      "name": "path_queries_benchmark<tree_ext_sct_un>/tree_ext_sct_un_median",
-      "run_name": "path_queries_benchmark<tree_ext_sct_un>/tree_ext_sct_un_median",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 5.3759908503293994e+11,
-      "cpu_time": 5.3750084160800000e+11,
-      "time_unit": "ns",
-      "seconds": 5.3700000000000000e+02
-    },
-    {
-      "name": "path_queries_benchmark<tree_ext_sct_rrr>/tree_ext_sct_rrr_median",
-      "run_name": "path_queries_benchmark<tree_ext_sct_rrr>/tree_ext_sct_rrr_median",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 8.4370511471852661e+11,
-      "cpu_time": 8.4354864523599829e+11,
-      "time_unit": "ns",
-      "seconds": 8.4300000000000000e+02
-    },
-    {
-      "name": "path_queries_benchmark<wt_hpd_un>/wt_hpd_un_median",
-      "run_name": "path_queries_benchmark<wt_hpd_un>/wt_hpd_un_median",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 4.6955486431717871e+11,
-      "cpu_time": 4.6947000959600153e+11,
-      "time_unit": "ns",
-      "seconds": 4.6900000000000000e+02
-    },
-    {
-      "name": "path_queries_benchmark<wt_hpd_rrr>/wt_hpd_rrr_median",
-      "run_name": "path_queries_benchmark<wt_hpd_rrr>/wt_hpd_rrr_median",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 1.1405404614564031e+12,
-      "cpu_time": 1.1403381605689993e+12,
-      "time_unit": "ns",
-      "seconds": 1.1400000000000000e+03
+      "seconds": 3.2760000000000000e+03
     }
   ]
 }
-Running: /users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/aggregate_bench /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.emst.dem.puu 10000000 1 --benchmark_counters_tabular=true --benchmark_format=json --benchmark_out=/users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/resfile_counting_K_1_eu.emst.dem.puu.json --benchmark_filter=counting
-Reading dataset: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.emst.dem.puu
-Dataset path: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.emst.dem.puu
-K= 1
+Running: /users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/aggregate_bench_sct /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu 1000000 10 --benchmark_counters_tabular=true --benchmark_format=json --benchmark_out=/users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/resfile_reporting_K_10_eu.d.mst.dimacs.puu.json --benchmark_filter=reporting
+Reading dataset: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu
+Dataset path: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu
+K= 10
 {
   "context": {
-    "date": "2019-12-28 14:34:01",
+    "date": "2020-01-06 20:56:38",
     "host_name": "saga",
-    "executable": "/users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.emst.dem.puu",
+    "executable": "/users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu",
     "num_cpus": 16,
     "mhz_per_cpu": 3301,
     "cpu_scaling_enabled": true,
@@ -628,123 +264,146 @@ K= 1
         "num_sharing": 16
       }
     ],
-    "load_avg": [1,1.01,1],
+    "load_avg": [1,1,1],
     "library_build_type": "release"
   },
   "benchmarks": [
     {
-      "name": "path_queries_benchmark<nv>/nv_counting",
-      "run_name": "path_queries_benchmark<nv>/nv_counting",
+      "name": "path_queries_benchmark<nv_sct>/nsrs_reporting",
+      "run_name": "path_queries_benchmark<nv_sct>/nsrs_reporting",
       "run_type": "iteration",
       "repetitions": 0,
       "repetition_index": 0,
       "threads": 1,
       "iterations": 1,
-      "real_time": 3.4817596288546919e+12,
-      "cpu_time": 3.4806754913690000e+12,
+      "real_time": 3.2751710326280444e+12,
+      "cpu_time": 3.2746635249730000e+12,
       "time_unit": "ns",
-      "seconds": 3.4810000000000000e+03
-    },
-    {
-      "name": "path_queries_benchmark<nv_lca>/nv_lca_counting",
-      "run_name": "path_queries_benchmark<nv_lca>/nv_lca_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 1.9879482313506306e+12,
-      "cpu_time": 1.9874406498640000e+12,
-      "time_unit": "ns",
-      "seconds": 1.9870000000000000e+03
-    },
-    {
-      "name": "path_queries_benchmark<tree_ext_ptr>/tree_ext_ptr_counting",
-      "run_name": "path_queries_benchmark<tree_ext_ptr>/tree_ext_ptr_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 2.9592980796471237e+10,
-      "cpu_time": 2.9588679236000645e+10,
-      "time_unit": "ns",
-      "seconds": 2.9000000000000000e+01
-    },
-    {
-      "name": "path_queries_benchmark<wt_hp_ptr>/wt_hpd_ptr_counting",
-      "run_name": "path_queries_benchmark<wt_hp_ptr>/wt_hpd_ptr_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 5.7879300050437454e+10,
-      "cpu_time": 5.7871055213000542e+10,
-      "time_unit": "ns",
-      "seconds": 5.7000000000000000e+01
-    },
-    {
-      "name": "path_queries_benchmark<tree_ext_sct_un>/tree_ext_sct_un_counting",
-      "run_name": "path_queries_benchmark<tree_ext_sct_un>/tree_ext_sct_un_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 7.6184408418275415e+11,
-      "cpu_time": 7.6170329518900049e+11,
-      "time_unit": "ns",
-      "seconds": 7.6100000000000000e+02
-    },
-    {
-      "name": "path_queries_benchmark<tree_ext_sct_rrr>/tree_ext_sct_rrr_counting",
-      "run_name": "path_queries_benchmark<tree_ext_sct_rrr>/tree_ext_sct_rrr_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 9.8558046161010864e+11,
-      "cpu_time": 9.8539121539600000e+11,
-      "time_unit": "ns",
-      "seconds": 9.8500000000000000e+02
-    },
-    {
-      "name": "path_queries_benchmark<wt_hpd_un>/wt_hpd_un_counting",
-      "run_name": "path_queries_benchmark<wt_hpd_un>/wt_hpd_un_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 1.1117100174073130e+12,
-      "cpu_time": 1.1115098575760002e+12,
-      "time_unit": "ns",
-      "seconds": 1.1110000000000000e+03
-    },
-    {
-      "name": "path_queries_benchmark<wt_hpd_rrr>/wt_hpd_rrr_counting",
-      "run_name": "path_queries_benchmark<wt_hpd_rrr>/wt_hpd_rrr_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 7.1456055932678281e+12,
-      "cpu_time": 7.1443551334169990e+12,
-      "time_unit": "ns",
-      "seconds": 7.1450000000000000e+03
+      "seconds": 3.2750000000000000e+03
     }
   ]
 }
-Running: /users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/aggregate_bench /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.emst.dem.puu 10000000 10 --benchmark_counters_tabular=true --benchmark_format=json --benchmark_out=/users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/resfile_counting_K_10_eu.emst.dem.puu.json --benchmark_filter=counting
-Reading dataset: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.emst.dem.puu
-Dataset path: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.emst.dem.puu
-K= 10
+Running: /users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/aggregate_bench_sct /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu 1000000 100 --benchmark_counters_tabular=true --benchmark_format=json --benchmark_out=/users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/resfile_reporting_K_100_eu.d.mst.dimacs.puu.json --benchmark_filter=reporting
+Reading dataset: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu
+Dataset path: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu
+K= 100
 {
   "context": {
-    "date": "2019-12-28 19:01:03",
+    "date": "2020-01-06 21:51:16",
+    "host_name": "saga",
+    "executable": "/users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu",
+    "num_cpus": 16,
+    "mhz_per_cpu": 3301,
+    "cpu_scaling_enabled": true,
+    "caches": [
+      {
+        "type": "Data",
+        "level": 1,
+        "size": 32000,
+        "num_sharing": 2
+      },
+      {
+        "type": "Instruction",
+        "level": 1,
+        "size": 32000,
+        "num_sharing": 2
+      },
+      {
+        "type": "Unified",
+        "level": 2,
+        "size": 1024000,
+        "num_sharing": 2
+      },
+      {
+        "type": "Unified",
+        "level": 3,
+        "size": 25344000,
+        "num_sharing": 16
+      }
+    ],
+    "load_avg": [1,1,1],
+    "library_build_type": "release"
+  },
+  "benchmarks": [
+    {
+      "name": "path_queries_benchmark<nv_sct>/nsrs_reporting",
+      "run_name": "path_queries_benchmark<nv_sct>/nsrs_reporting",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 3.2792016115635635e+12,
+      "cpu_time": 3.2786829183880000e+12,
+      "time_unit": "ns",
+      "seconds": 3.2790000000000000e+03
+    }
+  ]
+}
+Running: /users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/aggregate_bench_sct /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu 10000000 1 --benchmark_counters_tabular=true --benchmark_format=json --benchmark_out=/users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/resfile_median_eu.d.mst.dimacs.puu.json --benchmark_filter=median
+Reading dataset: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu
+Dataset path: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu
+K= 1
+{
+  "context": {
+    "date": "2020-01-06 22:46:12",
+    "host_name": "saga",
+    "executable": "/users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.d.mst.dimacs.puu",
+    "num_cpus": 16,
+    "mhz_per_cpu": 3301,
+    "cpu_scaling_enabled": true,
+    "caches": [
+      {
+        "type": "Data",
+        "level": 1,
+        "size": 32000,
+        "num_sharing": 2
+      },
+      {
+        "type": "Instruction",
+        "level": 1,
+        "size": 32000,
+        "num_sharing": 2
+      },
+      {
+        "type": "Unified",
+        "level": 2,
+        "size": 1024000,
+        "num_sharing": 2
+      },
+      {
+        "type": "Unified",
+        "level": 3,
+        "size": 25344000,
+        "num_sharing": 16
+      }
+    ],
+    "load_avg": [1,1,1],
+    "library_build_type": "release"
+  },
+  "benchmarks": [
+    {
+      "name": "path_queries_benchmark<nv_sct>/nsrs_median",
+      "run_name": "path_queries_benchmark<nv_sct>/nsrs_median",
+      "run_type": "iteration",
+      "repetitions": 0,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 6.5372821841873227e+13,
+      "cpu_time": 6.5362437126255000e+13,
+      "time_unit": "ns",
+      "seconds": 6.5372000000000000e+04
+    }
+  ]
+}
+Running: /users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/aggregate_bench_sct /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.emst.dem.puu 10000000 1 --benchmark_counters_tabular=true --benchmark_format=json --benchmark_out=/users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/resfile_counting_K_1_eu.emst.dem.puu.json --benchmark_filter=counting
+Reading dataset: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.emst.dem.puu
+Dataset path: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.emst.dem.puu
+K= 1
+{
+  "context": {
+    "date": "2020-01-07 16:56:03",
     "host_name": "saga",
     "executable": "/users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.emst.dem.puu",
     "num_cpus": 16,
@@ -781,118 +440,27 @@ K= 10
   },
   "benchmarks": [
     {
-      "name": "path_queries_benchmark<nv>/nv_counting",
-      "run_name": "path_queries_benchmark<nv>/nv_counting",
+      "name": "path_queries_benchmark<nv_sct>/nsrs_counting",
+      "run_name": "path_queries_benchmark<nv_sct>/nsrs_counting",
       "run_type": "iteration",
       "repetitions": 0,
       "repetition_index": 0,
       "threads": 1,
       "iterations": 1,
-      "real_time": 3.4833161996472627e+12,
-      "cpu_time": 3.4822320893650000e+12,
+      "real_time": 4.8301246019210664e+13,
+      "cpu_time": 4.8293776568631000e+13,
       "time_unit": "ns",
-      "seconds": 3.4830000000000000e+03
-    },
-    {
-      "name": "path_queries_benchmark<nv_lca>/nv_lca_counting",
-      "run_name": "path_queries_benchmark<nv_lca>/nv_lca_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 1.9940779728889465e+12,
-      "cpu_time": 1.9935928715849995e+12,
-      "time_unit": "ns",
-      "seconds": 1.9940000000000000e+03
-    },
-    {
-      "name": "path_queries_benchmark<tree_ext_ptr>/tree_ext_ptr_counting",
-      "run_name": "path_queries_benchmark<tree_ext_ptr>/tree_ext_ptr_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 3.2714154019951820e+10,
-      "cpu_time": 3.2709397494000767e+10,
-      "time_unit": "ns",
-      "seconds": 3.2000000000000000e+01
-    },
-    {
-      "name": "path_queries_benchmark<wt_hp_ptr>/wt_hpd_ptr_counting",
-      "run_name": "path_queries_benchmark<wt_hp_ptr>/wt_hpd_ptr_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 6.2766129376366737e+10,
-      "cpu_time": 6.2757277263999641e+10,
-      "time_unit": "ns",
-      "seconds": 6.2000000000000000e+01
-    },
-    {
-      "name": "path_queries_benchmark<tree_ext_sct_un>/tree_ext_sct_un_counting",
-      "run_name": "path_queries_benchmark<tree_ext_sct_un>/tree_ext_sct_un_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 8.6297671851888293e+11,
-      "cpu_time": 8.6281863498700024e+11,
-      "time_unit": "ns",
-      "seconds": 8.6200000000000000e+02
-    },
-    {
-      "name": "path_queries_benchmark<tree_ext_sct_rrr>/tree_ext_sct_rrr_counting",
-      "run_name": "path_queries_benchmark<tree_ext_sct_rrr>/tree_ext_sct_rrr_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 1.1531747254207729e+12,
-      "cpu_time": 1.1529582194550002e+12,
-      "time_unit": "ns",
-      "seconds": 1.1530000000000000e+03
-    },
-    {
-      "name": "path_queries_benchmark<wt_hpd_un>/wt_hpd_un_counting",
-      "run_name": "path_queries_benchmark<wt_hpd_un>/wt_hpd_un_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 5.8060188830085095e+11,
-      "cpu_time": 5.8049585351100000e+11,
-      "time_unit": "ns",
-      "seconds": 5.8000000000000000e+02
-    },
-    {
-      "name": "path_queries_benchmark<wt_hpd_rrr>/wt_hpd_rrr_counting",
-      "run_name": "path_queries_benchmark<wt_hpd_rrr>/wt_hpd_rrr_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 2.0798389756977559e+12,
-      "cpu_time": 2.0794612794360000e+12,
-      "time_unit": "ns",
-      "seconds": 2.0790000000000000e+03
+      "seconds": 4.8301000000000000e+04
     }
   ]
 }
-Running: /users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/aggregate_bench /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.emst.dem.puu 10000000 100 --benchmark_counters_tabular=true --benchmark_format=json --benchmark_out=/users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/resfile_counting_K_100_eu.emst.dem.puu.json --benchmark_filter=counting
+Running: /users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/aggregate_bench_sct /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.emst.dem.puu 10000000 10 --benchmark_counters_tabular=true --benchmark_format=json --benchmark_out=/users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/resfile_counting_K_10_eu.emst.dem.puu.json --benchmark_filter=counting
 Reading dataset: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.emst.dem.puu
 Dataset path: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.emst.dem.puu
-K= 100
+K= 10
 {
   "context": {
-    "date": "2019-12-28 21:59:33",
+    "date": "2020-01-08 06:21:24",
     "host_name": "saga",
     "executable": "/users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.emst.dem.puu",
     "num_cpus": 16,
@@ -924,1669 +492,7 @@ K= 100
         "num_sharing": 16
       }
     ],
-    "load_avg": [1.01,1.02,1],
-    "library_build_type": "release"
-  },
-  "benchmarks": [
-    {
-      "name": "path_queries_benchmark<nv>/nv_counting",
-      "run_name": "path_queries_benchmark<nv>/nv_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 3.3966939516942949e+12,
-      "cpu_time": 3.3956196381680000e+12,
-      "time_unit": "ns",
-      "seconds": 3.3960000000000000e+03
-    },
-    {
-      "name": "path_queries_benchmark<nv_lca>/nv_lca_counting",
-      "run_name": "path_queries_benchmark<nv_lca>/nv_lca_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 1.9459911815635859e+12,
-      "cpu_time": 1.9454664866830002e+12,
-      "time_unit": "ns",
-      "seconds": 1.9450000000000000e+03
-    },
-    {
-      "name": "path_queries_benchmark<tree_ext_ptr>/tree_ext_ptr_counting",
-      "run_name": "path_queries_benchmark<tree_ext_ptr>/tree_ext_ptr_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 2.8175745652988552e+10,
-      "cpu_time": 2.8171811750000416e+10,
-      "time_unit": "ns",
-      "seconds": 2.8000000000000000e+01
-    },
-    {
-      "name": "path_queries_benchmark<wt_hp_ptr>/wt_hpd_ptr_counting",
-      "run_name": "path_queries_benchmark<wt_hp_ptr>/wt_hpd_ptr_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 5.8597685463726517e+10,
-      "cpu_time": 5.8589472955999557e+10,
-      "time_unit": "ns",
-      "seconds": 5.8000000000000000e+01
-    },
-    {
-      "name": "path_queries_benchmark<tree_ext_sct_un>/tree_ext_sct_un_counting",
-      "run_name": "path_queries_benchmark<tree_ext_sct_un>/tree_ext_sct_un_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 7.4138402186892932e+11,
-      "cpu_time": 7.4124590483499927e+11,
-      "time_unit": "ns",
-      "seconds": 7.4100000000000000e+02
-    },
-    {
-      "name": "path_queries_benchmark<tree_ext_sct_rrr>/tree_ext_sct_rrr_counting",
-      "run_name": "path_queries_benchmark<tree_ext_sct_rrr>/tree_ext_sct_rrr_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 9.8561867809109387e+11,
-      "cpu_time": 9.8543248256299927e+11,
-      "time_unit": "ns",
-      "seconds": 9.8500000000000000e+02
-    },
-    {
-      "name": "path_queries_benchmark<wt_hpd_un>/wt_hpd_un_counting",
-      "run_name": "path_queries_benchmark<wt_hpd_un>/wt_hpd_un_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 4.1780967034026978e+11,
-      "cpu_time": 4.1773323668100055e+11,
-      "time_unit": "ns",
-      "seconds": 4.1700000000000000e+02
-    },
-    {
-      "name": "path_queries_benchmark<wt_hpd_rrr>/wt_hpd_rrr_counting",
-      "run_name": "path_queries_benchmark<wt_hpd_rrr>/wt_hpd_rrr_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 7.8974268999136987e+11,
-      "cpu_time": 7.8959863690200110e+11,
-      "time_unit": "ns",
-      "seconds": 7.8900000000000000e+02
-    }
-  ]
-}
-Running: /users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/aggregate_bench /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.emst.dem.puu 10000000 1 --benchmark_counters_tabular=true --benchmark_format=json --benchmark_out=/users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/resfile_median_eu.emst.dem.puu.json --benchmark_filter=median
-Reading dataset: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.emst.dem.puu
-Dataset path: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.emst.dem.puu
-K= 1
-{
-  "context": {
-    "date": "2019-12-29 00:26:37",
-    "host_name": "saga",
-    "executable": "/users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.emst.dem.puu",
-    "num_cpus": 16,
-    "mhz_per_cpu": 3301,
-    "cpu_scaling_enabled": true,
-    "caches": [
-      {
-        "type": "Data",
-        "level": 1,
-        "size": 32000,
-        "num_sharing": 2
-      },
-      {
-        "type": "Instruction",
-        "level": 1,
-        "size": 32000,
-        "num_sharing": 2
-      },
-      {
-        "type": "Unified",
-        "level": 2,
-        "size": 1024000,
-        "num_sharing": 2
-      },
-      {
-        "type": "Unified",
-        "level": 3,
-        "size": 25344000,
-        "num_sharing": 16
-      }
-    ],
-    "load_avg": [1.01,1,1],
-    "library_build_type": "release"
-  },
-  "benchmarks": [
-    {
-      "name": "path_queries_benchmark<nv>/nv_median",
-      "run_name": "path_queries_benchmark<nv>/nv_median",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 7.0954183685872705e+12,
-      "cpu_time": 7.0931799287640010e+12,
-      "time_unit": "ns",
-      "seconds": 7.0950000000000000e+03
-    },
-    {
-      "name": "path_queries_benchmark<nv_lca>/nv_lca_median",
-      "run_name": "path_queries_benchmark<nv_lca>/nv_lca_median",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 4.3647594279516489e+12,
-      "cpu_time": 4.3637147039750005e+12,
-      "time_unit": "ns",
-      "seconds": 4.3640000000000000e+03
-    },
-    {
-      "name": "path_queries_benchmark<tree_ext_ptr>/tree_ext_ptr_median",
-      "run_name": "path_queries_benchmark<tree_ext_ptr>/tree_ext_ptr_median",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 4.1857342204079033e+10,
-      "cpu_time": 4.1850276388999191e+10,
-      "time_unit": "ns",
-      "seconds": 4.1000000000000000e+01
-    },
-    {
-      "name": "path_queries_benchmark<wt_hp_ptr>/wt_hpd_ptr_median",
-      "run_name": "path_queries_benchmark<wt_hp_ptr>/wt_hpd_ptr_median",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 5.3759575895965103e+10,
-      "cpu_time": 5.3749898640000534e+10,
-      "time_unit": "ns",
-      "seconds": 5.3000000000000000e+01
-    },
-    {
-      "name": "path_queries_benchmark<tree_ext_sct_un>/tree_ext_sct_un_median",
-      "run_name": "path_queries_benchmark<tree_ext_sct_un>/tree_ext_sct_un_median",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 8.3795246403850610e+11,
-      "cpu_time": 8.3779898097499976e+11,
-      "time_unit": "ns",
-      "seconds": 8.3700000000000000e+02
-    },
-    {
-      "name": "path_queries_benchmark<tree_ext_sct_rrr>/tree_ext_sct_rrr_median",
-      "run_name": "path_queries_benchmark<tree_ext_sct_rrr>/tree_ext_sct_rrr_median",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 1.0891066592559219e+12,
-      "cpu_time": 1.0888982462240001e+12,
-      "time_unit": "ns",
-      "seconds": 1.0890000000000000e+03
-    },
-    {
-      "name": "path_queries_benchmark<wt_hpd_un>/wt_hpd_un_median",
-      "run_name": "path_queries_benchmark<wt_hpd_un>/wt_hpd_un_median",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 4.5415646738000214e+11,
-      "cpu_time": 4.5407280960699976e+11,
-      "time_unit": "ns",
-      "seconds": 4.5400000000000000e+02
-    },
-    {
-      "name": "path_queries_benchmark<wt_hpd_rrr>/wt_hpd_rrr_median",
-      "run_name": "path_queries_benchmark<wt_hpd_rrr>/wt_hpd_rrr_median",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 8.6937019176967444e+11,
-      "cpu_time": 8.6921025092799939e+11,
-      "time_unit": "ns",
-      "seconds": 8.6900000000000000e+02
-    }
-  ]
-}
-Running: /users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/aggregate_bench /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.mst.osm.puu 10000000 1 --benchmark_counters_tabular=true --benchmark_format=json --benchmark_out=/users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/resfile_counting_K_1_eu.mst.osm.puu.json --benchmark_filter=counting
-Reading dataset: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.mst.osm.puu
-Dataset path: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.mst.osm.puu
-K= 1
-{
-  "context": {
-    "date": "2019-12-29 04:41:05",
-    "host_name": "saga",
-    "executable": "/users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.mst.osm.puu",
-    "num_cpus": 16,
-    "mhz_per_cpu": 3301,
-    "cpu_scaling_enabled": true,
-    "caches": [
-      {
-        "type": "Data",
-        "level": 1,
-        "size": 32000,
-        "num_sharing": 2
-      },
-      {
-        "type": "Instruction",
-        "level": 1,
-        "size": 32000,
-        "num_sharing": 2
-      },
-      {
-        "type": "Unified",
-        "level": 2,
-        "size": 1024000,
-        "num_sharing": 2
-      },
-      {
-        "type": "Unified",
-        "level": 3,
-        "size": 25344000,
-        "num_sharing": 16
-      }
-    ],
     "load_avg": [1,1,1],
     "library_build_type": "release"
   },
   "benchmarks": [
-    {
-      "name": "path_queries_benchmark<nv>/nv_counting",
-      "run_name": "path_queries_benchmark<nv>/nv_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 2.4694825428929180e+12,
-      "cpu_time": 2.4687512771500000e+12,
-      "time_unit": "ns",
-      "seconds": 2.4690000000000000e+03
-    },
-    {
-      "name": "path_queries_benchmark<nv_lca>/nv_lca_counting",
-      "run_name": "path_queries_benchmark<nv_lca>/nv_lca_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 1.4371338618081062e+12,
-      "cpu_time": 1.4367825477700002e+12,
-      "time_unit": "ns",
-      "seconds": 1.4370000000000000e+03
-    },
-    {
-      "name": "path_queries_benchmark<tree_ext_ptr>/tree_ext_ptr_counting",
-      "run_name": "path_queries_benchmark<tree_ext_ptr>/tree_ext_ptr_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 1.4956203658133745e+10,
-      "cpu_time": 1.4954234389000248e+10,
-      "time_unit": "ns",
-      "seconds": 1.4000000000000000e+01
-    },
-    {
-      "name": "path_queries_benchmark<wt_hp_ptr>/wt_hpd_ptr_counting",
-      "run_name": "path_queries_benchmark<wt_hp_ptr>/wt_hpd_ptr_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 3.7081181578338150e+10,
-      "cpu_time": 3.7076165536999725e+10,
-      "time_unit": "ns",
-      "seconds": 3.7000000000000000e+01
-    },
-    {
-      "name": "path_queries_benchmark<tree_ext_sct_un>/tree_ext_sct_un_counting",
-      "run_name": "path_queries_benchmark<tree_ext_sct_un>/tree_ext_sct_un_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 2.5091670612059534e+11,
-      "cpu_time": 2.5087084052000046e+11,
-      "time_unit": "ns",
-      "seconds": 2.5000000000000000e+02
-    },
-    {
-      "name": "path_queries_benchmark<tree_ext_sct_rrr>/tree_ext_sct_rrr_counting",
-      "run_name": "path_queries_benchmark<tree_ext_sct_rrr>/tree_ext_sct_rrr_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 3.2959884721972046e+11,
-      "cpu_time": 3.2953654347100018e+11,
-      "time_unit": "ns",
-      "seconds": 3.2900000000000000e+02
-    },
-    {
-      "name": "path_queries_benchmark<wt_hpd_un>/wt_hpd_un_counting",
-      "run_name": "path_queries_benchmark<wt_hpd_un>/wt_hpd_un_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 3.6031906289048492e+11,
-      "cpu_time": 3.6025286905600024e+11,
-      "time_unit": "ns",
-      "seconds": 3.6000000000000000e+02
-    },
-    {
-      "name": "path_queries_benchmark<wt_hpd_rrr>/wt_hpd_rrr_counting",
-      "run_name": "path_queries_benchmark<wt_hpd_rrr>/wt_hpd_rrr_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 7.1610380289517346e+11,
-      "cpu_time": 7.1597376530400012e+11,
-      "time_unit": "ns",
-      "seconds": 7.1600000000000000e+02
-    }
-  ]
-}
-Running: /users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/aggregate_bench /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.mst.osm.puu 10000000 10 --benchmark_counters_tabular=true --benchmark_format=json --benchmark_out=/users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/resfile_counting_K_10_eu.mst.osm.puu.json --benchmark_filter=counting
-Reading dataset: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.mst.osm.puu
-Dataset path: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.mst.osm.puu
-K= 10
-{
-  "context": {
-    "date": "2019-12-29 06:19:21",
-    "host_name": "saga",
-    "executable": "/users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.mst.osm.puu",
-    "num_cpus": 16,
-    "mhz_per_cpu": 3301,
-    "cpu_scaling_enabled": true,
-    "caches": [
-      {
-        "type": "Data",
-        "level": 1,
-        "size": 32000,
-        "num_sharing": 2
-      },
-      {
-        "type": "Instruction",
-        "level": 1,
-        "size": 32000,
-        "num_sharing": 2
-      },
-      {
-        "type": "Unified",
-        "level": 2,
-        "size": 1024000,
-        "num_sharing": 2
-      },
-      {
-        "type": "Unified",
-        "level": 3,
-        "size": 25344000,
-        "num_sharing": 16
-      }
-    ],
-    "load_avg": [1,1,1],
-    "library_build_type": "release"
-  },
-  "benchmarks": [
-    {
-      "name": "path_queries_benchmark<nv>/nv_counting",
-      "run_name": "path_queries_benchmark<nv>/nv_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 2.3892964632697402e+12,
-      "cpu_time": 2.3886314157270005e+12,
-      "time_unit": "ns",
-      "seconds": 2.3890000000000000e+03
-    },
-    {
-      "name": "path_queries_benchmark<nv_lca>/nv_lca_counting",
-      "run_name": "path_queries_benchmark<nv_lca>/nv_lca_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 1.4027831836100667e+12,
-      "cpu_time": 1.4024514715629998e+12,
-      "time_unit": "ns",
-      "seconds": 1.4020000000000000e+03
-    },
-    {
-      "name": "path_queries_benchmark<tree_ext_ptr>/tree_ext_ptr_counting",
-      "run_name": "path_queries_benchmark<tree_ext_ptr>/tree_ext_ptr_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 1.5425074020400642e+10,
-      "cpu_time": 1.5423042293999969e+10,
-      "time_unit": "ns",
-      "seconds": 1.5000000000000000e+01
-    },
-    {
-      "name": "path_queries_benchmark<wt_hp_ptr>/wt_hpd_ptr_counting",
-      "run_name": "path_queries_benchmark<wt_hp_ptr>/wt_hpd_ptr_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 3.6824955558404327e+10,
-      "cpu_time": 3.6820097796000031e+10,
-      "time_unit": "ns",
-      "seconds": 3.6000000000000000e+01
-    },
-    {
-      "name": "path_queries_benchmark<tree_ext_sct_un>/tree_ext_sct_un_counting",
-      "run_name": "path_queries_benchmark<tree_ext_sct_un>/tree_ext_sct_un_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 2.5100788841769098e+11,
-      "cpu_time": 2.5096306683300009e+11,
-      "time_unit": "ns",
-      "seconds": 2.5100000000000000e+02
-    },
-    {
-      "name": "path_queries_benchmark<tree_ext_sct_rrr>/tree_ext_sct_rrr_counting",
-      "run_name": "path_queries_benchmark<tree_ext_sct_rrr>/tree_ext_sct_rrr_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 3.3255595673061908e+11,
-      "cpu_time": 3.3249558032600000e+11,
-      "time_unit": "ns",
-      "seconds": 3.3200000000000000e+02
-    },
-    {
-      "name": "path_queries_benchmark<wt_hpd_un>/wt_hpd_un_counting",
-      "run_name": "path_queries_benchmark<wt_hpd_un>/wt_hpd_un_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 3.5965535298921167e+11,
-      "cpu_time": 3.5959226618400043e+11,
-      "time_unit": "ns",
-      "seconds": 3.5900000000000000e+02
-    },
-    {
-      "name": "path_queries_benchmark<wt_hpd_rrr>/wt_hpd_rrr_counting",
-      "run_name": "path_queries_benchmark<wt_hpd_rrr>/wt_hpd_rrr_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 7.0447128025442358e+11,
-      "cpu_time": 7.0434656414999976e+11,
-      "time_unit": "ns",
-      "seconds": 7.0400000000000000e+02
-    }
-  ]
-}
-Running: /users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/aggregate_bench /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.mst.osm.puu 10000000 100 --benchmark_counters_tabular=true --benchmark_format=json --benchmark_out=/users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/resfile_counting_K_100_eu.mst.osm.puu.json --benchmark_filter=counting
-Reading dataset: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.mst.osm.puu
-Dataset path: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.mst.osm.puu
-K= 100
-{
-  "context": {
-    "date": "2019-12-29 07:55:32",
-    "host_name": "saga",
-    "executable": "/users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.mst.osm.puu",
-    "num_cpus": 16,
-    "mhz_per_cpu": 3301,
-    "cpu_scaling_enabled": true,
-    "caches": [
-      {
-        "type": "Data",
-        "level": 1,
-        "size": 32000,
-        "num_sharing": 2
-      },
-      {
-        "type": "Instruction",
-        "level": 1,
-        "size": 32000,
-        "num_sharing": 2
-      },
-      {
-        "type": "Unified",
-        "level": 2,
-        "size": 1024000,
-        "num_sharing": 2
-      },
-      {
-        "type": "Unified",
-        "level": 3,
-        "size": 25344000,
-        "num_sharing": 16
-      }
-    ],
-    "load_avg": [1,1,1],
-    "library_build_type": "release"
-  },
-  "benchmarks": [
-    {
-      "name": "path_queries_benchmark<nv>/nv_counting",
-      "run_name": "path_queries_benchmark<nv>/nv_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 2.4690149663258345e+12,
-      "cpu_time": 2.4682859778140000e+12,
-      "time_unit": "ns",
-      "seconds": 2.4690000000000000e+03
-    },
-    {
-      "name": "path_queries_benchmark<nv_lca>/nv_lca_counting",
-      "run_name": "path_queries_benchmark<nv_lca>/nv_lca_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 1.4452432922068984e+12,
-      "cpu_time": 1.4449210238130000e+12,
-      "time_unit": "ns",
-      "seconds": 1.4450000000000000e+03
-    },
-    {
-      "name": "path_queries_benchmark<tree_ext_ptr>/tree_ext_ptr_counting",
-      "run_name": "path_queries_benchmark<tree_ext_ptr>/tree_ext_ptr_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 1.5508270321413876e+10,
-      "cpu_time": 1.5506147801999760e+10,
-      "time_unit": "ns",
-      "seconds": 1.5000000000000000e+01
-    },
-    {
-      "name": "path_queries_benchmark<wt_hp_ptr>/wt_hpd_ptr_counting",
-      "run_name": "path_queries_benchmark<wt_hp_ptr>/wt_hpd_ptr_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 3.7605744834989311e+10,
-      "cpu_time": 3.7600565708999969e+10,
-      "time_unit": "ns",
-      "seconds": 3.7000000000000000e+01
-    },
-    {
-      "name": "path_queries_benchmark<tree_ext_sct_un>/tree_ext_sct_un_counting",
-      "run_name": "path_queries_benchmark<tree_ext_sct_un>/tree_ext_sct_un_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 2.5817697851918637e+11,
-      "cpu_time": 2.5812938006399963e+11,
-      "time_unit": "ns",
-      "seconds": 2.5800000000000000e+02
-    },
-    {
-      "name": "path_queries_benchmark<tree_ext_sct_rrr>/tree_ext_sct_rrr_counting",
-      "run_name": "path_queries_benchmark<tree_ext_sct_rrr>/tree_ext_sct_rrr_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 3.4387089325860144e+11,
-      "cpu_time": 3.4380477481499927e+11,
-      "time_unit": "ns",
-      "seconds": 3.4300000000000000e+02
-    },
-    {
-      "name": "path_queries_benchmark<wt_hpd_un>/wt_hpd_un_counting",
-      "run_name": "path_queries_benchmark<wt_hpd_un>/wt_hpd_un_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 3.4957627684064209e+11,
-      "cpu_time": 3.4951071497500018e+11,
-      "time_unit": "ns",
-      "seconds": 3.4900000000000000e+02
-    },
-    {
-      "name": "path_queries_benchmark<wt_hpd_rrr>/wt_hpd_rrr_counting",
-      "run_name": "path_queries_benchmark<wt_hpd_rrr>/wt_hpd_rrr_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 6.1790462792105969e+11,
-      "cpu_time": 6.1778793993599988e+11,
-      "time_unit": "ns",
-      "seconds": 6.1700000000000000e+02
-    }
-  ]
-}
-Running: /users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/aggregate_bench /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.mst.osm.puu 10000000 1 --benchmark_counters_tabular=true --benchmark_format=json --benchmark_out=/users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/resfile_median_eu.mst.osm.puu.json --benchmark_filter=median
-Reading dataset: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.mst.osm.puu
-Dataset path: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.mst.osm.puu
-K= 1
-{
-  "context": {
-    "date": "2019-12-29 09:32:31",
-    "host_name": "saga",
-    "executable": "/users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/eu.mst.osm.puu",
-    "num_cpus": 16,
-    "mhz_per_cpu": 3301,
-    "cpu_scaling_enabled": true,
-    "caches": [
-      {
-        "type": "Data",
-        "level": 1,
-        "size": 32000,
-        "num_sharing": 2
-      },
-      {
-        "type": "Instruction",
-        "level": 1,
-        "size": 32000,
-        "num_sharing": 2
-      },
-      {
-        "type": "Unified",
-        "level": 2,
-        "size": 1024000,
-        "num_sharing": 2
-      },
-      {
-        "type": "Unified",
-        "level": 3,
-        "size": 25344000,
-        "num_sharing": 16
-      }
-    ],
-    "load_avg": [1.08,1.02,1.01],
-    "library_build_type": "release"
-  },
-  "benchmarks": [
-    {
-      "name": "path_queries_benchmark<nv>/nv_median",
-      "run_name": "path_queries_benchmark<nv>/nv_median",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 6.4666283073741943e+12,
-      "cpu_time": 6.4650195950640000e+12,
-      "time_unit": "ns",
-      "seconds": 6.4660000000000000e+03
-    },
-    {
-      "name": "path_queries_benchmark<nv_lca>/nv_lca_median",
-      "run_name": "path_queries_benchmark<nv_lca>/nv_lca_median",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 4.6997789308987559e+12,
-      "cpu_time": 4.6989768205570000e+12,
-      "time_unit": "ns",
-      "seconds": 4.6990000000000000e+03
-    },
-    {
-      "name": "path_queries_benchmark<tree_ext_ptr>/tree_ext_ptr_median",
-      "run_name": "path_queries_benchmark<tree_ext_ptr>/tree_ext_ptr_median",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 4.2261343063786629e+10,
-      "cpu_time": 4.2254910360999931e+10,
-      "time_unit": "ns",
-      "seconds": 4.2000000000000000e+01
-    },
-    {
-      "name": "path_queries_benchmark<wt_hp_ptr>/wt_hpd_ptr_median",
-      "run_name": "path_queries_benchmark<wt_hp_ptr>/wt_hpd_ptr_median",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 6.0974808864295486e+10,
-      "cpu_time": 6.0963737371001114e+10,
-      "time_unit": "ns",
-      "seconds": 6.0000000000000000e+01
-    },
-    {
-      "name": "path_queries_benchmark<tree_ext_sct_un>/tree_ext_sct_un_median",
-      "run_name": "path_queries_benchmark<tree_ext_sct_un>/tree_ext_sct_un_median",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 5.0280083943903448e+11,
-      "cpu_time": 5.0270500070199884e+11,
-      "time_unit": "ns",
-      "seconds": 5.0200000000000000e+02
-    },
-    {
-      "name": "path_queries_benchmark<tree_ext_sct_rrr>/tree_ext_sct_rrr_median",
-      "run_name": "path_queries_benchmark<tree_ext_sct_rrr>/tree_ext_sct_rrr_median",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 8.3899458009935913e+11,
-      "cpu_time": 8.3883134212499866e+11,
-      "time_unit": "ns",
-      "seconds": 8.3800000000000000e+02
-    },
-    {
-      "name": "path_queries_benchmark<wt_hpd_un>/wt_hpd_un_median",
-      "run_name": "path_queries_benchmark<wt_hpd_un>/wt_hpd_un_median",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 4.4569165417365729e+11,
-      "cpu_time": 4.4560642598000049e+11,
-      "time_unit": "ns",
-      "seconds": 4.4500000000000000e+02
-    },
-    {
-      "name": "path_queries_benchmark<wt_hpd_rrr>/wt_hpd_rrr_median",
-      "run_name": "path_queries_benchmark<wt_hpd_rrr>/wt_hpd_rrr_median",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 1.0418887547925115e+12,
-      "cpu_time": 1.0416904629460005e+12,
-      "time_unit": "ns",
-      "seconds": 1.0410000000000000e+03
-    }
-  ]
-}
-Running: /users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/aggregate_bench /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/mars.emst.dem.puu 10000000 1 --benchmark_counters_tabular=true --benchmark_format=json --benchmark_out=/users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/resfile_counting_K_1_mars.emst.dem.puu.json --benchmark_filter=counting
-Reading dataset: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/mars.emst.dem.puu
-Dataset path: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/mars.emst.dem.puu
-K= 1
-{
-  "context": {
-    "date": "2019-12-29 13:32:10",
-    "host_name": "saga",
-    "executable": "/users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/mars.emst.dem.puu",
-    "num_cpus": 16,
-    "mhz_per_cpu": 3301,
-    "cpu_scaling_enabled": true,
-    "caches": [
-      {
-        "type": "Data",
-        "level": 1,
-        "size": 32000,
-        "num_sharing": 2
-      },
-      {
-        "type": "Instruction",
-        "level": 1,
-        "size": 32000,
-        "num_sharing": 2
-      },
-      {
-        "type": "Unified",
-        "level": 2,
-        "size": 1024000,
-        "num_sharing": 2
-      },
-      {
-        "type": "Unified",
-        "level": 3,
-        "size": 25344000,
-        "num_sharing": 16
-      }
-    ],
-    "load_avg": [1,1,1],
-    "library_build_type": "release"
-  },
-  "benchmarks": [
-    {
-      "name": "path_queries_benchmark<nv>/nv_counting",
-      "run_name": "path_queries_benchmark<nv>/nv_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 2.3323258359059692e+12,
-      "cpu_time": 2.3316898904930005e+12,
-      "time_unit": "ns",
-      "seconds": 2.3320000000000000e+03
-    },
-    {
-      "name": "path_queries_benchmark<nv_lca>/nv_lca_counting",
-      "run_name": "path_queries_benchmark<nv_lca>/nv_lca_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 1.3967437574081123e+12,
-      "cpu_time": 1.3964590926840000e+12,
-      "time_unit": "ns",
-      "seconds": 1.3960000000000000e+03
-    },
-    {
-      "name": "path_queries_benchmark<tree_ext_ptr>/tree_ext_ptr_counting",
-      "run_name": "path_queries_benchmark<tree_ext_ptr>/tree_ext_ptr_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 3.7400209421291946e+10,
-      "cpu_time": 3.7394462424999802e+10,
-      "time_unit": "ns",
-      "seconds": 3.7000000000000000e+01
-    },
-    {
-      "name": "path_queries_benchmark<wt_hp_ptr>/wt_hpd_ptr_counting",
-      "run_name": "path_queries_benchmark<wt_hp_ptr>/wt_hpd_ptr_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 4.7127969542518257e+10,
-      "cpu_time": 4.7121396006999931e+10,
-      "time_unit": "ns",
-      "seconds": 4.7000000000000000e+01
-    },
-    {
-      "name": "path_queries_benchmark<tree_ext_sct_un>/tree_ext_sct_un_counting",
-      "run_name": "path_queries_benchmark<tree_ext_sct_un>/tree_ext_sct_un_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 6.9725565456971521e+11,
-      "cpu_time": 6.9712261941499988e+11,
-      "time_unit": "ns",
-      "seconds": 6.9700000000000000e+02
-    },
-    {
-      "name": "path_queries_benchmark<tree_ext_sct_rrr>/tree_ext_sct_rrr_counting",
-      "run_name": "path_queries_benchmark<tree_ext_sct_rrr>/tree_ext_sct_rrr_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 7.9339669394679370e+11,
-      "cpu_time": 7.9324127595299976e+11,
-      "time_unit": "ns",
-      "seconds": 7.9300000000000000e+02
-    },
-    {
-      "name": "path_queries_benchmark<wt_hpd_un>/wt_hpd_un_counting",
-      "run_name": "path_queries_benchmark<wt_hpd_un>/wt_hpd_un_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 2.8279626480080186e+12,
-      "cpu_time": 2.8274620966630000e+12,
-      "time_unit": "ns",
-      "seconds": 2.8270000000000000e+03
-    },
-    {
-      "name": "path_queries_benchmark<wt_hpd_rrr>/wt_hpd_rrr_counting",
-      "run_name": "path_queries_benchmark<wt_hpd_rrr>/wt_hpd_rrr_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 2.2748636088702828e+13,
-      "cpu_time": 2.2744802355373000e+13,
-      "time_unit": "ns",
-      "seconds": 2.2748000000000000e+04
-    }
-  ]
-}
-Running: /users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/aggregate_bench /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/mars.emst.dem.puu 10000000 10 --benchmark_counters_tabular=true --benchmark_format=json --benchmark_out=/users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/resfile_counting_K_10_mars.emst.dem.puu.json --benchmark_filter=counting
-Reading dataset: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/mars.emst.dem.puu
-Dataset path: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/mars.emst.dem.puu
-K= 10
-{
-  "context": {
-    "date": "2019-12-29 22:11:44",
-    "host_name": "saga",
-    "executable": "/users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/mars.emst.dem.puu",
-    "num_cpus": 16,
-    "mhz_per_cpu": 3301,
-    "cpu_scaling_enabled": true,
-    "caches": [
-      {
-        "type": "Data",
-        "level": 1,
-        "size": 32000,
-        "num_sharing": 2
-      },
-      {
-        "type": "Instruction",
-        "level": 1,
-        "size": 32000,
-        "num_sharing": 2
-      },
-      {
-        "type": "Unified",
-        "level": 2,
-        "size": 1024000,
-        "num_sharing": 2
-      },
-      {
-        "type": "Unified",
-        "level": 3,
-        "size": 25344000,
-        "num_sharing": 16
-      }
-    ],
-    "load_avg": [1,1,1],
-    "library_build_type": "release"
-  },
-  "benchmarks": [
-    {
-      "name": "path_queries_benchmark<nv>/nv_counting",
-      "run_name": "path_queries_benchmark<nv>/nv_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 2.4009723586477339e+12,
-      "cpu_time": 2.4003668077100000e+12,
-      "time_unit": "ns",
-      "seconds": 2.4000000000000000e+03
-    },
-    {
-      "name": "path_queries_benchmark<nv_lca>/nv_lca_counting",
-      "run_name": "path_queries_benchmark<nv_lca>/nv_lca_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 1.4233325987625867e+12,
-      "cpu_time": 1.4230074846330002e+12,
-      "time_unit": "ns",
-      "seconds": 1.4230000000000000e+03
-    },
-    {
-      "name": "path_queries_benchmark<tree_ext_ptr>/tree_ext_ptr_counting",
-      "run_name": "path_queries_benchmark<tree_ext_ptr>/tree_ext_ptr_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 4.0804152294993401e+10,
-      "cpu_time": 4.0798043125999809e+10,
-      "time_unit": "ns",
-      "seconds": 4.0000000000000000e+01
-    },
-    {
-      "name": "path_queries_benchmark<wt_hp_ptr>/wt_hpd_ptr_counting",
-      "run_name": "path_queries_benchmark<wt_hp_ptr>/wt_hpd_ptr_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 5.1763502564281227e+10,
-      "cpu_time": 5.1756329188000107e+10,
-      "time_unit": "ns",
-      "seconds": 5.1000000000000000e+01
-    },
-    {
-      "name": "path_queries_benchmark<tree_ext_sct_un>/tree_ext_sct_un_counting",
-      "run_name": "path_queries_benchmark<tree_ext_sct_un>/tree_ext_sct_un_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 8.2795732827857141e+11,
-      "cpu_time": 8.2779975064299976e+11,
-      "time_unit": "ns",
-      "seconds": 8.2700000000000000e+02
-    },
-    {
-      "name": "path_queries_benchmark<tree_ext_sct_rrr>/tree_ext_sct_rrr_counting",
-      "run_name": "path_queries_benchmark<tree_ext_sct_rrr>/tree_ext_sct_rrr_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 9.8984181107766931e+11,
-      "cpu_time": 9.8964722455500037e+11,
-      "time_unit": "ns",
-      "seconds": 9.8900000000000000e+02
-    },
-    {
-      "name": "path_queries_benchmark<wt_hpd_un>/wt_hpd_un_counting",
-      "run_name": "path_queries_benchmark<wt_hpd_un>/wt_hpd_un_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 8.5273244246840479e+11,
-      "cpu_time": 8.5257392399699988e+11,
-      "time_unit": "ns",
-      "seconds": 8.5200000000000000e+02
-    },
-    {
-      "name": "path_queries_benchmark<wt_hpd_rrr>/wt_hpd_rrr_counting",
-      "run_name": "path_queries_benchmark<wt_hpd_rrr>/wt_hpd_rrr_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 4.7559310037158428e+12,
-      "cpu_time": 4.7550548421120010e+12,
-      "time_unit": "ns",
-      "seconds": 4.7550000000000000e+03
-    }
-  ]
-}
-Running: /users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/aggregate_bench /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/mars.emst.dem.puu 10000000 100 --benchmark_counters_tabular=true --benchmark_format=json --benchmark_out=/users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/resfile_counting_K_100_mars.emst.dem.puu.json --benchmark_filter=counting
-Reading dataset: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/mars.emst.dem.puu
-Dataset path: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/mars.emst.dem.puu
-K= 100
-{
-  "context": {
-    "date": "2019-12-30 01:25:40",
-    "host_name": "saga",
-    "executable": "/users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/mars.emst.dem.puu",
-    "num_cpus": 16,
-    "mhz_per_cpu": 3301,
-    "cpu_scaling_enabled": true,
-    "caches": [
-      {
-        "type": "Data",
-        "level": 1,
-        "size": 32000,
-        "num_sharing": 2
-      },
-      {
-        "type": "Instruction",
-        "level": 1,
-        "size": 32000,
-        "num_sharing": 2
-      },
-      {
-        "type": "Unified",
-        "level": 2,
-        "size": 1024000,
-        "num_sharing": 2
-      },
-      {
-        "type": "Unified",
-        "level": 3,
-        "size": 25344000,
-        "num_sharing": 16
-      }
-    ],
-    "load_avg": [1,1,1],
-    "library_build_type": "release"
-  },
-  "benchmarks": [
-    {
-      "name": "path_queries_benchmark<nv>/nv_counting",
-      "run_name": "path_queries_benchmark<nv>/nv_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 2.3456125872712583e+12,
-      "cpu_time": 2.3449207474920000e+12,
-      "time_unit": "ns",
-      "seconds": 2.3450000000000000e+03
-    },
-    {
-      "name": "path_queries_benchmark<nv_lca>/nv_lca_counting",
-      "run_name": "path_queries_benchmark<nv_lca>/nv_lca_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 1.7221748480908572e+12,
-      "cpu_time": 1.7218763964450000e+12,
-      "time_unit": "ns",
-      "seconds": 1.7220000000000000e+03
-    },
-    {
-      "name": "path_queries_benchmark<tree_ext_ptr>/tree_ext_ptr_counting",
-      "run_name": "path_queries_benchmark<tree_ext_ptr>/tree_ext_ptr_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 3.5859380630776283e+10,
-      "cpu_time": 3.5853496438000549e+10,
-      "time_unit": "ns",
-      "seconds": 3.5000000000000000e+01
-    },
-    {
-      "name": "path_queries_benchmark<wt_hp_ptr>/wt_hpd_ptr_counting",
-      "run_name": "path_queries_benchmark<wt_hp_ptr>/wt_hpd_ptr_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 4.8072994302958252e+10,
-      "cpu_time": 4.8066343927000160e+10,
-      "time_unit": "ns",
-      "seconds": 4.8000000000000000e+01
-    },
-    {
-      "name": "path_queries_benchmark<tree_ext_sct_un>/tree_ext_sct_un_counting",
-      "run_name": "path_queries_benchmark<tree_ext_sct_un>/tree_ext_sct_un_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 7.2086168141104285e+11,
-      "cpu_time": 7.2071582849100012e+11,
-      "time_unit": "ns",
-      "seconds": 7.2000000000000000e+02
-    },
-    {
-      "name": "path_queries_benchmark<tree_ext_sct_rrr>/tree_ext_sct_rrr_counting",
-      "run_name": "path_queries_benchmark<tree_ext_sct_rrr>/tree_ext_sct_rrr_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 8.5323513169400391e+11,
-      "cpu_time": 8.5307588941700037e+11,
-      "time_unit": "ns",
-      "seconds": 8.5300000000000000e+02
-    },
-    {
-      "name": "path_queries_benchmark<wt_hpd_un>/wt_hpd_un_counting",
-      "run_name": "path_queries_benchmark<wt_hpd_un>/wt_hpd_un_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 4.2924002033844592e+11,
-      "cpu_time": 4.2916350192200024e+11,
-      "time_unit": "ns",
-      "seconds": 4.2900000000000000e+02
-    },
-    {
-      "name": "path_queries_benchmark<wt_hpd_rrr>/wt_hpd_rrr_counting",
-      "run_name": "path_queries_benchmark<wt_hpd_rrr>/wt_hpd_rrr_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 9.9275041826255615e+11,
-      "cpu_time": 9.9257221282500000e+11,
-      "time_unit": "ns",
-      "seconds": 9.9200000000000000e+02
-    }
-  ]
-}
-Running: /users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/aggregate_bench /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/mars.emst.dem.puu 10000000 1 --benchmark_counters_tabular=true --benchmark_format=json --benchmark_out=/users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/resfile_median_mars.emst.dem.puu.json --benchmark_filter=median
-Reading dataset: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/mars.emst.dem.puu
-Dataset path: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/mars.emst.dem.puu
-K= 1
-{
-  "context": {
-    "date": "2019-12-30 03:29:40",
-    "host_name": "saga",
-    "executable": "/users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/mars.emst.dem.puu",
-    "num_cpus": 16,
-    "mhz_per_cpu": 3301,
-    "cpu_scaling_enabled": true,
-    "caches": [
-      {
-        "type": "Data",
-        "level": 1,
-        "size": 32000,
-        "num_sharing": 2
-      },
-      {
-        "type": "Instruction",
-        "level": 1,
-        "size": 32000,
-        "num_sharing": 2
-      },
-      {
-        "type": "Unified",
-        "level": 2,
-        "size": 1024000,
-        "num_sharing": 2
-      },
-      {
-        "type": "Unified",
-        "level": 3,
-        "size": 25344000,
-        "num_sharing": 16
-      }
-    ],
-    "load_avg": [1,1,1],
-    "library_build_type": "release"
-  },
-  "benchmarks": [
-    {
-      "name": "path_queries_benchmark<nv>/nv_median",
-      "run_name": "path_queries_benchmark<nv>/nv_median",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 4.7373861256148662e+12,
-      "cpu_time": 4.7362531625030010e+12,
-      "time_unit": "ns",
-      "seconds": 4.7370000000000000e+03
-    },
-    {
-      "name": "path_queries_benchmark<nv_lca>/nv_lca_median",
-      "run_name": "path_queries_benchmark<nv_lca>/nv_lca_median",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 2.9798948514237998e+12,
-      "cpu_time": 2.9792970933720010e+12,
-      "time_unit": "ns",
-      "seconds": 2.9790000000000000e+03
-    },
-    {
-      "name": "path_queries_benchmark<tree_ext_ptr>/tree_ext_ptr_median",
-      "run_name": "path_queries_benchmark<tree_ext_ptr>/tree_ext_ptr_median",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 5.0325017426162956e+10,
-      "cpu_time": 5.0315988497999573e+10,
-      "time_unit": "ns",
-      "seconds": 5.0000000000000000e+01
-    },
-    {
-      "name": "path_queries_benchmark<wt_hp_ptr>/wt_hpd_ptr_median",
-      "run_name": "path_queries_benchmark<wt_hp_ptr>/wt_hpd_ptr_median",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 4.9920134434476494e+10,
-      "cpu_time": 4.9911385597000847e+10,
-      "time_unit": "ns",
-      "seconds": 4.9000000000000000e+01
-    },
-    {
-      "name": "path_queries_benchmark<tree_ext_sct_un>/tree_ext_sct_un_median",
-      "run_name": "path_queries_benchmark<tree_ext_sct_un>/tree_ext_sct_un_median",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 1.0425649272203445e+12,
-      "cpu_time": 1.0423678424739991e+12,
-      "time_unit": "ns",
-      "seconds": 1.0420000000000000e+03
-    },
-    {
-      "name": "path_queries_benchmark<tree_ext_sct_rrr>/tree_ext_sct_rrr_median",
-      "run_name": "path_queries_benchmark<tree_ext_sct_rrr>/tree_ext_sct_rrr_median",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 1.3181261973250657e+12,
-      "cpu_time": 1.3178627647600005e+12,
-      "time_unit": "ns",
-      "seconds": 1.3180000000000000e+03
-    },
-    {
-      "name": "path_queries_benchmark<wt_hpd_un>/wt_hpd_un_median",
-      "run_name": "path_queries_benchmark<wt_hpd_un>/wt_hpd_un_median",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 4.2877162664011121e+11,
-      "cpu_time": 4.2868987675599963e+11,
-      "time_unit": "ns",
-      "seconds": 4.2800000000000000e+02
-    },
-    {
-      "name": "path_queries_benchmark<wt_hpd_rrr>/wt_hpd_rrr_median",
-      "run_name": "path_queries_benchmark<wt_hpd_rrr>/wt_hpd_rrr_median",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 8.1535248245112598e+11,
-      "cpu_time": 8.1519839558700000e+11,
-      "time_unit": "ns",
-      "seconds": 8.1500000000000000e+02
-    }
-  ]
-}
-Running: /users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/aggregate_bench /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/rnd.1bln.sqrt.puu 10000000 1 --benchmark_counters_tabular=true --benchmark_format=json --benchmark_out=/users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/resfile_counting_K_1_rnd.1bln.sqrt.puu.json --benchmark_filter=counting
-Reading dataset: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/rnd.1bln.sqrt.puu
-Dataset path: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/rnd.1bln.sqrt.puu
-K= 1
-{
-  "context": {
-    "date": "2019-12-30 06:45:49",
-    "host_name": "saga",
-    "executable": "/users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/rnd.1bln.sqrt.puu",
-    "num_cpus": 16,
-    "mhz_per_cpu": 3301,
-    "cpu_scaling_enabled": true,
-    "caches": [
-      {
-        "type": "Data",
-        "level": 1,
-        "size": 32000,
-        "num_sharing": 2
-      },
-      {
-        "type": "Instruction",
-        "level": 1,
-        "size": 32000,
-        "num_sharing": 2
-      },
-      {
-        "type": "Unified",
-        "level": 2,
-        "size": 1024000,
-        "num_sharing": 2
-      },
-      {
-        "type": "Unified",
-        "level": 3,
-        "size": 25344000,
-        "num_sharing": 16
-      }
-    ],
-    "load_avg": [1,1,1],
-    "library_build_type": "release"
-  },
-  "benchmarks": [
-    {
-      "name": "path_queries_benchmark<nv>/nv_counting",
-      "run_name": "path_queries_benchmark<nv>/nv_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 3.6882205065973105e+12,
-      "cpu_time": 3.6873347787850000e+12,
-      "time_unit": "ns",
-      "seconds": 3.6880000000000000e+03
-    }terminate called after throwing an instance of 'std::bad_alloc'
-  what():  std::bad_alloc
-Running: /users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/aggregate_bench /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/rnd.1bln.sqrt.puu 10000000 10 --benchmark_counters_tabular=true --benchmark_format=json --benchmark_out=/users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/resfile_counting_K_10_rnd.1bln.sqrt.puu.json --benchmark_filter=counting
-Reading dataset: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/rnd.1bln.sqrt.puu
-Dataset path: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/rnd.1bln.sqrt.puu
-K= 10
-{
-  "context": {
-    "date": "2019-12-30 07:53:17",
-    "host_name": "saga",
-    "executable": "/users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/rnd.1bln.sqrt.puu",
-    "num_cpus": 16,
-    "mhz_per_cpu": 3301,
-    "cpu_scaling_enabled": true,
-    "caches": [
-      {
-        "type": "Data",
-        "level": 1,
-        "size": 32000,
-        "num_sharing": 2
-      },
-      {
-        "type": "Instruction",
-        "level": 1,
-        "size": 32000,
-        "num_sharing": 2
-      },
-      {
-        "type": "Unified",
-        "level": 2,
-        "size": 1024000,
-        "num_sharing": 2
-      },
-      {
-        "type": "Unified",
-        "level": 3,
-        "size": 25344000,
-        "num_sharing": 16
-      }
-    ],
-    "load_avg": [1.12,1.06,1.02],
-    "library_build_type": "release"
-  },
-  "benchmarks": [
-    {
-      "name": "path_queries_benchmark<nv>/nv_counting",
-      "run_name": "path_queries_benchmark<nv>/nv_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 3.8219863329753281e+12,
-      "cpu_time": 3.8209997531700000e+12,
-      "time_unit": "ns",
-      "seconds": 3.8210000000000000e+03
-    }terminate called after throwing an instance of 'std::bad_alloc'
-  what():  std::bad_alloc
-Running: /users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/aggregate_bench /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/rnd.1bln.sqrt.puu 10000000 100 --benchmark_counters_tabular=true --benchmark_format=json --benchmark_out=/users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/resfile_counting_K_100_rnd.1bln.sqrt.puu.json --benchmark_filter=counting
-Reading dataset: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/rnd.1bln.sqrt.puu
-Dataset path: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/rnd.1bln.sqrt.puu
-K= 100
-{
-  "context": {
-    "date": "2019-12-30 09:03:00",
-    "host_name": "saga",
-    "executable": "/users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/rnd.1bln.sqrt.puu",
-    "num_cpus": 16,
-    "mhz_per_cpu": 3301,
-    "cpu_scaling_enabled": true,
-    "caches": [
-      {
-        "type": "Data",
-        "level": 1,
-        "size": 32000,
-        "num_sharing": 2
-      },
-      {
-        "type": "Instruction",
-        "level": 1,
-        "size": 32000,
-        "num_sharing": 2
-      },
-      {
-        "type": "Unified",
-        "level": 2,
-        "size": 1024000,
-        "num_sharing": 2
-      },
-      {
-        "type": "Unified",
-        "level": 3,
-        "size": 25344000,
-        "num_sharing": 16
-      }
-    ],
-    "load_avg": [1.07,1.04,1.01],
-    "library_build_type": "release"
-  },
-  "benchmarks": [
-    {
-      "name": "path_queries_benchmark<nv>/nv_counting",
-      "run_name": "path_queries_benchmark<nv>/nv_counting",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 3.8253532436322422e+12,
-      "cpu_time": 3.8242900642689995e+12,
-      "time_unit": "ns",
-      "seconds": 3.8250000000000000e+03
-    }terminate called after throwing an instance of 'std::bad_alloc'
-  what():  std::bad_alloc
-Running: /users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/aggregate_bench /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/rnd.1bln.sqrt.puu 10000000 1 --benchmark_counters_tabular=true --benchmark_format=json --benchmark_out=/users/grad/kazi/CLionProjects/tree_path_queries/cmake-build-debug/src/benchmarking/utils/resfile_median_rnd.1bln.sqrt.puu.json --benchmark_filter=median
-Reading dataset: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/rnd.1bln.sqrt.puu
-Dataset path: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/rnd.1bln.sqrt.puu
-K= 1
-{
-  "context": {
-    "date": "2019-12-30 10:12:47",
-    "host_name": "saga",
-    "executable": "/users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/rnd.1bln.sqrt.puu",
-    "num_cpus": 16,
-    "mhz_per_cpu": 3301,
-    "cpu_scaling_enabled": true,
-    "caches": [
-      {
-        "type": "Data",
-        "level": 1,
-        "size": 32000,
-        "num_sharing": 2
-      },
-      {
-        "type": "Instruction",
-        "level": 1,
-        "size": 32000,
-        "num_sharing": 2
-      },
-      {
-        "type": "Unified",
-        "level": 2,
-        "size": 1024000,
-        "num_sharing": 2
-      },
-      {
-        "type": "Unified",
-        "level": 3,
-        "size": 25344000,
-        "num_sharing": 16
-      }
-    ],
-    "load_avg": [1.05,1.02,1],
-    "library_build_type": "release"
-  },
-  "benchmarks": [
-    {
-      "name": "path_queries_benchmark<nv>/nv_median",
-      "run_name": "path_queries_benchmark<nv>/nv_median",
-      "run_type": "iteration",
-      "repetitions": 0,
-      "repetition_index": 0,
-      "threads": 1,
-      "iterations": 1,
-      "real_time": 7.7331800576206299e+12,
-      "cpu_time": 7.7311846148800000e+12,
-      "time_unit": "ns",
-      "seconds": 7.7330000000000000e+03
-    }terminate called after throwing an instance of 'std::bad_alloc'
-  what():  std::bad_alloc

@@ -19,7 +19,7 @@ public:
     using result_type= std::vector<std::pair<value_type,size_type>>;
 private:
 
-    const std::vector<value_type> &original_weights;
+    std::vector<value_type> original_weights;
 
     static std::pair<size_type,size_type> get_config( value_type n ) {
         auto max_node_id= std::numeric_limits<size_type>::min();
@@ -115,6 +115,8 @@ void wavelet_tree<size_type,value_type>::construct_im( std::unique_ptr<value_typ
         auto mid= (tr.a+tr.b)>>1;
 
         auto ls= 2*tr.idx+1, rs= 2*tr.idx+2;
+        assert( ls < 2*sigma+7 );
+        assert( rs < 2*sigma+7 );
         len[ls]= len[rs]= 0;
 
         for ( auto l= tr.l; l <= tr.r; ++l )
@@ -143,8 +145,9 @@ void wavelet_tree<size_type,value_type>::construct_im( std::unique_ptr<value_typ
         q.push({tr.l+len[ls],tr.r,mid+1,tr.b,rs});
     }
     delete[] tw;
+    for ( auto l= highest_accessed+1; l <= length; ++l ) backbone[l]= 0;
 
-    for ( auto l= 0; l <= highest_accessed; ++l ) {
+    for ( auto l= 0; l <= length; ++l ) {
         if ( not(backbone[l] < std::numeric_limits<size_type>::max()) ) {
             std::cerr << l << " " << length << " " << std::endl;
             std::cerr << length << " " << highest_accessed << std::endl;
@@ -153,11 +156,11 @@ void wavelet_tree<size_type,value_type>::construct_im( std::unique_ptr<value_typ
     }
 
     value_type carry= backbone[0]; backbone[0]= 0;
-    for ( auto l= 1; l <= highest_accessed; ++l ) {
+    for ( auto l= 1; l < length; ++l ) {
         auto _tmp= carry; carry= backbone[l];
         backbone[l]= backbone[l-1]+_tmp;
     }
-    backbone[highest_accessed+1]= backbone[highest_accessed]+carry;
+    backbone[length]= backbone[length-1]+carry;
 }
 
 template <typename size_type, typename value_type>
@@ -224,8 +227,8 @@ value_type wavelet_tree<size_type,value_type>::_range_quantile(
 
 // ctor
 template <typename size_type,typename value_type>
-wavelet_tree<size_type,value_type>::wavelet_tree( const std::vector<value_type> &w, bool make_power_of_two ):
-original_weights(w) {
+wavelet_tree<size_type,value_type>::wavelet_tree( const std::vector<value_type> &w, bool make_power_of_two ) {
+    original_weights= w;
     sigma= *(std::max_element(begin(w),end(w)))+1;
     for (;make_power_of_two and (sigma & (sigma-1)); ++sigma ) ;
     // making sigma to be closest power of two
@@ -377,11 +380,10 @@ size_type wavelet_tree<size_type, value_type>::srch( size_type j, std::function<
 // we'll first go for a logarithmic select
 template<typename size_type, typename value_type>
 size_type wavelet_tree<size_type, value_type>::select0( size_type j ) const {
+    assert( j );
     // return the position i s.t. rank_0[i] == j, and rank_0[i-1] == j-1
     size_type low= 0, high= length;
     assert( rank0(high) >= j );
-    if ( rank0(low) == j )
-        return low;
     assert( rank0(low) < j );
     for ( ;low+1 < high; ) {
         auto mid= (low+high)>>1;
@@ -390,25 +392,24 @@ size_type wavelet_tree<size_type, value_type>::select0( size_type j ) const {
     assert( low+1 == high );
     assert( rank0(low) < j );
     assert( rank0(high) == j );
-    return high;
+    return low;
     // return srch(j,rank0());
 }
 
 template<typename size_type, typename value_type>
 size_type wavelet_tree<size_type, value_type>::select1(size_type j) const {
+    assert( j );
     size_type low= 0, high= length;
     assert( rank1(high) >= j );
-    if ( rank1(low) == j )
-        return low;
     assert( rank1(low) < j );
     for ( ;low+1 < high; ) {
         auto mid= (low+high)>>1;
-        rank0(mid)<j?(low= mid):(high= mid);
+        rank1(mid)<j?(low= mid):(high= mid);
     }
     assert( low+1 == high );
     assert( rank1(low) < j );
     assert( rank1(high) == j );
-    return high;
+    return low;
     // return srch(j,rank1());
 }
 
@@ -464,8 +465,11 @@ size_type wavelet_tree<size_type, value_type>::range_2d_counting_query(
 
 template<typename size_type, typename value_type>
 std::pair<value_type,size_type> wavelet_tree<size_type, value_type>::recover(size_type idx, size_type i) const {
-    if ( idx == 0 ) return {original_weights[i],i};
-    auto parent_id= (idx>>1);
+    if ( idx == 0 ) {
+        assert( 0 <= i and i < original_weights.size() );
+        return {i,original_weights[i]};
+    };
+    auto parent_id= (idx-1)>>1;
     auto pos= i-shifts[idx];
     return (idx&1)?\
            recover(parent_id,select0(rank0(shifts[parent_id])+pos+1)):\

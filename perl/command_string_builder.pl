@@ -7,13 +7,15 @@ use warnings;
 my $R="1000000";
 my $N="10000000";
 
-# my @qtypes = ('counting','reporting','median');
-my @qtypes = ('counting','median');
+my @qtypes = ('counting','reporting','median');
+# my @qtypes = ('reporting');
+# my @qtypes = ('counting','median');
 my @ks= ('1','10','100');
 my $executable = "complete_queryset_benchmark.pl";
 
 # my @datasets = ('eu.d.mst.dimacs.puu','eu.emst.dem.puu','eu.mst.osm.puu','mars.emst.dem.puu','rnd.50mln.sqrt.puu');
-my @datasets = ('eu.d.mst.dimacs.puu','eu.emst.dem.puu','eu.mst.osm.puu','mars.emst.dem.puu','rnd.1bln.sqrt.puu');
+my @datasets = ('rnd.100mln.sqrt.puu');
+# my @datasets = ('eu.d.mst.dimacs.puu','eu.emst.dem.puu','eu.mst.osm.puu','mars.emst.dem.puu');
 my $dataset_path = "/users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/";
 
 for my $i (0 .. $#datasets) {
