@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
 set(THREADS_PREFER_PTHREAD_FLAG TRUE)
 
-set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -mcmodel=large -O2 -g -DNDEBUG")
+# set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -mcmodel=large -O2 -g -DNDEBUG")
 # set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -mcmodel=large -O2 -g")
 # add_compile_options(-mcmodel=large -O2 -g -DNDEBUG)
 
@@ -20,8 +20,8 @@ message(WARNING "Gtest main library dir: " ${GTEST_MAIN_LIBRARIES})
 message(WARNING "CXX compiler used: " ${CMAKE_CXX_COMPILER_ID})
 message(WARNING "CXX compiler flags: " ${CMAKE_CXX_FLAGS})
 
-# set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=undefined -O1 -fsanitize=address")
-# set (CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=undefined -fsanitize=address")
+set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=undefined -O2 -fsanitize=address")
+set (CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=undefined -fsanitize=address")
 
 set(BENCHMARK_ROOT ~/local/benchmark/build/src)
 set(BENCHMARK_INCLUDE_DIR ~/local/benchmark/include)

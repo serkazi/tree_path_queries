@@ -79,6 +79,7 @@ public:
                 }
                 else stck.pop();
             assert( V == n );
+            assert( E+1 == n );
         }
     };
 private:
