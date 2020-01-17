@@ -6,7 +6,6 @@ cmake-build-debug/
 # FIXME: remove later, after incorporating into the prouject
 include/wrappers/bp_tree.hpp
 include/wrappers/bp_tree_g.hpp
-include/wrappers/bp_tree_gg.hpp
 extern/googlebenchmark
 extern/googletest
 extern/gtest
