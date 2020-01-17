@@ -29,7 +29,7 @@ namespace {
             std::string("eu.emst.dem.puu"),
             std::string("eu.mst.osm.puu"),
             std::string("mars.emst.dem.puu"),
-            std::string("rnd100mln.sqrt.puu")
+            std::string("rnd.100mln.sqrt.puu")
     };
 
     using holder= std::shared_ptr<wt_hpd<node_type, size_type, value_type, bp_tree_sada<node_type, size_type>, sdsl::rrr_vector<> > >;
@@ -177,13 +177,14 @@ namespace {
     INSTANTIATE_TEST_SUITE_P(
             TestSuiteP,
             wt_hpd_test,
-            testing::Values(
+            /*testing::Values(
                     root_dir + paths[0],
                     root_dir + paths[1],
                     root_dir + paths[2],
                     root_dir + paths[3],
                     root_dir + paths[4]
-            ),
+            ),*/
+            testing::Values(root_dir+paths[4]),
             [](const testing::TestParamInfo<wt_hpd_test::ParamType> &info) {
                 std::string name = info.param;
                 std::regex r("([^/]+)$");

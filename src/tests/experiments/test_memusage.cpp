@@ -33,7 +33,7 @@ void instantiate_exp( uint16_t mask, experiments::IMPLS impl ) {
             std::cerr << "Construction time: " << std::fixed << std::setprecision(2) << tm << "sec" << std::endl;
             malloc_count_print_status();
             // we are writing the results so that the compiler does not optimize it out
-            for (auto it = 0; it < ITERATIONS; ++it) {
+            for (auto it = 0; it < 32; ++it) {
                 arr[it & 0xf] = processor->query((*distribution)(engine), (*distribution)(engine));
             }
             std::cerr << std::accumulate(arr.begin(), arr.end(), 0ul) << std::endl;

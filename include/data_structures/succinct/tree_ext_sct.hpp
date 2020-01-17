@@ -267,6 +267,8 @@ private:
 			const std::string &s, const std::vector<value_type> &wgt,
 			value_type a, value_type b ) {
 
+		tpos= bpos= 0;
+		assert( not s.empty() );
     	std::queue<size_type> que;
     	std::queue<std::pair<value_type,value_type>> qw;
 		std::queue<std::pair<long long,long long>> qstr, qwgt;
@@ -286,6 +288,7 @@ private:
 			max_tree_id= std::max(max_tree_id,tree_id);
 			auto pr= qw.front();
 			auto si= qstr.front().first, sj= qstr.front().second;
+			assert( sj >= si );
 			auto wi= qwgt.front().first, wj= qwgt.front().second;
 			assert( (sj-si+1) == 2*(wj-wi+1) );
 			qstr.pop(), qwgt.pop(), qw.pop(), que.pop();
@@ -337,7 +340,8 @@ private:
 			for ( size_type i= wi, j= 0; j < vlen[0]; weights[i++]= vec[0][j++] ) ;
 			for ( size_type i= wi+vlen[0], j= 0; j < vlen[1]; weights[i++]= vec[1][j++] ) ;
 
-			que.push(left_child(tree_id)),qw.push({aa,mid}),qstr.push({si,si+slen[0]-1}),qwgt.push({wi,wi+vlen[0]-1});
+			if ( vlen[0] )
+				que.push(left_child(tree_id)),qw.push({aa,mid}),qstr.push({si,si+slen[0]-1}),qwgt.push({wi,wi+vlen[0]-1});
 			que.push(right_child(tree_id)),qw.push({mid+1,bb}),qstr.push({si+slen[0],sj}),qwgt.push({wi+vlen[0],wj});
 
 		}
@@ -563,6 +567,7 @@ public:
 		        size_type,value_type,
 		        t_bitvector,t_rank,t_select_zero,t_select_one>>(bv);
 		backbone= std::make_unique<sdsl::bit_vector>(tpos);
+		// std::cerr << tpos << std::endl;
 		for ( auto tt= 0; tt < tpos; ++tt )
 			(*backbone)[tt]= (*tbv)[tt];
 		delete tbv, delete bv;

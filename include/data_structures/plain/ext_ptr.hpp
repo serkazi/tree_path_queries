@@ -11,6 +11,14 @@
 #include <optional>
 #include <stack>
 
+/**
+ * @note since lca_processor needs a reference to a tree,
+ * we formally do implement tree interface -- just at the stage
+ * of constructing the lca_processor. Then we call shed_redundancy()
+ * and get rid of all the structures that enable
+ * usual tree operations such as "list of children" etc.,
+ * as we don't need them for answering path queries
+ */
 template<
         typename node_type= pq_types::node_type,
         typename size_type= pq_types::size_type,
@@ -24,6 +32,7 @@ public:
     // inner class
     // we are making this inner class, together with the constructor
     // that makes use of it, public so that unique_ptr can be created
+    /*
     class weighted_tree {
     private:
         size_type n,E;
@@ -82,12 +91,83 @@ public:
             assert( E+1 == n );
         }
     };
+    */
+    class weighted_tree {
+    private:
+        size_type n,E{};
+        node_type V;
+        std::vector<size_type> d;
+        std::vector<value_type> weights;
+        std::vector<std::optional<node_type>> prnt;
+        std::vector<node_type> oid;
+        std::vector<node_type> to;
+        std::vector<std::optional<size_type>> next_,last;
+    public:
+        weighted_tree( size_type n ) {
+            this->n= n, E= V= 0;
+            oid.resize(n), weights.resize(n), prnt.resize(n), d.resize(n), last.resize(n), next_.resize(n==0?0:n-1);
+            std::fill(prnt.begin(),prnt.end(),std::nullopt), to.resize(n==0?0:n-1);
+            std::fill(next_.begin(),next_.end(),std::nullopt);
+            std::fill(last.begin(),last.end(),std::nullopt);
+        }
+        size_type nvertices() const { return V; }
+        node_type original_id( node_type x ) const {
+            assert( x < V );
+            return oid[x];
+        }
+        virtual ~weighted_tree() = default;
+        // FIXME: this place gives bad_alloc most of the time
+        void add_arc( node_type p, node_type x ) {
+            size_type i= E++;
+            to[i]= x, next_[i]= last[p], last[p]= i, prnt[x]= p;
+        }
+        value_type weight_of( node_type x ) const { return weights[x]; }
+        std::vector<node_type> children( node_type x ) const {
+            std::vector<node_type> res;
+            for ( auto i= last[x]; i; i= next_[*i] )
+                res.push_back(to[*i]);
+            return res;
+        }
+        size_type size() const { return n; }
+        std::optional<node_type> parent( node_type x ) const {
+            return prnt[x];
+        }
+        node_type depth( node_type x ) const { return d[x]; }
+        void assign_weight( node_type x, value_type w ) { weights[x]= w; }
+        void assign_depth( node_type x, value_type w ) { d[x]= w; }
+        void assign_original_id( node_type x, node_type ox ) {
+            oid[x]= ox;
+        }
+        node_type new_node( node_type _oid ) {
+            oid[V++]= _oid;
+            return V-1;
+        }
+        size_type nedges() const { return E; }
+        weighted_tree( const std::string &s, const std::vector<value_type> &w ) : weighted_tree(s.size()/2) {
+            for ( node_type x= 0; x < n; oid[x]= x, ++x ) ;
+            std::stack<node_type> stck;
+            for ( int i= 0; i < (int)w.size(); weights[i]= w[i], ++i ) ;
+            for ( char ch: s )
+                if ( ch == '(' ) {
+                    if ( not stck.empty() )
+                        add_arc(stck.top(),V);
+                    d[V]= stck.size(), stck.push(V++);
+                }
+                else stck.pop();
+            assert( V == n );
+            assert( E+1 == n );
+        }
+    };
+
 private:
 
-    size_type n,K;
+    size_type n,K,E= 0;
     value_type lower, upper;
     std::vector<std::vector<std::optional<node_type>>> precomputed_image;
-    std::vector<std::vector<node_type>> adj;
+
+	std::vector<std::optional<size_type>> last,next_;
+	std::vector<node_type> to;
+
     std::vector<node_type> original_node;
     std::vector<std::optional<node_type>> prnt;
     std::vector<value_type> wgt;
@@ -96,6 +176,10 @@ private:
 
     std::vector<bool> seen;
     std::stack<node_type> st[2];
+
+	void shed_redundancy() {
+		to.clear(), next_.clear(), last.clear();
+	}
 
     void precalc( const weighted_tree *tr, node_type x, std::vector<std::unique_ptr<weighted_tree>> &str, value_type mid ) {
         assert( not seen[x] );
@@ -237,6 +321,11 @@ private:
         return res;
     }
 
+	void add_arc( node_type p, node_type x ) {
+		auto i= E++;
+		to[i]= x, next_[i]= last[p], last[p]= i;
+	}
+
 public:
     ext_ptr( value_type a, value_type b,
              const weighted_tree *un_compressed_tree )
@@ -260,21 +349,25 @@ public:
         assert( un_compressed_version->nvertices() == s.size()/2 );
         assert( un_compressed_version->nedges()+1 == s.size()/2 );
         wgt.resize(n= un_compressed_version->size());
-        original_node.resize(n), adj.resize(n);
-        for ( auto &v: adj ) v.clear();
+        E= 0, original_node.resize(n), to.resize(n==0?0:n-1), next_.resize(n==0?0:n-1), last.resize(n);
+		std::fill(next_.begin(),next_.end(),std::nullopt);
+		std::fill(last.begin(),last.end(),std::nullopt);
         d.resize(n), prnt.resize(n), std::fill(prnt.begin(),prnt.end(),std::nullopt);
         for ( node_type x= 0; x < n;\
         wgt[x]= w[x], original_node[x]= x, d[x]= un_compressed_version->depth(x), ++x ) ;
         for ( node_type x= 0; x < n; ++x )
-            if ( x != 0 )
-                adj[(prnt[x]= un_compressed_version->parent(x)).value()].push_back(x);
-        auto sm= std::accumulate(adj.begin(),adj.end(),0,[](size_type res, const auto &c){return res+c.size();});
-        assert( sm+1 == n );
+            if ( x != 0 ) {
+				prnt[x]= un_compressed_version->parent(x);
+				add_arc(prnt[x].value(),x);
+			}
+		assert( E+1 == n );
         auto minw= *(std::min_element(wgt.begin(),wgt.end())),
              maxw= *(std::max_element(wgt.begin(),wgt.end()));
         for ( K= 0; (1<<K) <= n; ++K ) ;
         init(0,maxw,un_compressed_version.get());
         prc= std::make_unique<lca_processor<node_type,size_type>>(this);
+		un_compressed_version.reset();
+		shed_redundancy();
     }
 
     node_type lca( node_type cx, node_type cy ) const override {
@@ -283,7 +376,10 @@ public:
 
 	std::vector<node_type> children(node_type x) const override {
         assert( 0 <= x and x < n );
-        return adj[x];
+        std::vector<node_type> res{};
+		for ( auto i= last[x]; i; i= next_[*i] )
+			res.push_back(to[*i]);
+		return res;
     }
 
     //====================================================================================
@@ -340,7 +436,7 @@ public:
     }
 
     bool is_leaf(node_type x) const override {
-        return adj[x].empty();
+		return false ;
     }
 };
 #endif //SPQ_EXT_PTR_V3_HPP

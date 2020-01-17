@@ -28,7 +28,8 @@ namespace {
             std::string("eu.emst.dem.puu"),
             std::string("eu.mst.osm.puu"),
             std::string("mars.emst.dem.puu"),
-            std::string("rnd100mln.sqrt.puu")
+            std::string("us.rd.d.dfs.dimacs.puu"),
+            std::string("rnd.100mln.sqrt.puu")
     };
 
     using holder= std::shared_ptr<ext_ptr<node_type,size_type,value_type>>;
@@ -181,7 +182,8 @@ INSTANTIATE_TEST_SUITE_P(testSuiteP,
                                  root_dir+paths[1],
                                  root_dir+paths[2],
                                  root_dir+paths[3],
-                                 root_dir+paths[4]
+                                 root_dir+paths[4],
+                                 root_dir+paths[5]
                          ),
                          [](const testing::TestParamInfo<ext_ptr_test::ParamType>& info) {
                              std::string name= info.param;

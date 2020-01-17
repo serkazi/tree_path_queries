@@ -51,6 +51,7 @@ private:
     size_type *backbone= nullptr;
     value_type sigma;
     std::unique_ptr<size_type[]> shifts= nullptr;
+	std::vector<size_type> precalc_select[2];
 
     void construct_im( std::unique_ptr<value_type[]> w ) ;
     inline size_type rank0( size_type i ) const ;
@@ -147,6 +148,20 @@ void wavelet_tree<size_type,value_type>::construct_im( std::unique_ptr<value_typ
     delete[] tw;
     for ( auto l= highest_accessed+1; l <= length; ++l ) backbone[l]= 0;
 
+	// for constant-time select we precalculate values
+	auto ones = std::count_if(backbone,backbone+length+1,[]( auto x ) { return x == 1; });
+	auto zeros= std::count_if(backbone,backbone+length+1,[]( auto x ) { return x == 0; });
+	precalc_select[0].resize(zeros+1), precalc_select[1].resize(ones+1);
+	ones= zeros= 0;
+	for ( auto pos= 0; pos <= length; ++pos )
+		if ( backbone[pos] == 0 )
+			precalc_select[0][++zeros]= pos;
+		else precalc_select[1][++ones]= pos;
+	assert( precalc_select[0].size() == zeros+1 );
+	assert( precalc_select[1].size() == ones+1 );
+
+	// some checks, can be deleted
+	// TODO: delete this afterwards
     for ( auto l= 0; l <= length; ++l ) {
         if ( not(backbone[l] < std::numeric_limits<size_type>::max()) ) {
             std::cerr << l << " " << length << " " << std::endl;
@@ -380,6 +395,7 @@ size_type wavelet_tree<size_type, value_type>::srch( size_type j, std::function<
 // we'll first go for a logarithmic select
 template<typename size_type, typename value_type>
 size_type wavelet_tree<size_type, value_type>::select0( size_type j ) const {
+	/*
     assert( j );
     // return the position i s.t. rank_0[i] == j, and rank_0[i-1] == j-1
     size_type low= 0, high= length;
@@ -393,11 +409,14 @@ size_type wavelet_tree<size_type, value_type>::select0( size_type j ) const {
     assert( rank0(low) < j );
     assert( rank0(high) == j );
     return low;
-    // return srch(j,rank0());
+	*/
+	assert( 1 <= j and j < precalc_select[0].size() );
+	return precalc_select[0][j];
 }
 
 template<typename size_type, typename value_type>
 size_type wavelet_tree<size_type, value_type>::select1(size_type j) const {
+	/*
     assert( j );
     size_type low= 0, high= length;
     assert( rank1(high) >= j );
@@ -410,6 +429,9 @@ size_type wavelet_tree<size_type, value_type>::select1(size_type j) const {
     assert( rank1(low) < j );
     assert( rank1(high) == j );
     return low;
+	*/
+	assert( 1 <= j and j < precalc_select[1].size() );
+	return precalc_select[1][j];
     // return srch(j,rank1());
 }
 

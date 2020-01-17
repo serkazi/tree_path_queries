@@ -209,6 +209,9 @@ public:
 		pq_types::size_type cur= 0;
 		//euler_tour(0,0,cur);
         euler_tour_with_explicit_stack(0,cur);
+		if ( cur != 2*n-1 )  {
+			std::cerr << "cur= " << cur << " vs 2*n-1 = " << 2*n-1 << std::endl;
+		}
 		assert( cur == 2*n-1 );
 		rmq= std::make_unique<pm_one_rmq<size_type>>(std::move(L),2*n-1);
 		L= nullptr;

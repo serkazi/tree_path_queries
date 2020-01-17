@@ -31,7 +31,7 @@ private:
 	 * \param x the pre-order number of the node
 	 */
 	size_type node2position( const node_type x ) const {
-		return bp_sada.select(x+1);
+        return bp_sada.select(x+1);
 	}
 	/*! The pre-order number of the node, whose opening parenthesis is at position i
 	 * \param i position of the opening parenthesis

@@ -6,7 +6,7 @@
 #include <cmath>
 #include <vector>
 #include <random>
-#include <bp_tree_sada.hpp>
+#include "bp_trees.hpp"
 #include "path_query_processor.hpp"
 #include "succinct_tree.hpp"
 #include "naive_processor_lca.hpp"
@@ -23,7 +23,7 @@ template<
         typename node_type= pq_types::node_type,
         typename size_type= pq_types::size_type,
         typename value_type= pq_types::value_type,
-        typename t_succinct_tree= bp_tree_sada<node_type,size_type>>
+        typename t_succinct_tree= bp_tree_gg<node_type,size_type>>
 class nsrs: public naive_processor_lca<node_type,size_type,value_type> {
 
 private:

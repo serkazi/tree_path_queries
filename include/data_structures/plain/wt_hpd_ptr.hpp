@@ -18,7 +18,8 @@ template <
         typename value_type= pq_types::value_type
 >
 class wt_hpd_ptr:
-        public path_query_processor<node_type,size_type,value_type> {
+        public path_query_processor<node_type,size_type,value_type>,
+		public path_decomposer<node_type,size_type> {
 private:
     std::unique_ptr<heavy_path_decomp<node_type,size_type,value_type>> h= nullptr;
     std::unique_ptr<wavelet_tree<size_type,value_type>> wt= nullptr;
@@ -26,6 +27,9 @@ private:
     std::shared_ptr<lca_processor<node_type,size_type>> lca_proc= nullptr;
     void init() ;
 public:
+
+	// implementing path decomposer
+    size_type get_decomposition_length( node_type x, node_type y ) const override ;
 
     wt_hpd_ptr( const std::string &s, const std::vector<value_type> &w ) ;
     explicit wt_hpd_ptr( std::istream &is ) ;
@@ -169,5 +173,10 @@ size_type wt_hpd_ptr<node_type, size_type, value_type>::num_segments( node_type 
     return h->num_segments(x,y);
 }
 
+// decompose_path returns the actual path, but we only need the size of the path
+template<typename node_type, typename size_type, typename value_type>
+size_type wt_hpd_ptr<node_type, size_type, value_type>::get_decomposition_length( node_type x, node_type y ) const {
+    return h->num_segments(x,y);
+}
 
 #endif //TREE_PATH_QUERIES_WT_HPD_PTR_HPP

@@ -22,9 +22,13 @@ template<
         typename value_type
         >
 struct tree: public succinct_tree<node_type,size_type> {
-    size_type n,K;
+
+    size_type n,K,E= 0;
     const node_type root= 0;
-    std::unique_ptr<std::vector<node_type>[]> adj;
+
+	std::vector<std::optional<size_type>> last,next_;
+	std::vector<node_type> to;
+
     std::vector<std::optional<node_type>> p;
     std::unique_ptr<value_type[]> w;
     std::vector<size_type> d;
@@ -53,7 +57,7 @@ struct tree: public succinct_tree<node_type,size_type> {
     tree( const std::string &s, const std::vector<value_type> &weights ) ;
 
     virtual ~tree() ;
-    virtual const std::vector<node_type> &kinder( node_type x ) const ;
+    virtual std::vector<node_type> kinder( node_type x ) const ;
 
     // delete the copy constructor
     tree<node_type,size_type,value_type>( const tree<node_type,size_type,value_type> &other ) = default;
@@ -69,7 +73,16 @@ struct tree: public succinct_tree<node_type,size_type> {
     std::vector<node_type> children(node_type x) const override;
 
     bool is_ancestor(node_type p, node_type x) const override;
+
+	void add_arc( node_type p, node_type x ) ;
 };
+
+template<typename node_type, typename size_type, typename value_type>
+void tree<node_type, size_type, value_type>::add_arc( node_type p, node_type x ) {
+	auto i= E++;
+	assert( E < n );
+	to[i]= x, next_[i]= last[p], last[p]= i;
+}
 
 template<typename node_type, typename size_type, typename value_type>
 std::optional<node_type> tree<node_type, size_type, value_type>::parent(node_type x) const {
@@ -95,9 +108,6 @@ std::optional<node_type> tree<node_type, size_type, value_type>::up(node_type x,
     if ( u > d[x] ) return std::nullopt;
     for ( size_type k= 0; k < K and u; u>>= 1, ++k )
         if ( u & 1 ) {
-            if ( k >= anc[x].size() ) {
-                std::cerr << "k= " << k << ", and K= " << K << std::endl;
-            }
             assert( k < anc[x].size() );
             assert( anc[x][k] );
             x = *anc[x][k];
@@ -129,15 +139,12 @@ node_type tree<node_type, size_type, value_type>::lca(node_type x, node_type y) 
 
 template<typename node_type, typename size_type, typename value_type>
 bool tree<node_type, size_type, value_type>::is_leaf(node_type x) const {
-    return adj[x].empty();
+    return false;
 }
 
 template<typename node_type, typename size_type, typename value_type>
 void tree<node_type, size_type, value_type>::shed_redundancy() {
-    adj.reset();
-    for ( auto &vec: anc )
-        vec.clear();
-    anc.clear();
+	to.clear(), last.clear(), next_.clear(), anc.clear();
 }
 
 template<typename node_type, typename size_type, typename value_type>
@@ -149,7 +156,7 @@ void tree<node_type, size_type, value_type>::preprocess() {
     std::fill(d.begin(),d.end(),std::numeric_limits<size_type>::max());
     for ( d[root]= 0, q.push(root); not q.empty(); ) {
         auto x= q.front(); q.pop();
-        const auto &kind= kinder(x);
+        auto kind= kinder(x);
         for ( auto y: kind )
             if ( d[y] > d[x]+1 ) {
                 d[y]= d[*(anc[y][0]= x)]+1;
@@ -163,8 +170,9 @@ void tree<node_type, size_type, value_type>::preprocess() {
 
 template<typename node_type, typename size_type, typename value_type>
 void tree<node_type, size_type, value_type>::init(const std::string &s, const std::vector<value_type> &weights) {
-    for ( n= s.size()/2, K= 0; (1<<K)<=n; ++K ) ;
-    adj= std::make_unique<std::vector<node_type>[]>(n);
+    for ( E= 0, n= s.size()/2, K= 0; (1<<K)<=n; ++K ) ;
+	to.resize(n==0?0:n-1), last.resize(n), next_.resize(n==0?0:n-1);
+	std::fill(last.begin(),last.end(),std::nullopt), std::fill(next_.begin(),next_.end(),std::nullopt);
     p.resize(n);
     std::fill(p.begin(),p.end(),std::nullopt);
     d.resize(n);
@@ -175,8 +183,10 @@ void tree<node_type, size_type, value_type>::init(const std::string &s, const st
     for ( auto ch: s ) {
         if ( ch == '(' ) {
             d[V]= st.size();
-            if ( not st.empty() )
-                adj[*(p[V]= st.top())].push_back(V);
+            if ( not st.empty() ) {
+				p[V]= st.top();
+				add_arc(*p[V],V);
+			}
             st.push(V++);
             continue ;
         }
@@ -206,8 +216,11 @@ tree<node_type, size_type, value_type>::tree(const std::string &s, const std::ve
 }
 
 template<typename node_type, typename size_type, typename value_type>
-const std::vector<node_type> &tree<node_type, size_type, value_type>::kinder(node_type x) const {
-    return adj[x];
+std::vector<node_type> tree<node_type, size_type, value_type>::kinder(node_type x) const {
+	std::vector<node_type> res{};
+	for ( auto i= last[x]; i; i= next_[*i] )
+		res.push_back(to[*i]);
+	return res;
 }
 
 /*
@@ -243,7 +256,10 @@ std::optional<node_type> tree<node_type, size_type, value_type>::ancestor(node_t
 
 template<typename node_type, typename size_type, typename value_type>
 std::vector<node_type> tree<node_type, size_type, value_type>::children(node_type x) const {
-    return adj != nullptr ? adj[x] : std::vector<node_type>();
+	std::vector<node_type> res{};
+	for ( auto i= last[x]; i; i= next_[*i] )
+		res.push_back(to[*i]);
+	return res;
 }
 
 template<typename node_type, typename size_type, typename value_type>

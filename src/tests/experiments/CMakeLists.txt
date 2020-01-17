@@ -44,3 +44,25 @@ target_include_directories(
         ${PROJECT_SOURCE_DIR}/experiments/utils
         ${PROJECT_SOURCE_DIR}/extern/malloc_count
 )
+
+set(SDSL_INCLUDE_DIR ~/local/include)
+set(SDSL_LIBRARY ~/local/lib)
+add_executable(bp_memusage test_bp_memusage.cpp)
+target_link_directories(bp_memusage PUBLIC ${SDSL_LIBRARY})
+target_link_libraries(
+        bp_memusage
+        PUBLIC
+        sdsl
+        malloc_count
+)
+target_compile_options(bp_memusage PUBLIC -g -O2)
+target_include_directories(
+       bp_memusage
+        PUBLIC
+        ${SDSL_INCLUDE_DIR}
+        ${PROJECT_SOURCE_DIR}/src/tests/experiments
+        ${PROJECT_SOURCE_DIR}/experiments/managers
+        ${PROJECT_SOURCE_DIR}/experiments/utils
+        ${PROJECT_SOURCE_DIR}/extern/malloc_count
+        ${PROJECT_SOURCE_DIR}/src/misc
+)

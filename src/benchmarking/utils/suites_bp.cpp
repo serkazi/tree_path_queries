@@ -1,30 +1,17 @@
-//
-// Created by kazi on 2019-12-16.
-//
 #include <sys/resource.h>
-// #include <benchmark/benchmark.h>
 #include "benchmark/benchmark.h"
 #include <fstream>
 #include <string>
 #include <vector>
 #include <memory>
-#include "path_query_processor.hpp"
-#include "naive_processor_lca.hpp"
-#include "pq_request.hpp"
-#include "naive_processor.hpp"
 #include "wt_hpd.hpp"
-#include "wt_hpd_ptr.hpp"
 #include <random>
 #include <functional>
 #include <algorithm>
 #include "sdsl/rrr_vector.hpp"
-#include <bp_tree_sada.hpp>
-#include "nsrs.hpp"
-#include "ext_ptr.hpp"
+#include "bp_trees.hpp"
 #include "tree_ext_sct.hpp"
 #include "query_stream_builder.hpp"
-#include "bp_trees.hpp"
-#define NVENABLED 1
 
 using node_type= pq_types::node_type;
 using size_type= pq_types::size_type;
@@ -50,67 +37,64 @@ template <
           typename t_select= sdsl::select_support_mcl<>
          >
  */
-
-using wt_hpd_un= wt_hpd<node_type,size_type,value_type,
-	  	bp_trees::bp_gg_fast<node_type,size_type>,
-        sdsl::bit_vector,
-		sdsl::rank_support_v5<>,
-        sdsl::select_support_mcl<1,1>,
-        sdsl::select_support_mcl<0,1>
->;
-using tree_ext_sct_un= tree_ext_sct<
-        node_type,size_type,value_type,
-        sdsl::bp_support_gg<>,
-		2,
-        sdsl::bit_vector ,
-        sdsl::rank_support_v5<>,
-        sdsl::select_support_mcl<1,1>,
-        sdsl::select_support_mcl<0,1>
->;
-using wt_hpd_rrr= wt_hpd<
-        node_type,size_type,value_type,
-	  	bp_trees::bp_gg_fast<node_type,size_type>,
-        sdsl::rrr_vector<>
->;
-using tree_ext_sct_rrr= tree_ext_sct<
-        node_type,size_type,
-		value_type,
-        sdsl::bp_support_gg<>,
-		2,
-        sdsl::rrr_vector<>
->;
-
-using nv                 = naive_processor<node_type,size_type,value_type>;
-using nv_lca             = naive_processor_lca<node_type,size_type,value_type>;
-using nv_sct            = nsrs<node_type,size_type,value_type>;
-using wt_hp_ptr          = wt_hpd_ptr<node_type,size_type,value_type>;
-using tree_ext_ptr       = ext_ptr<node_type,size_type,value_type>;
-/*
-using wt_hpd_un= wt_hpd<node_type,size_type,value_type,
-        bp_tree_sada<node_type,size_type>,
+/*=========================================================*/
+using wt_hpd_un_fast_sada= wt_hpd<node_type,size_type,value_type,
+	  	bp_trees::bp_sada_fast<node_type,size_type>,
         sdsl::bit_vector,sdsl::rank_support_v5<>,
         sdsl::select_support_mcl<1,1>,
         sdsl::select_support_mcl<0,1>
 >;
-using wt_hpd_rrr         = wt_hpd<
+using wt_hpd_un_fast_gg= wt_hpd<node_type,size_type,value_type,
+	  	bp_trees::bp_gg_fast<node_type,size_type>,
+        sdsl::bit_vector,sdsl::rank_support_v5<>,
+        sdsl::select_support_mcl<1,1>,
+        sdsl::select_support_mcl<0,1>
+>;
+using wt_hpd_rrr_small_sada  = wt_hpd<
         node_type,size_type,value_type,
-        bp_tree_sada<node_type,size_type>,
+	  	bp_trees::bp_sada_small<node_type,size_type>,
         sdsl::rrr_vector<>
 >;
-using tree_ext_sct_un    = tree_ext_sct<
+using wt_hpd_rrr_small_gg  = wt_hpd<
         node_type,size_type,value_type,
-        sdsl::bp_support_sada<>,2,
+	  	bp_trees::bp_gg_small<node_type,size_type>,
+        sdsl::rrr_vector<>
+>;
+
+/*=========================================================*/
+using tree_ext_sct_un_fast_sada = tree_ext_sct<
+        node_type,size_type,value_type,
+        sdsl::bp_support_sada<>,
+		2,
         sdsl::bit_vector ,
         sdsl::rank_support_v5<>,
         sdsl::select_support_mcl<1,1>,
         sdsl::select_support_mcl<0,1>
 >;
-using tree_ext_sct_rrr  = tree_ext_sct<
+using tree_ext_sct_un_fast_gg= tree_ext_sct<
         node_type,size_type,value_type,
-        sdsl::bp_support_sada<>,2,
+        sdsl::bp_support_gg<>,
+		2,
+        sdsl::bit_vector ,
+        sdsl::rank_support_v5<>,
+        sdsl::select_support_mcl<1,1>,
+        sdsl::select_support_mcl<0,1>
+>;
+
+using tree_ext_sct_rrr_small_sada= tree_ext_sct<
+        node_type,size_type,
+		value_type,
+        sdsl::bp_support_sada<256,32,sdsl::rank_support_scan<>,sdsl::select_support_scan<>>,
+		2,
         sdsl::rrr_vector<>
 >;
-*/
+using tree_ext_sct_rrr_small_gg= tree_ext_sct<
+        node_type,size_type,
+		value_type,
+        sdsl::bp_support_gg<sdsl::nearest_neighbour_dictionary<30>,sdsl::rank_support_scan<>,sdsl::select_support_scan<>,840>,
+		2,
+        sdsl::rrr_vector<>
+>;
 
 const std::string root= "/users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/";
 
@@ -118,7 +102,7 @@ const std::string root= "/users/grad/kazi/CLionProjects/tree_path_queries/data/d
 // and save some time into the bargain
 namespace experiment_settings {
     std::string dataset_path;
-    int K, nq;
+    int K= 1, nq;
 
     struct shared_info {
         std::default_random_engine engine{};
@@ -227,18 +211,65 @@ public:
     void reporting( node_type x, node_type y, value_type a, value_type b, std::vector<std::pair<value_type,size_type>> &res ) {
         processor->report(x,y,a,b,res);
     }
-	std::int64_t num_segments( node_type x, node_type y ) {
-		if ( dynamic_cast<path_decomposer<node_type,size_type> *>(processor.get()) ) 
-			return dynamic_cast<path_decomposer<node_type,size_type> *>(processor.get())->get_decomposition_length(x,y);
-		return 0;
-	}
 };
 
-/*
-BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_median,nv)(benchmark::State &state) {
+/*** ============================================= Median ========================================================== ***/
+/*============================================tree_ext_median=======================================================*/
+BENCHMARK_TEMPLATE_F(path_queries_benchmark,median_tree_ext_sct_un_fast_sada,tree_ext_sct_un_fast_sada)(benchmark::State &state) {
     for ( auto _ : state ) {
         auto start = std::chrono::high_resolution_clock::now();
         // the code that gets measured
+        const auto &dict= experiment_settings::shared_info_obj->med_queries;
+        for ( const auto &qr: dict ) {
+            auto res = median(qr.x_,qr.y_);
+            benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
+            benchmark::ClobberMemory(); // <-- took these lines from the documentation,
+        }
+        auto end = std::chrono::high_resolution_clock::now();
+        state.counters["seconds"]+= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
+        // @see https://github.com/google/benchmark#user-guide
+        // end of the code that gets measured
+    }
+}
+BENCHMARK_TEMPLATE_F(path_queries_benchmark,median_tree_ext_sct_un_fast_gg,tree_ext_sct_un_fast_gg)(benchmark::State &state) {
+    for ( auto _ : state ) {
+        auto start = std::chrono::high_resolution_clock::now();
+        // the code that gets measured
+        const auto &dict= experiment_settings::shared_info_obj->med_queries;
+        for ( const auto &qr: dict ) {
+            auto res = median(qr.x_,qr.y_);
+            benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
+            benchmark::ClobberMemory(); // <-- took these lines from the documentation,
+        }
+        auto end = std::chrono::high_resolution_clock::now();
+        state.counters["seconds"]+= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
+        // @see https://github.com/google/benchmark#user-guide
+        // end of the code that gets measured
+    }
+}
+/*
+BENCHMARK_TEMPLATE_F(path_queries_benchmark,median_tree_ext_sct_rrr_small_sada,tree_ext_sct_rrr_small_sada)(benchmark::State &state) {
+    for ( auto _ : state ) {
+        auto start = std::chrono::high_resolution_clock::now();
+        // the code that gets measured
+        // const auto &dict= med_queries;
+        const auto &dict= experiment_settings::shared_info_obj->med_queries;
+        for ( const auto &qr: dict ) {
+            auto res = median(qr.x_,qr.y_);
+            benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
+            benchmark::ClobberMemory(); // <-- took these lines from the documentation,
+        }
+        auto end = std::chrono::high_resolution_clock::now();
+        state.counters["seconds"]+= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
+        // @see https://github.com/google/benchmark#user-guide
+        // end of the code that gets measured
+    }
+}
+BENCHMARK_TEMPLATE_F(path_queries_benchmark,median_tree_ext_sct_rrr_small_gg,tree_ext_sct_rrr_small_gg)(benchmark::State &state) {
+    for ( auto _ : state ) {
+        auto start = std::chrono::high_resolution_clock::now();
+        // the code that gets measured
+        // const auto &dict= med_queries;
         const auto &dict= experiment_settings::shared_info_obj->med_queries;
         for ( const auto &qr: dict ) {
             auto res = median(qr.x_,qr.y_);
@@ -253,8 +284,8 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_median,nv)(benchmark::State &stat
 }
 */
 
-#if 0
-BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_lca_median,nv_lca)(benchmark::State &state) {
+/*============================================wt_hpd_median=======================================================*/
+BENCHMARK_TEMPLATE_F(path_queries_benchmark,median_wt_hpd_un_fast_sada,wt_hpd_un_fast_sada)(benchmark::State &state) {
     for ( auto _ : state ) {
         auto start = std::chrono::high_resolution_clock::now();
         // the code that gets measured
@@ -270,28 +301,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_lca_median,nv_lca)(benchmark::Sta
         // end of the code that gets measured
     }
 }
-#endif
-
-#if NVENABLED
-BENCHMARK_TEMPLATE_F(path_queries_benchmark,tree_ext_ptr_median,tree_ext_ptr)(benchmark::State &state) {
-    for ( auto _ : state ) {
-        auto start = std::chrono::high_resolution_clock::now();
-        // the code that gets measured
-        // const auto &dict= med_queries;
-        const auto &dict= experiment_settings::shared_info_obj->med_queries;
-        for ( const auto &qr: dict ) {
-            auto res = median(qr.x_,qr.y_);
-            benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
-            benchmark::ClobberMemory(); // <-- took these lines from the documentation,
-        }
-        auto end = std::chrono::high_resolution_clock::now();
-        state.counters["seconds"]+= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
-        // @see https://github.com/google/benchmark#user-guide
-        // end of the code that gets measured
-    }
-}
-
-BENCHMARK_TEMPLATE_F(path_queries_benchmark,wt_hpd_ptr_median,wt_hp_ptr)(benchmark::State &state) {
+BENCHMARK_TEMPLATE_F(path_queries_benchmark,median_wt_hpd_un_fast_gg,wt_hpd_un_fast_gg)(benchmark::State &state) {
     for ( auto _ : state ) {
         auto start = std::chrono::high_resolution_clock::now();
         // the code that gets measured
@@ -307,85 +317,12 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,wt_hpd_ptr_median,wt_hp_ptr)(benchma
         // end of the code that gets measured
     }
 }
-#endif
-
-BENCHMARK_TEMPLATE_F(path_queries_benchmark,tree_ext_sct_un_median,tree_ext_sct_un)(benchmark::State &state) {
-    for ( auto _ : state ) {
-        auto start = std::chrono::high_resolution_clock::now();
-        // the code that gets measured
-        // const auto &dict= med_queries;
-        const auto &dict= experiment_settings::shared_info_obj->med_queries;
-        for ( const auto &qr: dict ) {
-            auto res = median(qr.x_,qr.y_);
-            benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
-            benchmark::ClobberMemory(); // <-- took these lines from the documentation,
-        }
-        auto end = std::chrono::high_resolution_clock::now();
-        state.counters["seconds"]+= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
-        // @see https://github.com/google/benchmark#user-guide
-        // end of the code that gets measured
-    }
-}
-
-BENCHMARK_TEMPLATE_F(path_queries_benchmark,tree_ext_sct_rrr_median,tree_ext_sct_rrr)(benchmark::State &state) {
-    for ( auto _ : state ) {
-        auto start = std::chrono::high_resolution_clock::now();
-        // the code that gets measured
-        // const auto &dict= med_queries;
-        const auto &dict= experiment_settings::shared_info_obj->med_queries;
-        for ( const auto &qr: dict ) {
-            auto res = median(qr.x_,qr.y_);
-            benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
-            benchmark::ClobberMemory(); // <-- took these lines from the documentation,
-        }
-        auto end = std::chrono::high_resolution_clock::now();
-        state.counters["seconds"]+= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
-        // @see https://github.com/google/benchmark#user-guide
-        // end of the code that gets measured
-    }
-}
-
-BENCHMARK_TEMPLATE_F(path_queries_benchmark,wt_hpd_un_median,wt_hpd_un)(benchmark::State &state) {
-    for ( auto _ : state ) {
-        auto start = std::chrono::high_resolution_clock::now();
-        // the code that gets measured
-        // const auto &dict= med_queries;
-        const auto &dict= experiment_settings::shared_info_obj->med_queries;
-        for ( const auto &qr: dict ) {
-            auto res = median(qr.x_,qr.y_);
-            benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
-            benchmark::ClobberMemory(); // <-- took these lines from the documentation,
-        }
-        auto end = std::chrono::high_resolution_clock::now();
-        state.counters["seconds"]+= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
-        // @see https://github.com/google/benchmark#user-guide
-        // end of the code that gets measured
-    }
-}
-
-BENCHMARK_TEMPLATE_F(path_queries_benchmark,wt_hpd_rrr_median,wt_hpd_rrr)(benchmark::State &state) {
-    for ( auto _ : state ) {
-        auto start = std::chrono::high_resolution_clock::now();
-        // the code that gets measured
-        // const auto &dict= med_queries;
-        const auto &dict= experiment_settings::shared_info_obj->med_queries;
-        for ( const auto &qr: dict ) {
-            auto res = median(qr.x_,qr.y_);
-            benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
-            benchmark::ClobberMemory(); // <-- took these lines from the documentation,
-        }
-        auto end = std::chrono::high_resolution_clock::now();
-        state.counters["seconds"]+= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
-        // @see https://github.com/google/benchmark#user-guide
-        // end of the code that gets measured
-    }
-}
-
 /*
-BENCHMARK_TEMPLATE_F(path_queries_benchmark,nsrs_median,nv_sct)(benchmark::State &state) {
+BENCHMARK_TEMPLATE_F(path_queries_benchmark,median_wt_hpd_rrr_small_sada,wt_hpd_rrr_small_sada)(benchmark::State &state) {
     for ( auto _ : state ) {
         auto start = std::chrono::high_resolution_clock::now();
         // the code that gets measured
+        // const auto &dict= med_queries;
         const auto &dict= experiment_settings::shared_info_obj->med_queries;
         for ( const auto &qr: dict ) {
             auto res = median(qr.x_,qr.y_);
@@ -398,16 +335,33 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,nsrs_median,nv_sct)(benchmark::State
         // end of the code that gets measured
     }
 }
- */
+BENCHMARK_TEMPLATE_F(path_queries_benchmark,median_wt_hpd_rrr_small_gg,wt_hpd_rrr_small_gg)(benchmark::State &state) {
+    for ( auto _ : state ) {
+        auto start = std::chrono::high_resolution_clock::now();
+        // the code that gets measured
+        // const auto &dict= med_queries;
+        const auto &dict= experiment_settings::shared_info_obj->med_queries;
+        for ( const auto &qr: dict ) {
+            auto res = median(qr.x_,qr.y_);
+            benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
+            benchmark::ClobberMemory(); // <-- took these lines from the documentation,
+        }
+        auto end = std::chrono::high_resolution_clock::now();
+        state.counters["seconds"]+= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
+        // @see https://github.com/google/benchmark#user-guide
+        // end of the code that gets measured
+    }
+}
+*/
+
 
 //=============================== Counting ==============================================/
-/*
-BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_counting,nv)(benchmark::State &state) {
-    // const auto &dict= cnt_queries;
-    const auto &dict= experiment_settings::shared_info_obj->cnt_queries;
+//*============================================tree_ext_counting=======================================================*/
+BENCHMARK_TEMPLATE_F(path_queries_benchmark,counting_tree_ext_sct_un_fast_sada,tree_ext_sct_un_fast_sada)(benchmark::State &state) {
     for ( auto _ : state ) {
         auto start = std::chrono::high_resolution_clock::now();
         // the code that gets measured
+        const auto &dict= experiment_settings::shared_info_obj->cnt_queries;
         for ( const auto &qr: dict ) {
             auto res = counting(qr.x_,qr.y_,qr.a_,qr.b_);
             benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
@@ -419,140 +373,11 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_counting,nv)(benchmark::State &st
         // end of the code that gets measured
     }
 }
-*/
-#if 0
-BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_lca_counting,nv_lca)(benchmark::State &state) {
-    // const auto &dict= cnt_queries;
-    const auto &dict= experiment_settings::shared_info_obj->cnt_queries;
+BENCHMARK_TEMPLATE_F(path_queries_benchmark,counting_tree_ext_sct_un_fast_gg,tree_ext_sct_un_fast_gg)(benchmark::State &state) {
     for ( auto _ : state ) {
         auto start = std::chrono::high_resolution_clock::now();
         // the code that gets measured
-        for ( const auto &qr: dict ) {
-            auto res = counting(qr.x_,qr.y_,qr.a_,qr.b_);
-            benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
-            benchmark::ClobberMemory(); // <-- took these lines from the documentation,
-        }
-        auto end = std::chrono::high_resolution_clock::now();
-        state.counters["seconds"]+= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
-        // @see https://github.com/google/benchmark#user-guide
-        // end of the code that gets measured
-    }
-}
-#endif
-
-#if NVENABLED
-BENCHMARK_TEMPLATE_F(path_queries_benchmark,tree_ext_ptr_counting,tree_ext_ptr)(benchmark::State &state) {
-    // const auto &dict= cnt_queries;
-    const auto &dict= experiment_settings::shared_info_obj->cnt_queries;
-    for ( auto _ : state ) {
-        auto start = std::chrono::high_resolution_clock::now();
-        // the code that gets measured
-        for ( const auto &qr: dict ) {
-            auto res = counting(qr.x_,qr.y_,qr.a_,qr.b_);
-            benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
-            benchmark::ClobberMemory(); // <-- took these lines from the documentation,
-        }
-        auto end = std::chrono::high_resolution_clock::now();
-        state.counters["seconds"]+= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
-        // @see https://github.com/google/benchmark#user-guide
-        // end of the code that gets measured
-    }
-}
-
-BENCHMARK_TEMPLATE_F(path_queries_benchmark,wt_hpd_ptr_counting,wt_hp_ptr)(benchmark::State &state) {
-    // const auto &dict= cnt_queries;
-    const auto &dict= experiment_settings::shared_info_obj->cnt_queries;
-	std::vector<std::int64_t> decomposition_lengths;
-    for ( auto _ : state ) {
-        auto start = std::chrono::high_resolution_clock::now();
-        // the code that gets measured
-		decomposition_lengths.resize(dict.size());
-		size_t k= 0;
-        for ( const auto &qr: dict ) {
-            auto res = counting(qr.x_,qr.y_,qr.a_,qr.b_);
-            benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
-            benchmark::ClobberMemory(); // <-- took these lines from the documentation,
-			decomposition_lengths[k++]= num_segments(qr.x_,qr.y_);
-        }
-        auto end = std::chrono::high_resolution_clock::now();
-        state.counters["seconds"]+= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
-		double mean= state.counters["avgNumSegments"]= std::accumulate(
-						decomposition_lengths.begin(),
-						decomposition_lengths.end(),
-						0ull,
-						[]( std::uint64_t acc, auto x ) { return acc+x; }) / (0.00 + decomposition_lengths.size());
-		state.counters["stddev"]= sqrt(std::accumulate(
-						decomposition_lengths.begin(),
-						decomposition_lengths.end(),
-						0.00,
-						[&mean]( double acc, auto x ) { return acc+(x-mean)*(x-mean); }) / (decomposition_lengths.size()-1.00)
-						);
-        // @see https://github.com/google/benchmark#user-guide
-        // end of the code that gets measured
-    }
-}
-#endif
-
-BENCHMARK_TEMPLATE_F(path_queries_benchmark,tree_ext_sct_un_counting,tree_ext_sct_un)(benchmark::State &state) {
-    // const auto &dict= cnt_queries;
-    const auto &dict= experiment_settings::shared_info_obj->cnt_queries;
-    for ( auto _ : state ) {
-        auto start = std::chrono::high_resolution_clock::now();
-        // the code that gets measured
-        for ( const auto &qr: dict ) {
-            auto res = counting(qr.x_,qr.y_,qr.a_,qr.b_);
-            benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
-            benchmark::ClobberMemory(); // <-- took these lines from the documentation,
-        }
-        auto end = std::chrono::high_resolution_clock::now();
-        state.counters["seconds"]+= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
-        // @see https://github.com/google/benchmark#user-guide
-        // end of the code that gets measured
-    }
-}
-
-BENCHMARK_TEMPLATE_F(path_queries_benchmark,tree_ext_sct_rrr_counting,tree_ext_sct_rrr)(benchmark::State &state) {
-    // const auto &dict= cnt_queries;
-    const auto &dict= experiment_settings::shared_info_obj->cnt_queries;
-    for ( auto _ : state ) {
-        auto start = std::chrono::high_resolution_clock::now();
-        // the code that gets measured
-        for ( const auto &qr: dict ) {
-            auto res = counting(qr.x_,qr.y_,qr.a_,qr.b_);
-            benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
-            benchmark::ClobberMemory(); // <-- took these lines from the documentation,
-        }
-        auto end = std::chrono::high_resolution_clock::now();
-        state.counters["seconds"]+= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
-        // @see https://github.com/google/benchmark#user-guide
-        // end of the code that gets measured
-    }
-}
-
-BENCHMARK_TEMPLATE_F(path_queries_benchmark,wt_hpd_un_counting,wt_hpd_un)(benchmark::State &state) {
-    // const auto &dict= cnt_queries;
-    const auto &dict= experiment_settings::shared_info_obj->cnt_queries;
-    for ( auto _ : state ) {
-        auto start = std::chrono::high_resolution_clock::now();
-        // the code that gets measured
-        for ( const auto &qr: dict ) {
-            auto res = counting(qr.x_,qr.y_,qr.a_,qr.b_);
-            benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
-            benchmark::ClobberMemory(); // <-- took these lines from the documentation,
-        }
-        auto end = std::chrono::high_resolution_clock::now();
-        state.counters["seconds"]+= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
-        // @see https://github.com/google/benchmark#user-guide
-        // end of the code that gets measured
-    }
-}
-
-BENCHMARK_TEMPLATE_F(path_queries_benchmark,wt_hpd_rrr_counting,wt_hpd_rrr)(benchmark::State &state) {
-    // const auto &dict= cnt_queries;
-    const auto &dict= experiment_settings::shared_info_obj->cnt_queries;
-    for ( auto _ : state ) {
-        auto start = std::chrono::high_resolution_clock::now();
-        // the code that gets measured
+        const auto &dict= experiment_settings::shared_info_obj->cnt_queries;
         for ( const auto &qr: dict ) {
             auto res = counting(qr.x_,qr.y_,qr.a_,qr.b_);
             benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
@@ -565,12 +390,29 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,wt_hpd_rrr_counting,wt_hpd_rrr)(benc
     }
 }
 /*
-BENCHMARK_TEMPLATE_F(path_queries_benchmark,nsrs_counting,nv_sct)(benchmark::State &state) {
-    // const auto &dict= cnt_queries;
-    const auto &dict= experiment_settings::shared_info_obj->cnt_queries;
+BENCHMARK_TEMPLATE_F(path_queries_benchmark,counting_tree_ext_sct_rrr_small_sada,tree_ext_sct_rrr_small_sada)(benchmark::State &state) {
     for ( auto _ : state ) {
         auto start = std::chrono::high_resolution_clock::now();
         // the code that gets measured
+        // const auto &dict= med_queries;
+        const auto &dict= experiment_settings::shared_info_obj->cnt_queries;
+        for ( const auto &qr: dict ) {
+            auto res = counting(qr.x_,qr.y_,qr.a_,qr.b_);
+            benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
+            benchmark::ClobberMemory(); // <-- took these lines from the documentation,
+        }
+        auto end = std::chrono::high_resolution_clock::now();
+        state.counters["seconds"]+= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
+        // @see https://github.com/google/benchmark#user-guide
+        // end of the code that gets measured
+    }
+}
+BENCHMARK_TEMPLATE_F(path_queries_benchmark,counting_tree_ext_sct_rrr_small_gg,tree_ext_sct_rrr_small_gg)(benchmark::State &state) {
+    for ( auto _ : state ) {
+        auto start = std::chrono::high_resolution_clock::now();
+        // the code that gets measured
+        // const auto &dict= med_queries;
+        const auto &dict= experiment_settings::shared_info_obj->cnt_queries;
         for ( const auto &qr: dict ) {
             auto res = counting(qr.x_,qr.y_,qr.a_,qr.b_);
             benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
@@ -583,6 +425,77 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,nsrs_counting,nv_sct)(benchmark::Sta
     }
 }
 */
+
+/*============================================wt_hpd_counting=======================================================*/
+BENCHMARK_TEMPLATE_F(path_queries_benchmark,counting_wt_hpd_un_fast_sada,wt_hpd_un_fast_sada)(benchmark::State &state) {
+    for ( auto _ : state ) {
+        auto start = std::chrono::high_resolution_clock::now();
+        // the code that gets measured
+        const auto &dict= experiment_settings::shared_info_obj->cnt_queries;
+        for ( const auto &qr: dict ) {
+            auto res = counting(qr.x_,qr.y_,qr.a_,qr.b_);
+            benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
+            benchmark::ClobberMemory(); // <-- took these lines from the documentation,
+        }
+        auto end = std::chrono::high_resolution_clock::now();
+        state.counters["seconds"]+= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
+        // @see https://github.com/google/benchmark#user-guide
+        // end of the code that gets measured
+    }
+}
+BENCHMARK_TEMPLATE_F(path_queries_benchmark,counting_wt_hpd_un_fast_gg,wt_hpd_un_fast_gg)(benchmark::State &state) {
+    for ( auto _ : state ) {
+        auto start = std::chrono::high_resolution_clock::now();
+        // the code that gets measured
+        const auto &dict= experiment_settings::shared_info_obj->cnt_queries;
+        for ( const auto &qr: dict ) {
+            auto res = counting(qr.x_,qr.y_,qr.a_,qr.b_);
+            benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
+            benchmark::ClobberMemory(); // <-- took these lines from the documentation,
+        }
+        auto end = std::chrono::high_resolution_clock::now();
+        state.counters["seconds"]+= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
+        // @see https://github.com/google/benchmark#user-guide
+        // end of the code that gets measured
+    }
+}
+/*
+BENCHMARK_TEMPLATE_F(path_queries_benchmark,counting_wt_hpd_rrr_small_sada,wt_hpd_rrr_small_sada)(benchmark::State &state) {
+    for ( auto _ : state ) {
+        auto start = std::chrono::high_resolution_clock::now();
+        // the code that gets measured
+        // const auto &dict= med_queries;
+        const auto &dict= experiment_settings::shared_info_obj->cnt_queries;
+        for ( const auto &qr: dict ) {
+            auto res = counting(qr.x_,qr.y_,qr.a_,qr.b_);
+            benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
+            benchmark::ClobberMemory(); // <-- took these lines from the documentation,
+        }
+        auto end = std::chrono::high_resolution_clock::now();
+        state.counters["seconds"]+= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
+        // @see https://github.com/google/benchmark#user-guide
+        // end of the code that gets measured
+    }
+}
+BENCHMARK_TEMPLATE_F(path_queries_benchmark,counting_wt_hpd_rrr_small_gg,wt_hpd_rrr_small_gg)(benchmark::State &state) {
+    for ( auto _ : state ) {
+        auto start = std::chrono::high_resolution_clock::now();
+        // the code that gets measured
+        // const auto &dict= med_queries;
+        const auto &dict= experiment_settings::shared_info_obj->cnt_queries;
+        for ( const auto &qr: dict ) {
+            auto res = counting(qr.x_,qr.y_,qr.a_,qr.b_);
+            benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
+            benchmark::ClobberMemory(); // <-- took these lines from the documentation,
+        }
+        auto end = std::chrono::high_resolution_clock::now();
+        state.counters["seconds"]+= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
+        // @see https://github.com/google/benchmark#user-guide
+        // end of the code that gets measured
+    }
+}
+*/
+
 //=============================== Reporting ==============================================/
 /*
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_reporting,nv)(benchmark::State &state) {
@@ -604,39 +517,21 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_reporting,nv)(benchmark::State &s
         // end of the code that gets measured
     }
 }
-*/
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_lca_reporting,nv_lca)(benchmark::State &state) {
     // const auto &dict= rpt_queries;
-    std::vector<std::uint64_t> output_sizes;
     const auto &dict= experiment_settings::shared_info_obj->rpt_queries;
     std::vector<std::pair<value_type,size_type>> res;
     for ( auto _ : state ) {
         auto start = std::chrono::high_resolution_clock::now();
         // the code that gets measured
-		output_sizes.resize(dict.size());
-		size_t k= 0;
         for ( const auto &qr: dict ) {
             res.clear();
             reporting(qr.x_,qr.y_,qr.a_,qr.b_,res);
             benchmark::DoNotOptimize(res.data());  // <-- since we are doing nothing with "res"
             benchmark::ClobberMemory(); // <-- took these lines from the documentation,
-			output_sizes[k++]= res.size();
         }
         auto end = std::chrono::high_resolution_clock::now();
         state.counters["seconds"]+= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
-		double mean= state.counters["avgOutputSize"]= 
-				std::accumulate(
-						output_sizes.begin(),
-						output_sizes.end(),
-						0ull,
-						[]( std::uint64_t acc, auto x ) { return acc+x; }
-				) / (0.00 + output_sizes.size());
-		state.counters["stddevOfOutputSizes"]= sqrt(std::accumulate(
-						output_sizes.begin(),
-						output_sizes.end(),
-						0.00,
-						[&mean]( double acc, auto x ) { return acc+(x-mean)*(x-mean); }) / (output_sizes.size()-1.00)
-						);
         // @see https://github.com/google/benchmark#user-guide
         // end of the code that gets measured
     }
@@ -762,7 +657,6 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,wt_hpd_rrr_reporting,wt_hpd_rrr)(ben
     }
 }
 
-/*
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,nsrs_reporting,nv_sct)(benchmark::State &state) {
     // const auto &dict= rpt_queries;
     const auto &dict= experiment_settings::shared_info_obj->rpt_queries;
@@ -800,19 +694,17 @@ void RunAllGiven( int argc, char **argv ) {
         }
     }
 
-    const int FULL_PATH= 0, NUM_QUERIES= 1, K_VAL= 2;
+    const int FULL_PATH= 0, NUM_QUERIES= 1;
 
     // ".*nv_lca_counting\|.*tree_ext_ptr_counting"
 
     experiment_settings::dataset_path= std::string(argv[FULL_PATH]);
-    experiment_settings::K           = strtol(argv[K_VAL],nullptr,10);
     experiment_settings::nq          = strtol(argv[NUM_QUERIES],nullptr,10);
 
     // set up the shared object, such that the common set of queries is generated beforehand
     experiment_settings::shared_info_obj= std::make_unique<experiment_settings::shared_info>();
 
     std::cerr << "Dataset path: " << experiment_settings::dataset_path << std::endl;
-    std::cerr << "K= " << experiment_settings::K << std::endl;
     ::benchmark::Initialize (&argc, argv);
     ::benchmark::RunSpecifiedBenchmarks ();
 }

@@ -131,7 +131,7 @@ void heavy_path_decomp<node_type, size_type, value_type>::perform_decomposition(
         if ( best_son[y] != NONE )
             st.push(y), idx.push(best_son[y]), cnt.push(0);
         else {
-            assert( T->is_leaf(y) );
+            //assert( T->is_leaf(y) );
         }
     }
 }
