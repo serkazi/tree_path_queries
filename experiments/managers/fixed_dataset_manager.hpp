@@ -14,6 +14,7 @@
 #include "nsrs.hpp"
 #include "tree_ext_sct.hpp"
 #include "wt_hpd_ptr.hpp"
+#include "bp_trees.hpp"
 
 namespace experiments {
 
@@ -52,7 +53,44 @@ namespace experiments {
     std::unique_ptr<path_query_processor<node_type,size_type,value_type>>
     instantiate( const std::string &topology, const std::vector<value_type> &w, uint16_t i ) {
 
+		using wt_hpd_un= wt_hpd<node_type,size_type,value_type,
+				bp_trees::bp_gg_fast<node_type,size_type>,
+				sdsl::bit_vector,
+				sdsl::rank_support_v5<>,
+				sdsl::select_support_mcl<1,1>,
+				sdsl::select_support_mcl<0,1>
+		>;
+		using tree_ext_sct_un= tree_ext_sct<
+				node_type,size_type,value_type,
+				sdsl::bp_support_gg<>,
+				2,
+				sdsl::bit_vector ,
+				sdsl::rank_support_v5<>,
+				sdsl::select_support_mcl<1,1>,
+				sdsl::select_support_mcl<0,1>
+		>;
+		using wt_hpd_rrr= wt_hpd<
+				node_type,size_type,value_type,
+				bp_trees::bp_gg_fast<node_type,size_type>,
+				sdsl::rrr_vector<>
+		>;
+		using tree_ext_sct_rrr= tree_ext_sct<
+				node_type,size_type,
+				value_type,
+				sdsl::bp_support_gg<>,
+				2,
+				sdsl::rrr_vector<>
+		>;
+
+		using nv                 = naive_processor<node_type,size_type,value_type>;
+		using nv_lca             = naive_processor_lca<node_type,size_type,value_type>;
+		using nv_succ            = nsrs<node_type,size_type,value_type>;
+		using wt_hp_ptr          = wt_hpd_ptr<node_type,size_type,value_type>;
+		using tree_ext_ptr       = ext_ptr<node_type,size_type,value_type>;
+
+
         // some shorthands for further use
+		/*
         using nv                 = naive_processor<node_type,size_type,value_type>;
         using nv_lca             = naive_processor_lca<node_type,size_type,value_type>;
         using nv_succ            = nsrs<node_type,size_type,value_type>;
@@ -83,6 +121,7 @@ namespace experiments {
                 sdsl::bp_support_sada<>,2,
                 sdsl::rrr_vector<>
         >;
+		*/
 
         try {
             switch (i) {
@@ -102,7 +141,7 @@ namespace experiments {
                     return std::move(std::make_unique<tree_ext_ptr>(topology, w));
                 }
                 case static_cast<int>(experiments::IMPLS::WT_HPD_UN): {
-                    return std::move(std::make_unique<wt_hpd_uncompressed>(topology, w));
+                    return std::move(std::make_unique<wt_hpd_un>(topology, w));
                 }
                 case static_cast<int>(experiments::IMPLS::WT_HPD_RRR): {
                     return std::move(std::make_unique<wt_hpd_rrr>(topology, w));
@@ -136,6 +175,43 @@ class fixed_dataset_manager {
 
 private:
 
+using wt_hpd_un= wt_hpd<node_type,size_type,value_type,
+	  	bp_trees::bp_gg_fast<node_type,size_type>,
+        sdsl::bit_vector,
+		sdsl::rank_support_v5<>,
+        sdsl::select_support_mcl<1,1>,
+        sdsl::select_support_mcl<0,1>
+>;
+using tree_ext_sct_un= tree_ext_sct<
+        node_type,size_type,value_type,
+        sdsl::bp_support_gg<>,
+		2,
+        sdsl::bit_vector ,
+        sdsl::rank_support_v5<>,
+        sdsl::select_support_mcl<1,1>,
+        sdsl::select_support_mcl<0,1>
+>;
+using wt_hpd_rrr= wt_hpd<
+        node_type,size_type,value_type,
+	  	bp_trees::bp_gg_fast<node_type,size_type>,
+        sdsl::rrr_vector<>
+>;
+using tree_ext_sct_rrr= tree_ext_sct<
+        node_type,size_type,
+		value_type,
+        sdsl::bp_support_gg<>,
+		2,
+        sdsl::rrr_vector<>
+>;
+
+using nv                 = naive_processor<node_type,size_type,value_type>;
+using nv_lca             = naive_processor_lca<node_type,size_type,value_type>;
+using nv_sct            = nsrs<node_type,size_type,value_type>;
+using wt_hp_ptr          = wt_hpd_ptr<node_type,size_type,value_type>;
+using tree_ext_ptr       = ext_ptr<node_type,size_type,value_type>;
+
+/*
+
     using nv                 = naive_processor<node_type,size_type,value_type>;
     using nv_lca             = naive_processor_lca<node_type,size_type,value_type>;
     using nv_succ            = nsrs<node_type,size_type,value_type>;
@@ -166,6 +242,7 @@ private:
                                         sdsl::bp_support_sada<>,2,
                                         sdsl::rrr_vector<>
                                         >;
+*/
     std::string description;
     value_type a,b;
     size_type n;
