@@ -127,6 +127,7 @@ namespace experiment_settings {
         std::vector<path_queries::counting_query<node_type,size_type,value_type>> cnt_queries;
         std::vector<path_queries::reporting_query<node_type,size_type,value_type>> rpt_queries;
         std::vector<path_queries::median_query<node_type,size_type,value_type>> med_queries;
+		std::vector<value_type> weights;
 
         shared_info() {
             size_type n;
@@ -136,6 +137,7 @@ namespace experiment_settings {
             is >> topology;
             std::vector<value_type> w(n= topology.size()/2);
             for ( auto &x: w ) is >> x;
+			weights= w, std::sort(weights.begin(),weights.end());
 
             auto a= *(std::min_element(w.begin(),w.end()));
             auto b= *(std::max_element(w.begin(),w.end()));
@@ -149,7 +151,7 @@ namespace experiment_settings {
                     .set(path_queries::QUERY_TYPE::REPORTING,experiment_settings::nq)
                     .set_scaling_param(experiment_settings::K)
                     .set_node_range(n)
-                    .set_weight_range(a,b)
+                    .set_weight_range(0,n-1)
                     .build();
 
             // insert all the queries into our internal storage, so that we can partition it
@@ -172,13 +174,21 @@ namespace experiment_settings {
                         path_queries::median_query<node_type,size_type,value_type>>(q);
             });
             // unpack the values, so that we don't have to unpack them during the benchmark runs
-            std::transform(qrs.begin(),counting_end,std::back_inserter(cnt_queries),[&]( const auto &qr ) {
-                return std::get<path_queries::counting_query<node_type,size_type,value_type>>(qr);
+            std::transform(qrs.begin(),counting_end,std::back_inserter(cnt_queries),[&]( auto qr ) {
+				auto q= std::get<path_queries::counting_query<node_type,size_type,value_type>>(qr);
+				assert( q.a_ < n );
+				q.a_= weights[q.a_], q.b_= weights[q.b_];
+                //return std::get<path_queries::counting_query<node_type,size_type,value_type>>(qr);
+				return q;
             });
-            std::transform(counting_end,reporting_end,std::back_inserter(rpt_queries),[&]( const auto &qr ) {
-                return std::get<path_queries::reporting_query<node_type,size_type,value_type>>(qr);
+            std::transform(counting_end,reporting_end,std::back_inserter(rpt_queries),[&]( auto qr ) {
+			    auto q= std::get<path_queries::reporting_query<node_type,size_type,value_type>>(qr);
+				assert( q.a_ < n );
+				q.a_= weights[q.a_], q.b_= weights[q.b_];
+                //return std::get<path_queries::reporting_query<node_type,size_type,value_type>>(qr);
+				return q;
             });
-            std::transform(reporting_end,qrs.end(),std::back_inserter(med_queries),[&]( const auto &qr ) {
+            std::transform(reporting_end,qrs.end(),std::back_inserter(med_queries),[&]( auto qr ) {
                 return std::get<path_queries::median_query<node_type,size_type,value_type>>(qr);
             });
             qrs.clear();
@@ -394,18 +404,31 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_sct_median,nv_sct)(benchmark::Sta
 
 //=============================== Counting ==============================================/
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_counting,nv)(benchmark::State &state) {
+	std::vector<size_type> output_sizes;
     // const auto &dict= cnt_queries;
     const auto &dict= experiment_settings::shared_info_obj->cnt_queries;
     for ( auto _ : state ) {
         auto start = std::chrono::high_resolution_clock::now();
         // the code that gets measured
+		output_sizes.resize(dict.size());
+		int k= 0;
         for ( const auto &qr: dict ) {
             auto res = counting(qr.x_,qr.y_,qr.a_,qr.b_);
             benchmark::DoNotOptimize(res);  // <-- since we are doing nothing with "res"
             benchmark::ClobberMemory(); // <-- took these lines from the documentation,
+			output_sizes[k++]= res;
         }
         auto end = std::chrono::high_resolution_clock::now();
         state.counters["seconds"]= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
+		double mean= state.counters["avgOutputSize"]= 
+				std::accumulate(
+						output_sizes.begin(),
+						output_sizes.end(),
+						0ull)
+				/ (0.00 + output_sizes.size());
+		std::vector<double> diff(output_sizes.size());
+		std::transform(output_sizes.begin(), output_sizes.end(), diff.begin(), [mean]( auto x ) { return x-mean; });
+		state.counters["stddevOfOutputSizes"]= std::sqrt(std::inner_product(diff.begin(), diff.end(), diff.begin(), 0.0)/output_sizes.size());
         // @see https://github.com/google/benchmark#user-guide
         // end of the code that gets measured
     }
@@ -571,6 +594,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_sct_counting,nv_sct)(benchmark::S
 }
 
 //=============================== Reporting ==============================================/
+#if 0
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_reporting,nv)(benchmark::State &state) {
     // const auto &dict= rpt_queries;
     const auto &dict= experiment_settings::shared_info_obj->rpt_queries;
@@ -643,7 +667,6 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,tree_ext_ptr_reporting,tree_ext_ptr)
         // end of the code that gets measured
     }
 }
-
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,wt_hpd_ptr_reporting,wt_hp_ptr)(benchmark::State &state) {
     // const auto &dict= rpt_queries;
     const auto &dict= experiment_settings::shared_info_obj->rpt_queries;
@@ -663,6 +686,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,wt_hpd_ptr_reporting,wt_hp_ptr)(benc
         // end of the code that gets measured
     }
 }
+#endif
 
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,tree_ext_sct_rrr_reporting,tree_ext_sct_rrr)(benchmark::State &state) {
     // const auto &dict= rpt_queries;
@@ -744,6 +768,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,wt_hpd_un_reporting,wt_hpd_un)(bench
     }
 }
 
+#if 0
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_sct_reporting,nv_sct)(benchmark::State &state) {
     // const auto &dict= rpt_queries;
     const auto &dict= experiment_settings::shared_info_obj->rpt_queries;
@@ -763,6 +788,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_sct_reporting,nv_sct)(benchmark::
         // end of the code that gets measured
     }
 }
+#endif
 
 void RunAllGiven( int argc, char **argv ) {
     const rlim_t kStackSize = 20 * 1024ll * 1024ll * 1024ll;

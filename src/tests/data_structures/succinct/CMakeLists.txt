@@ -10,6 +10,7 @@ target_include_directories(test_wt_hpd
         ${PROJECT_SOURCE_DIR}/src/tests/data_structures/succinct
         ${PROJECT_SOURCE_DIR}/include/data_structures/succinct
         ${PROJECT_SOURCE_DIR}/src/misc
+        ${PROJECT_SOURCE_DIR}/include/wrappers
         )
 target_link_libraries(test_wt_hpd PUBLIC wt_hpd raw_processor gtest pthread)
 

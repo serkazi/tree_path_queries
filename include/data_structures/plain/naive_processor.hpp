@@ -14,25 +14,6 @@
 #include <optional>
 
 /**
- * //TODO format nicely in doxygen format
- * Randomized_Partition(A, l, u)
- * @\li Choose a random index i from [l..u]. Assign p ← A[i].
- * @\li Rearrange the elements of A[l..u] so that there exists an integer j s.t.
- *	    elements in A[l..j-1] are <= p,
- *			     A[j] = p (i.e. p is moved from A[i] to A[j]), and
- *						     elements in A[j+1..u] are >= p.
- * @\li return j
- * Randomized_Select(A, l, u, i) // find the ith smallest element from A[l..u]
- * if l = r then
- *  return A[l]
- *  p ← Randomized_Partition(A, l, u)
- *  k ← p - l + 1 // note that a[p] is the k-th smallest element in A[l..u]
- *  if k = i then
- *    return A[p]
- *    else if i < k then
- *           return Randomized_Select(A, l, p-1, i)
- *                else
- *                       return Randomized_Select(A, p+1, u, i-k)
  * @tparam node_type
  * @tparam size_type
  * @tparam value_type
@@ -51,10 +32,12 @@ protected:
 		ROOT = 0
 	};
 
-	size_type n;
+	size_type n,E;
 	std::unique_ptr<size_type[]> d= nullptr;
 	std::unique_ptr<node_type[]> p = nullptr;
-	std::unique_ptr<std::vector<pq_types::node_type>[]> adj = nullptr;
+
+	std::vector<node_type> to;
+	std::vector<std::optional<size_type>> last, next;
 	std::vector<value_type> weights;
 
     int find_length(const node_type x, const node_type y) const {
@@ -65,26 +48,37 @@ protected:
 		return 1+res;
 	}
 
+	void add_arc( node_type x, node_type y ) {
+		size_type i= E++;
+		to[i]= y, next[i]= last[x], last[x]= i;
+	}
+
+	void shed_redundancy() {
+		last.clear(), next.clear(), to.clear();
+	}
+
 public:
 
 	naive_processor() = default;
 
-	naive_processor( const std::string &s, const std::vector<value_type> &w ) {
+	naive_processor( const std::string &s, const std::vector<value_type> &w, bool finalize_= true ) {
 		int i, j, k, x, y;
 		node_type V = 0;
 		assert( not (s.size() & 1) );
-		n = s.size() / 2;
-		adj = std::make_unique<std::vector<node_type>[]>(n);
-		p = std::make_unique<node_type[]>(n);
-		d = std::make_unique<size_type[]>(n);
+		E= 0, n = s.size()/2;
+		p= std::make_unique<node_type[]>(n);
+		d= std::make_unique<size_type[]>(n);
+		to.resize(n-1), last.resize(n), next.resize(n-1);
+		std::fill(last.begin(),last.end(),std::nullopt);
 		assert(w.size() >= n);
-		for (weights.clear(), weights.reserve(n), i = 0; i < n; weights.push_back(w[i]), adj[i++].clear());
+		weights= w;
 		std::stack<node_type> st;
 		assert(st.empty());
 		for ( char ch: s ) {
 			if ( ch == '(' ) {
-				if ( not st.empty() )
-					adj[st.top()].push_back(V), p[V] = st.top();
+				if ( not st.empty() ) {
+					add_arc(p[V]= st.top(),V);
+				}
 				d[V] = static_cast<size_type>(st.size()), st.push(V++);
 				continue;
 			}
@@ -92,6 +86,7 @@ public:
 		}
 		assert(V == n);
 		this->m_sigma= *(std::max_element(w.begin(),w.end()))+1;
+		if ( finalize_ ) shed_redundancy();
 	}
 
 	// tree info
@@ -111,7 +106,10 @@ public:
 	}
 
 	std::vector<node_type> children(node_type x) const override {
-		return adj[x];
+		std::vector<node_type> kinder{};
+		for ( auto i= last[x]; i; i= next[*i] )
+			kinder.push_back(to[*i]);
+		return kinder;
 	}
 
 	node_type lca(node_type cx, node_type cy) const override {
@@ -136,7 +134,7 @@ public:
 	}
 
 	bool is_leaf(node_type x) const override {
-		return adj[x].empty();
+		return not last[x];
 	}
 
 	value_type

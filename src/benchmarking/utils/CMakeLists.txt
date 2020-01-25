@@ -41,6 +41,26 @@ target_include_directories(
         ${PROJECT_SOURCE_DIR}/experiments/utils
 )
 
+add_executable(cli_bench cli_gbench.cpp)
+target_link_libraries(
+		cli_bench
+        PUBLIC
+        benchmark benchmark_main pthread nlohmann_json::nlohmann_json
+		naive wt_hpd ext_ptr tree_ext_sct)
+target_link_directories(cli_bench PUBLIC ${BENCHMARK_ROOT})
+target_include_directories(
+		cli_bench
+        PUBLIC
+        ${BENCHMARK_INCLUDE_DIR}
+        ${PROJECT_SOURCE_DIR}/include/interfaces
+        ${PROJECT_SOURCE_DIR}/include/requests
+        ${PROJECT_SOURCE_DIR}/src/misc
+        ${PROJECT_SOURCE_DIR}/include/data_structures/plain
+        ${PROJECT_SOURCE_DIR}/include/data_structures/succinct
+        ${PROJECT_SOURCE_DIR}/include/data_structures/hybrid
+        ${PROJECT_SOURCE_DIR}/experiments/utils
+)
+
 add_executable(normal_bench run_normal_bench.cpp)
 target_link_libraries(
         normal_bench

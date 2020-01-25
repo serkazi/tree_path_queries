@@ -3,6 +3,7 @@
 #include "tree_ext_sct.hpp"
 #include "pq_types.hpp"
 #include <regex>
+#include <sdsl/bp_support_gg.hpp>
 
 namespace {
 
@@ -27,7 +28,16 @@ namespace {
             std::string("rnd.100mln.sqrt.puu")
     };
 
-    using holder= std::shared_ptr<tree_ext_sct<node_type,size_type,value_type>>;
+    using tree_ext_sct_un= tree_ext_sct<
+            node_type,size_type,value_type,
+            sdsl::bp_support_gg<>,
+            2,
+            sdsl::bit_vector ,
+            sdsl::rank_support_v5<>,
+            sdsl::select_support_mcl<1,1>,
+            sdsl::select_support_mcl<0,1>
+    >;
+    using holder= std::shared_ptr<tree_ext_sct_un>;
 
     bool equal_multisets(
             const std::vector<std::pair<value_type, size_type>> &a,
@@ -50,7 +60,7 @@ namespace {
         return s == t;
     }
 
-    class wt_hpd_test : public testing::TestWithParam<std::string> {
+    class tree_ext_sct_test : public testing::TestWithParam<std::string> {
     public:
 
         using key_type= std::string;
@@ -60,6 +70,7 @@ namespace {
         static std::map<key_type, std::shared_ptr<path_query_processor<node_type, size_type, value_type>>> raws;
         static std::map<key_type, size_type> n;
         static std::map<key_type, std::vector<value_type>> w;
+        static std::map<key_type,std::vector<value_type>> sorted_weights;
         static std::map<key_type, std::default_random_engine> gen_nodes, gen_weights, gen_qntl;
         static std::map<key_type, std::shared_ptr<std::uniform_int_distribution<node_type>>> nodes_distr;
         static std::map<key_type, std::shared_ptr<std::uniform_int_distribution<size_type>>> qntl_distr;
@@ -75,15 +86,16 @@ namespace {
                 w[key].resize(s.size() / 2);
                 for (auto &x: w[key])
                     is >> x;
+                sorted_weights[key]= w[key], std::sort(sorted_weights[key].begin(),sorted_weights[key].end());
                 n[key] = s.size() / 2;
                 processors[key] =
-                        std::make_shared<tree_ext_sct<node_type,size_type,value_type>>(s, w[key]);
+                        std::make_shared<tree_ext_sct_un>(s, w[key]);
                 raws[key] = std::make_shared<raw_processor<node_type, size_type, value_type>>(s, w[key]);
                 nodes_distr[key] = std::make_shared<std::uniform_int_distribution<node_type>>(0, n[key] - 1);
                 qntl_distr[key] = std::make_shared<std::uniform_int_distribution<size_type>>(1, 100);
                 value_type lower = *(min_element(begin(w[key]), end(w[key]))), upper = *(max_element(begin(w[key]),
                                                                                                      end(w[key])));
-                weights_distr[key] = std::make_shared<std::uniform_int_distribution<value_type>>(lower, upper);
+                weights_distr[key] = std::make_shared<std::uniform_int_distribution<value_type>>(0,n[key]-1);
             }
         }
 
@@ -97,16 +109,17 @@ namespace {
         }
     };
 
-    std::map<std::string, holder> wt_hpd_test::processors;
-    std::map<std::string, std::shared_ptr<path_query_processor<node_type, size_type, value_type>>> wt_hpd_test::raws;
-    std::map<std::string, size_type> wt_hpd_test::n;
-    std::map<std::string, std::vector<value_type>> wt_hpd_test::w;
-    std::map<std::string, std::default_random_engine> wt_hpd_test::gen_nodes, wt_hpd_test::gen_weights, wt_hpd_test::gen_qntl;
-    std::map<std::string, std::shared_ptr<std::uniform_int_distribution<node_type>>> wt_hpd_test::nodes_distr;
-    std::map<std::string, std::shared_ptr<std::uniform_int_distribution<size_type>>> wt_hpd_test::qntl_distr;
-    std::map<std::string, std::shared_ptr<std::uniform_int_distribution<value_type>>> wt_hpd_test::weights_distr;
+    std::map<std::string, holder> tree_ext_sct_test::processors;
+    std::map<std::string, std::shared_ptr<path_query_processor<node_type, size_type, value_type>>> tree_ext_sct_test::raws;
+    std::map<std::string, size_type> tree_ext_sct_test::n;
+    std::map<std::string, std::vector<value_type>> tree_ext_sct_test::w;
+    std::map<std::string,std::vector<value_type>> tree_ext_sct_test::sorted_weights;
+    std::map<std::string, std::default_random_engine> tree_ext_sct_test::gen_nodes, tree_ext_sct_test::gen_weights, tree_ext_sct_test::gen_qntl;
+    std::map<std::string, std::shared_ptr<std::uniform_int_distribution<node_type>>> tree_ext_sct_test::nodes_distr;
+    std::map<std::string, std::shared_ptr<std::uniform_int_distribution<size_type>>> tree_ext_sct_test::qntl_distr;
+    std::map<std::string, std::shared_ptr<std::uniform_int_distribution<value_type>>> tree_ext_sct_test::weights_distr;
 
-    TEST_P(wt_hpd_test, all_queries_correct) {
+    TEST_P(tree_ext_sct_test, all_queries_correct) {
         auto ndistr = this->nodes_distr[pathname];
         auto genn = this->gen_nodes[pathname];
         auto wdistr = this->weights_distr[pathname];
@@ -118,7 +131,7 @@ namespace {
             for (auto it = 0; it < ITERS; ++it) {
                 assert(this->w[pathname].size() >= this->n[pathname]);
                 auto x = nodes_dice(), y = nodes_dice();
-                auto vl = weights_dice(), vr = weights_dice();
+                auto vl = sorted_weights[pathname][weights_dice()], vr = sorted_weights[pathname][weights_dice()];
                 if (vl > vr) std::swap(vl, vr);
                 std::vector<std::pair<value_type, size_type>> answer1, answer2;
                 this->processors[pathname]->report(x, y, static_cast<value_type>(vl), static_cast<value_type>(vr),
@@ -134,7 +147,7 @@ namespace {
             for (auto it = 0; it < ITERS; ++it) {
                 assert(this->w[pathname].size() >= this->n[pathname]);
                 auto x = nodes_dice(), y = nodes_dice();
-                auto vl = weights_dice(), vr = weights_dice();
+                auto vl = sorted_weights[pathname][weights_dice()], vr = sorted_weights[pathname][weights_dice()];
                 if (vl > vr) std::swap(vl, vr);
                 auto ans1 = this->processors[pathname]->count(x, y, static_cast<value_type>(vl),
                                                               static_cast<value_type>(vr));
@@ -170,7 +183,7 @@ namespace {
 
     INSTANTIATE_TEST_SUITE_P(
             TestSuiteP,
-            wt_hpd_test,
+            tree_ext_sct_test,
             testing::Values(
                     root_dir + paths[0],
                     root_dir + paths[1],
@@ -178,7 +191,7 @@ namespace {
                     root_dir + paths[3],
                     root_dir + paths[4]
             ),
-            [](const testing::TestParamInfo<wt_hpd_test::ParamType> &info) {
+            [](const testing::TestParamInfo<tree_ext_sct_test::ParamType> &info) {
                 std::string name = info.param;
                 std::regex r("([^/]+)$");
                 std::smatch m;

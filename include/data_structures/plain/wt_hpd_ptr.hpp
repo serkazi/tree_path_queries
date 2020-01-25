@@ -8,8 +8,8 @@
 #include "heavy_path_decomp.hpp"
 #include "wavelet_tree.hpp"
 #include "bender_farach_colton.hpp"
-// #include "succinct_container.hpp" <-- we'll worry about memory later
 #include "path_query_processor.hpp"
+#include "path_decomposer.hpp"
 #include <memory>
 
 template <

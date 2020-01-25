@@ -342,8 +342,8 @@ private:
 
 			if ( vlen[0] )
 				que.push(left_child(tree_id)),qw.push({aa,mid}),qstr.push({si,si+slen[0]-1}),qwgt.push({wi,wi+vlen[0]-1});
-			que.push(right_child(tree_id)),qw.push({mid+1,bb}),qstr.push({si+slen[0],sj}),qwgt.push({wi+vlen[0],wj});
-
+			if ( vlen[1] )
+			    que.push(right_child(tree_id)),qw.push({mid+1,bb}),qstr.push({si+slen[0],sj}),qwgt.push({wi+vlen[0],wj});
 		}
 
 		delete []buff, delete []weights;

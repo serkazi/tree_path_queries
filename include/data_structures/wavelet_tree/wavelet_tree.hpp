@@ -20,6 +20,7 @@ public:
 private:
 
     std::vector<value_type> original_weights;
+	std::vector<size_type> original_id;
 
     static std::pair<size_type,size_type> get_config( value_type n ) {
         auto max_node_id= std::numeric_limits<size_type>::min();
@@ -51,7 +52,7 @@ private:
     size_type *backbone= nullptr;
     value_type sigma;
     std::unique_ptr<size_type[]> shifts= nullptr;
-	std::vector<size_type> precalc_select[2];
+	//std::vector<size_type> precalc_select[2];
 
     void construct_im( std::unique_ptr<value_type[]> w ) ;
     inline size_type rank0( size_type i ) const ;
@@ -101,12 +102,14 @@ void wavelet_tree<size_type,value_type>::construct_im( std::unique_ptr<value_typ
     std::queue<state> q;
     auto tmp= state(0,n-1,0,sigma-1,0);
     auto highest_accessed= std::numeric_limits<size_type>::min();
-
-    for ( shifts[tmp.idx]= 0, len[tmp.idx]= n, q.push(std::move(tmp)); not q.empty(); ) {
+	shifts[tmp.idx]= 0, len[tmp.idx]= n;
+	// for sake of consistency, we store the identity permutation
+	for ( auto idx= 0; idx < n; ++idx )
+		original_id[shifts[tmp.idx]+idx]= idx;
+    for ( q.push(std::move(tmp)); not q.empty(); ) {
         auto tr= q.front(); q.pop();
         assert( shifts[tr.idx] < std::numeric_limits<size_type>::max() );
         assert( len[tr.idx] == tr.r-tr.l+1 );
-        //std::cerr << "[" << tr.l << "," << tr.r << "]" << std::endl;
         if ( tr.a == tr.b ) {
             backbone[shifts[tr.idx]]= 0, len[tr.idx]= 1; //just some value; we are not going to access it anyway, since it is a leaf
             // highest_accessed= std::max(highest_accessed,shifts[tr.idx]);
@@ -125,9 +128,6 @@ void wavelet_tree<size_type,value_type>::construct_im( std::unique_ptr<value_typ
             else ++len[rs];
         auto *lptr= tw;
         auto *rptr= tw+len[ls];
-        //if ( tr.l <= tr.r ) {
-        //    std::cerr << "[" << shifts[tr.idx] << "," << shifts[tr.idx]+tr.r-tr.l << "]" << std::endl;
-        //}
         for ( auto l= tr.l; l <= tr.r; ++l ) {
             assert( shifts[tr.idx]+l-tr.l < length );
             backbone[shifts[tr.idx]+l-tr.l]= (w[l]<=mid) ? (*lptr++= w[l], 0) : (*rptr++= w[l], 1);
@@ -135,15 +135,21 @@ void wavelet_tree<size_type,value_type>::construct_im( std::unique_ptr<value_typ
         }
         lptr= rptr= nullptr;
 
-        for ( auto l= tr.l; l <= tr.r; w[l]= tw[l-tr.l], ++l ) ;
-
         shifts[ls]= shifts[ls-1]+len[ls-1];
         assert( ls < num_nodes );
+		for ( auto l= tr.l, ff=0ul; l <= tr.r; ++l ) 
+			if ( w[l] <= mid )
+				original_id[shifts[ls]+ff]= original_id[shifts[tr.idx]+l-tr.l], ++ff;
         q.push({tr.l,tr.l+len[ls]-1,tr.a,mid,ls});
 
         assert( rs < num_nodes );
         shifts[rs]= shifts[ls]+len[ls];
+		for ( auto l= tr.l, ff=0ul; l <= tr.r; ++l ) 
+			if ( w[l] > mid )
+				original_id[shifts[rs]+ff]= original_id[shifts[tr.idx]+l-tr.l], ++ff;
         q.push({tr.l+len[ls],tr.r,mid+1,tr.b,rs});
+
+        for ( auto l= tr.l; l <= tr.r; w[l]= tw[l-tr.l], ++l ) ;
     }
     delete[] tw;
     for ( auto l= highest_accessed+1; l <= length; ++l ) backbone[l]= 0;
@@ -151,7 +157,7 @@ void wavelet_tree<size_type,value_type>::construct_im( std::unique_ptr<value_typ
 	// for constant-time select we precalculate values
 	auto ones = std::count_if(backbone,backbone+length+1,[]( auto x ) { return x == 1; });
 	auto zeros= std::count_if(backbone,backbone+length+1,[]( auto x ) { return x == 0; });
-	precalc_select[0].resize(zeros+1), precalc_select[1].resize(ones+1);
+	/*precalc_select[0].resize(zeros+1), precalc_select[1].resize(ones+1);
 	ones= zeros= 0;
 	for ( auto pos= 0; pos <= length; ++pos )
 		if ( backbone[pos] == 0 )
@@ -159,6 +165,7 @@ void wavelet_tree<size_type,value_type>::construct_im( std::unique_ptr<value_typ
 		else precalc_select[1][++ones]= pos;
 	assert( precalc_select[0].size() == zeros+1 );
 	assert( precalc_select[1].size() == ones+1 );
+	*/
 
 	// some checks, can be deleted
 	// TODO: delete this afterwards
@@ -253,6 +260,7 @@ wavelet_tree<size_type,value_type>::wavelet_tree( const std::vector<value_type> 
     auto num_levels= static_cast<size_type>(floor(log(sigma)/log(2)+1+(1e-7)));
     length= num_levels*n+1;
     // std::cerr << "n*num_levels+1 = " << n*num_levels+1 << ", sigma= " << sigma << std::endl;
+	original_id.resize(length+1);
     backbone= new size_type[length+1];
     for ( auto x= 0; x < length+1; backbone[x++]= std::numeric_limits<size_type>::max() ) ;
     shifts= std::make_unique<size_type[]>(num_nodes);
@@ -395,7 +403,6 @@ size_type wavelet_tree<size_type, value_type>::srch( size_type j, std::function<
 // we'll first go for a logarithmic select
 template<typename size_type, typename value_type>
 size_type wavelet_tree<size_type, value_type>::select0( size_type j ) const {
-	/*
     assert( j );
     // return the position i s.t. rank_0[i] == j, and rank_0[i-1] == j-1
     size_type low= 0, high= length;
@@ -409,14 +416,18 @@ size_type wavelet_tree<size_type, value_type>::select0( size_type j ) const {
     assert( rank0(low) < j );
     assert( rank0(high) == j );
     return low;
-	*/
+    // we remove precalc_select, as we are storing the original ids directly
+    // so recovering a node is O(1) rather than O(\lg{\sigma})
+    // if we want to use this binary-search-based select, then
+    // recovering time is O(\lg\sigma\cdot{}\lg{n})
+    /*
 	assert( 1 <= j and j < precalc_select[0].size() );
 	return precalc_select[0][j];
+    */
 }
 
 template<typename size_type, typename value_type>
 size_type wavelet_tree<size_type, value_type>::select1(size_type j) const {
-	/*
     assert( j );
     size_type low= 0, high= length;
     assert( rank1(high) >= j );
@@ -429,10 +440,11 @@ size_type wavelet_tree<size_type, value_type>::select1(size_type j) const {
     assert( rank1(low) < j );
     assert( rank1(high) == j );
     return low;
-	*/
+    /*
 	assert( 1 <= j and j < precalc_select[1].size() );
 	return precalc_select[1][j];
     // return srch(j,rank1());
+    */
 }
 
 template<typename size_type, typename value_type>
@@ -487,6 +499,9 @@ size_type wavelet_tree<size_type, value_type>::range_2d_counting_query(
 
 template<typename size_type, typename value_type>
 std::pair<value_type,size_type> wavelet_tree<size_type, value_type>::recover(size_type idx, size_type i) const {
+	auto oid= original_id[i];
+	return {oid,original_weights[oid]};
+		/*
     if ( idx == 0 ) {
         assert( 0 <= i and i < original_weights.size() );
         return {i,original_weights[i]};
@@ -496,6 +511,7 @@ std::pair<value_type,size_type> wavelet_tree<size_type, value_type>::recover(siz
     return (idx&1)?\
            recover(parent_id,select0(rank0(shifts[parent_id])+pos+1)):\
            recover(parent_id,select1(rank1(shifts[parent_id])+pos+1));
+		   */
 }
 
 template<typename size_type, typename value_type>

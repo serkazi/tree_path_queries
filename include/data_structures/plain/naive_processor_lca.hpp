@@ -22,13 +22,13 @@ private:
 	std::unique_ptr<lca_processor<node_type,size_type>> prc= nullptr;
 	using naive_processor<node_type,size_type,value_type> :: p;
 	using naive_processor<node_type,size_type,value_type> :: d;
-	using naive_processor<node_type,size_type,value_type> :: adj;
 
 public:
 	naive_processor_lca() = default;
     naive_processor_lca( const std::string &s, const std::vector<value_type> &w )
-    : naive_processor<node_type,size_type,value_type>(s,w) {
+    : naive_processor<node_type,size_type,value_type>(s,w,false) {
         prc= std::make_unique<lca_processor<node_type,size_type>>(this);
+		this->shed_redundancy();
     }
 	node_type lca( node_type cx, node_type cy ) const override {
 		return (*prc)(cx,cy);

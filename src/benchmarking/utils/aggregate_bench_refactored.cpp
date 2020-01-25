@@ -1,7 +1,7 @@
 //
 // Created by sj on 23/12/19.
 //
-#include "suites.cpp"
+#include "suites_modified_weights.cpp"
 
 int main (int argc, char** argv)
 {

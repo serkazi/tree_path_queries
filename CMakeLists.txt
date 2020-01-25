@@ -10,6 +10,8 @@ set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -mcmodel=large -O2 -g -DNDEBUG")
 # set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -mcmodel=large -O2 -g")
 # add_compile_options(-mcmodel=large -O2 -g -DNDEBUG)
 
+# set(gflags_DIR "~/local/lib/cmake/gflags")
+# find_package(gflags REQUIRED)
 find_package(Threads REQUIRED)
 # adding gtest as a subproject
 # add_subdirectory(${PROJECT_SOURCE_DIR}/extern/gtest)
@@ -405,3 +407,4 @@ target_include_directories(mgui
 
 #end of Qt5 inclusion
 
+# add_subdirectory(${PROJECT_SOURCE_DIR}/src/misc)
