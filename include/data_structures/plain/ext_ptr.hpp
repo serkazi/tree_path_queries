@@ -92,8 +92,7 @@ public:
         }
     };
     */
-    class weighted_tree {
-    private:
+    struct weighted_tree {
         size_type n,E{};
         node_type V;
         std::vector<size_type> d;
@@ -102,7 +101,6 @@ public:
         std::vector<node_type> oid;
         std::vector<node_type> to;
         std::vector<std::optional<size_type>> next_,last;
-    public:
         weighted_tree( size_type n ) {
             this->n= n, E= V= 0;
             oid.resize(n), weights.resize(n), prnt.resize(n), d.resize(n), last.resize(n), next_.resize(n==0?0:n-1);
@@ -289,16 +287,16 @@ private:
             if ( rprt ) {
                 for ( auto cx= x; cx.has_value() and cx.value() != z; cx= this->parent(cx.value()) ) {
                     auto original_cx= original_node[cx.value()];
-                    vec.emplace_back(original_cx,root_element.weight_of(original_cx));
+                    vec.emplace_back(original_cx,root_element.wgt[original_cx]);
                 }
                 for ( auto cy= y; cy.has_value() and cy.value() != z; cy= this->parent(cy.value()) ) {
                     auto original_cy= original_node[cy.value()];
-                    vec.emplace_back(original_cy,root_element.weight_of(original_cy));
+                    vec.emplace_back(original_cy,root_element.wgt[original_cy]);
                 }
-                //FIXME: what to do? z is now std::optional<>
-                if ( this->lies_inside(wc,a,b) ) {
+                if ( this->lies_inside(wc,a,b) and z.has_value() ) {
                     auto original_z= original_node[z.value()];
-                    vec.emplace_back(original_z,root_element.weight_of(original_z));
+                    //vec.emplace_back(original_z,root_element.weight_of(original_z));
+                    vec.emplace_back(original_z,root_element.wgt[original_z]);
                 }
             }
             dx= (x.has_value()?depth(x.value())+1:0);
@@ -327,6 +325,8 @@ private:
 	}
 
 public:
+    // we had to expose this constructor, as it is needed for make_unique
+    // in an ideal world, this constructor should be private
     ext_ptr( value_type a, value_type b,
              const weighted_tree *un_compressed_tree )
     {
@@ -337,7 +337,6 @@ public:
         d[x]= un_compressed_tree->depth(x), prnt[x]= un_compressed_tree->parent(x), ++x ) ;
         init(a,b,un_compressed_tree);
     }
-    // in an ideal world, the above should be private
 
     ext_ptr() {};
 

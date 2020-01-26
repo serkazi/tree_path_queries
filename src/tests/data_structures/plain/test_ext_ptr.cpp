@@ -66,6 +66,7 @@ namespace {
         static std::map<key_type,std::shared_ptr<path_query_processor<node_type, size_type, value_type>>> raws;
         static std::map<key_type,size_type> n;
         static std::map<key_type,std::vector<value_type>> w;
+        static std::map<key_type,std::vector<value_type>> sorted_weights;
         static std::map<key_type,std::default_random_engine> gen_nodes, gen_weights, gen_qntl;
         static std::map<key_type,std::shared_ptr<std::uniform_int_distribution<node_type>>> nodes_distr;
         static std::map<key_type,std::shared_ptr<std::uniform_int_distribution<size_type>>> qntl_distr;
@@ -81,6 +82,7 @@ namespace {
                 w[key].resize(s.size() / 2);
                 for (auto &x: w[key])
                     is >> x;
+                sorted_weights[key]= w[key], std::sort(sorted_weights[key].begin(),sorted_weights[key].end());
                 n[key] = s.size() / 2;
                 processors[key] =
                         std::make_shared<ext_ptr<node_type, size_type, value_type>>(s, w[key]);
@@ -88,7 +90,7 @@ namespace {
                 nodes_distr[key] = std::make_shared<std::uniform_int_distribution<node_type>>(0, n[key]-1);
                 qntl_distr[key] = std::make_shared<std::uniform_int_distribution<size_type>>(1, 100);
                 value_type lower= *(min_element(begin(w[key]), end(w[key]))), upper= *(max_element(begin(w[key]),end(w[key])));
-                weights_distr[key]= std::make_shared<std::uniform_int_distribution<value_type>>(lower, upper);
+                weights_distr[key]= std::make_shared<std::uniform_int_distribution<value_type>>(0, n[key]-1);
             }
         }
         void TearDown() override {
@@ -105,6 +107,7 @@ namespace {
     std::map<std::string,std::shared_ptr<path_query_processor<node_type, size_type, value_type>>> ext_ptr_test::raws;
     std::map<std::string,size_type> ext_ptr_test::n;
     std::map<std::string,std::vector<value_type>> ext_ptr_test::w;
+    std::map<std::string,std::vector<value_type>> ext_ptr_test::sorted_weights;
     std::map<std::string,std::default_random_engine> ext_ptr_test::gen_nodes, ext_ptr_test::gen_weights, ext_ptr_test::gen_qntl;
     std::map<std::string,std::shared_ptr<std::uniform_int_distribution<node_type>>> ext_ptr_test::nodes_distr;
     std::map<std::string,std::shared_ptr<std::uniform_int_distribution<size_type>>> ext_ptr_test::qntl_distr;
@@ -122,7 +125,7 @@ namespace {
             for (auto it = 0; it < ITERS; ++it) {
                 assert(this->w[pathname].size() >= this->n[pathname]);
                 auto x = nodes_dice(), y = nodes_dice();
-                auto vl = weights_dice(), vr = weights_dice();
+                auto vl = sorted_weights[pathname][weights_dice()], vr = sorted_weights[pathname][weights_dice()];
                 if (vl > vr) std::swap(vl, vr);
                 std::vector<std::pair<value_type, size_type>> answer1, answer2;
                 this->processors[pathname]->report(x, y, static_cast<value_type>(vl), static_cast<value_type>(vr),
@@ -138,7 +141,7 @@ namespace {
             for (auto it = 0; it < ITERS; ++it) {
                 assert(this->w[pathname].size() >= this->n[pathname]);
                 auto x = nodes_dice(), y = nodes_dice();
-                auto vl = weights_dice(), vr = weights_dice();
+                auto vl = sorted_weights[pathname][weights_dice()], vr = sorted_weights[pathname][weights_dice()];
                 if (vl > vr) std::swap(vl, vr);
                 auto ans1 = this->processors[pathname]->count(x, y, static_cast<value_type>(vl),
                                                               static_cast<value_type>(vr));

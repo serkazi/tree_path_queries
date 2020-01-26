@@ -594,7 +594,6 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_sct_counting,nv_sct)(benchmark::S
 }
 
 //=============================== Reporting ==============================================/
-#if 0
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_reporting,nv)(benchmark::State &state) {
     // const auto &dict= rpt_queries;
     const auto &dict= experiment_settings::shared_info_obj->rpt_queries;
@@ -686,7 +685,6 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,wt_hpd_ptr_reporting,wt_hp_ptr)(benc
         // end of the code that gets measured
     }
 }
-#endif
 
 BENCHMARK_TEMPLATE_F(path_queries_benchmark,tree_ext_sct_rrr_reporting,tree_ext_sct_rrr)(benchmark::State &state) {
     // const auto &dict= rpt_queries;
