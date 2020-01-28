@@ -285,18 +285,19 @@ private:
 
         if ( p <= a and b <= q ) {
             if ( rprt ) {
-                for ( auto cx= x; cx.has_value() and cx.value() != z; cx= this->parent(cx.value()) ) {
+				const auto &W= root_element.wgt;
+                for ( auto cx= x; cx.has_value() and cx.value() != z; cx= prnt[cx.value()] ) {
                     auto original_cx= original_node[cx.value()];
-                    vec.emplace_back(original_cx,root_element.wgt[original_cx]);
+                    vec.emplace_back(original_cx,W[original_cx]);
                 }
-                for ( auto cy= y; cy.has_value() and cy.value() != z; cy= this->parent(cy.value()) ) {
+                for ( auto cy= y; cy.has_value() and cy.value() != z; cy= prnt[cy.value()] ) {
                     auto original_cy= original_node[cy.value()];
-                    vec.emplace_back(original_cy,root_element.wgt[original_cy]);
+                    vec.emplace_back(original_cy,W[original_cy]);
                 }
                 if ( this->lies_inside(wc,a,b) and z.has_value() ) {
                     auto original_z= original_node[z.value()];
                     //vec.emplace_back(original_z,root_element.weight_of(original_z));
-                    vec.emplace_back(original_z,root_element.wgt[original_z]);
+                    vec.emplace_back(original_z,W[original_z]);
                 }
             }
             dx= (x.has_value()?depth(x.value())+1:0);
