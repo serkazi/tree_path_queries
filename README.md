@@ -199,21 +199,24 @@ A preliminary version is available [here on arxiv][SEAPAPER].
 
 ## External Resources used in SDSL
 
-We have included the code of two excellent suffix array
-construction algorithms.
-
-Additionally, we use the [googletest][GTEST] framework to provide unit tests.
-Our visualizations are implemented using the [qcustomplot][QCUSTOMPLOT]-library.
+We use the 
+	* [googletest][GTEST] framework to provide unit tests
+	* [google-benchmark][GBENCH] for time measurements
+	* [malloc\_count][MCNT] for measuring space occupancy
+In addition, we have GUI based on 
+	* [Qt][QT]; and
+	* [QCustomPlot][QCUSTOMPLOT] library for plotting
+The GUI functionality is currently work in progress.
 
 Authors
 --------
 
 The main contributors to the library are:
 
-* [Johannes Bader] (https://github.com/olydis)
-* [Timo Beller](https://github.com/tb38)
-* [Simon Gog](https://github.com/simongog) (Creator)
-* [Matthias Petri](https://github.com/mpetri)
+[//]: <> * [Johannes Bader] (https://github.com/olydis)
+[//]: <> * [Timo Beller](https://github.com/tb38)
+[//]: <> * [Simon Gog](https://github.com/simongog) (Creator)
+[//]: <> * [Matthias Petri](https://github.com/mpetri)
 
 Contribute
 ----------
@@ -222,7 +225,7 @@ Are you working on a new or improved implementation of a succinct data structure
 We encourage you to contribute your implementation to the SDSL library to make
 your work accessible to the community within the existing library framework.
 Feel free to contact any of the authors or create an issue on the
-[issue tracking system](https://github.com/simongog/sdsl-lite/issues).
+[//]: <> [issue tracking system](https://github.com/simongog/sdsl-lite/issues).
 
 
 [STL]: http://www.sgi.com/tech/stl/ "Standard Template Library"
@@ -231,6 +234,7 @@ Feel free to contact any of the authors or create an issue on the
 [gcc]: http://gcc.gnu.org/ "GNU Compiler Collection"
 [clang]: https://clang.llvm.org/docs/
 [LS]: http://www.sciencedirect.com/science/article/pii/S0304397507005257 "Larson &amp; Sadakane Algorithm"
+[MCNT]: https://github.com/bingmann/malloc_count "malloc_count"
 [GTEST]: https://code.google.com/p/googletest/ "Google C++ Testing Framework"
 [SDSLCS]: http://simongog.github.io/assets/data/sdsl-cheatsheet.pdf "SDSL Cheat Sheet"
 [SDSLLIT]: https://github.com/simongog/sdsl-lite/wiki/Literature "Succinct Data Structure Literature"
