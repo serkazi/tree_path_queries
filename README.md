@@ -14,9 +14,6 @@ The library requires:
 * A modern, `C++17` ready compiler such as `g++` version 5 or higher or `clang` version 5 or higher.
 * The [cmake][cmake] build system.
 * A 64-bit operating system. 
-[//]: <> (* For increased performance the processor of the system should support fast bit operations available in `SSE4.2`)
-
-[//]: <> (Dependencies)
 
 ### How to build the experiments with pre-generated queries
 The target `aggregate_bench` benchmarks _all_ the data structures
@@ -83,40 +80,9 @@ dataset and then measures the query time for the given type of query.
 Documentation
 -------------
 
-[//]: <> (We provide an extensive set of documentation describing all data structures)
-[//]: <> (and features provided by the library. Specifically we provide)
-
-[//]: <> (* A [cheat sheet][SDSLCS] which succinctly describes the usage of the library.)
-[//]: <> (* An doxygen generated [API reference][DOXYGENDOCS] which lists all types and functions of the library.)
-[//]: <> (* A set of [example](examples/) programs demonstrating how different features of the library are used.)
-[//]: <> (* A tutorial [presentation][TUT] with the [example code](tutorial/) using in the sides demonstrating all features of the library in a step-by-step walk-through.)
-[//]: <> (* [Unit Tests](test/) which contain small code snippets used to test each library feature.)
-
 Installation
 ------------
 
-[//]: <> (To download and install the library use the following commands.
-
-```sh
-git clone https://github.com/simongog/sdsl-lite.git
-cd sdsl-lite
-./install.sh
-```
-
-This installs the sdsl library into the `include` and `lib` directories in your
-home directory. A different location prefix can be specified as a parameter of
-the `install.sh` script:
-
-```sh
-./install /usr/local/
-```
-
-To remove the library from your system use the provided uninstall script:
-
-```sh
-./uninstall.sh
-```
-)
 #### TODO
 	[] install script
 	[] uninstall script
@@ -184,8 +150,6 @@ The syntax is as follows:
 outputs to `stdout` the tree in the above `*.puu` format.
 `gentree`'s source is `${PROJECT_SOURCE_DIR}/src/misc/gentree_uar.cpp`.
 
-[//]: <> (Next we suggest you look at the comprehensive [tutorial][TUT] which describes)
-[//]: <> (all major features of the library or look at some of the provided [examples](examples).)
 #### TODO
 	[] add a commandline flag -- the output file (with default being `stdout`)
 
@@ -198,17 +162,6 @@ collection of unit tests which can be used to check the correctness of the libra
 The [test](./test) directory contains test code. We use [googletest][GTEST]
 framework and [make][MAKE] to run the tests. 
 See the README file in the directory for details.
-
-[//]: <> (To simply run all unit tests after installing the library type)
-
-[//]: <> (```sh
-cd sdsl-lite/build
-make test-sdsl
-```
-)
-
-[//]: <> (Note: Running the tests requires several sample files to be downloaded from the web
-and can take up to 2 hours on slow machines.)
 
 Benchmarks
 ----------
@@ -225,15 +178,6 @@ While we use an extensive set of unit tests and test coverage tools you might
 still find bugs in the library. We encourage you to report any problems with
 the library via the [github issue tracking system](https://github.com/simongog/sdsl-lite/issues)
 of the project.
-
-[//]: <> (The Latest Version
-------------------
-
-The latest version can be found on the SDSL github project page https://github.com/simongog/sdsl-lite .
-
-If you are running experiments in an academic settings we suggest you use the
-most recent [released](https://github.com/simongog/sdsl-lite/releases) version
-of the library. This allows others to reproduce your experiments exactly.)
 
 Licensing
 ---------
@@ -266,11 +210,6 @@ Authors
 
 The main contributors to the library are:
 * [Serikzhan Kazi](https://github.com/serkazi) (Creator)
-
-[//]: <> (* [Johannes Bader] (https://github.com/olydis))
-[//]: <> (* [Timo Beller](https://github.com/tb38))
-[//]: <> (* [Simon Gog](https://github.com/simongog) (Creator))
-[//]: <> (* [Matthias Petri](https://github.com/mpetri))
 
 Contribute
 ----------
@@ -307,7 +246,6 @@ to building `gtest` as an external project and use `cmake`'s `find_packge/find_l
 [SDSLLIT]: https://github.com/simongog/sdsl-lite/wiki/Literature "Succinct Data Structure Literature"
 [TUT]: http://simongog.github.io/assets/data/sdsl-slides/tutorial "Tutorial"
 [CF]: https://github.com/simongog/sdsl-lite/blob/master/COPYING "Licence"
-[//]: <> ([SEAPAPER]: http://arxiv.org/pdf/1311.1249v1.pdf "SDSL paper")
 [SEAPAPER]: https://arxiv.org/submit/3022354/view "Path Query Data Structures in Practice"
 [DOXYGENDOCS]: http://algo2.iti.kit.edu/gog/docs/html/index.html "API Reference"
 [GBENCH]: https://github.com/google/benchmark "Google Benchmark Micro-Benchmarking Framework"
