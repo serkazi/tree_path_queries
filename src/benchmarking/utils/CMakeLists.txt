@@ -41,6 +41,48 @@ target_include_directories(
         ${PROJECT_SOURCE_DIR}/experiments/utils
 )
 
+set(gflags_DIR "~/local/lib/cmake/gflags")
+find_package(gflags REQUIRED)
+add_executable(tree_stats tree_stats.cpp)
+target_link_libraries(
+		tree_stats
+        PUBLIC
+        pthread nlohmann_json::nlohmann_json naive
+        hybrid wt_hpd ext_ptr tree_ext_sct
+		gflags)
+# target_link_directories(tree_stats PUBLIC gflags)
+target_include_directories(
+		tree_stats
+        PUBLIC
+        ${PROJECT_SOURCE_DIR}/include/interfaces
+        ${PROJECT_SOURCE_DIR}/include/requests
+        ${PROJECT_SOURCE_DIR}/src/misc
+        ${PROJECT_SOURCE_DIR}/include/data_structures/plain
+        ${PROJECT_SOURCE_DIR}/include/data_structures/succinct
+        ${PROJECT_SOURCE_DIR}/include/data_structures/hybrid
+        ${PROJECT_SOURCE_DIR}/experiments/utils
+)
+
+add_executable(hpd_stats aggregate_bench_refactored_hpd.cpp)
+target_link_libraries(
+		hpd_stats
+        PUBLIC
+        benchmark benchmark_main pthread nlohmann_json::nlohmann_json naive
+        hybrid wt_hpd)
+target_link_directories(hpd_stats PUBLIC ${BENCHMARK_ROOT})
+target_include_directories(
+		hpd_stats
+        PUBLIC
+        ${BENCHMARK_INCLUDE_DIR}
+        ${PROJECT_SOURCE_DIR}/include/interfaces
+        ${PROJECT_SOURCE_DIR}/include/requests
+        ${PROJECT_SOURCE_DIR}/src/misc
+        ${PROJECT_SOURCE_DIR}/include/data_structures/plain
+        ${PROJECT_SOURCE_DIR}/include/data_structures/succinct
+        ${PROJECT_SOURCE_DIR}/experiments/utils
+)
+
+
 add_executable(cli_bench cli_gbench.cpp)
 target_link_libraries(
 		cli_bench
