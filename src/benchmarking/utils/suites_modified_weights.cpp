@@ -256,6 +256,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_median,nv)(benchmark::State &stat
         }
         auto end = std::chrono::high_resolution_clock::now();
         state.counters["seconds"]= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
+        state.counters["num_queries"]= experiment_settings::nq;
         // @see https://github.com/google/benchmark#user-guide
         // end of the code that gets measured
     }
@@ -273,6 +274,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_lca_median,nv_lca)(benchmark::Sta
         }
         auto end = std::chrono::high_resolution_clock::now();
         state.counters["seconds"]= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
+        state.counters["num_queries"]= experiment_settings::nq;
         // @see https://github.com/google/benchmark#user-guide
         // end of the code that gets measured
     }
@@ -291,6 +293,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,tree_ext_ptr_median,tree_ext_ptr)(be
         }
         auto end = std::chrono::high_resolution_clock::now();
         state.counters["seconds"]= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
+        state.counters["num_queries"]= experiment_settings::nq;
         // @see https://github.com/google/benchmark#user-guide
         // end of the code that gets measured
     }
@@ -308,6 +311,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,wt_hpd_ptr_median,wt_hp_ptr)(benchma
         }
         auto end = std::chrono::high_resolution_clock::now();
         state.counters["seconds"]= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
+        state.counters["num_queries"]= experiment_settings::nq;
         // @see https://github.com/google/benchmark#user-guide
         // end of the code that gets measured
     }
@@ -326,6 +330,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,tree_ext_sct_rrr_median,tree_ext_sct
         }
         auto end = std::chrono::high_resolution_clock::now();
         state.counters["seconds"]= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
+        state.counters["num_queries"]= experiment_settings::nq;
         // @see https://github.com/google/benchmark#user-guide
         // end of the code that gets measured
     }
@@ -344,6 +349,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,tree_ext_sct_un_median,tree_ext_sct_
         }
         auto end = std::chrono::high_resolution_clock::now();
         state.counters["seconds"]= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
+        state.counters["num_queries"]= experiment_settings::nq;
         // @see https://github.com/google/benchmark#user-guide
         // end of the code that gets measured
     }
@@ -362,6 +368,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,wt_hpd_rrr_median,wt_hpd_rrr)(benchm
         }
         auto end = std::chrono::high_resolution_clock::now();
         state.counters["seconds"]= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
+        state.counters["num_queries"]= experiment_settings::nq;
         // @see https://github.com/google/benchmark#user-guide
         // end of the code that gets measured
     }
@@ -380,6 +387,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,wt_hpd_un_median,wt_hpd_un)(benchmar
         }
         auto end = std::chrono::high_resolution_clock::now();
         state.counters["seconds"]= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
+        state.counters["num_queries"]= experiment_settings::nq;
         // @see https://github.com/google/benchmark#user-guide
         // end of the code that gets measured
     }
@@ -397,6 +405,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_sct_median,nv_sct)(benchmark::Sta
         }
         auto end = std::chrono::high_resolution_clock::now();
         state.counters["seconds"]= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
+        state.counters["num_queries"]= experiment_settings::nq;
         // @see https://github.com/google/benchmark#user-guide
         // end of the code that gets measured
     }
@@ -420,7 +429,8 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_counting,nv)(benchmark::State &st
         }
         auto end = std::chrono::high_resolution_clock::now();
         state.counters["seconds"]= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
-		double mean= state.counters["avgOutputSize"]= 
+        state.counters["num_queries"]= experiment_settings::nq;
+		double mean= state.counters["avgOutputSize"]=
 				std::accumulate(
 						output_sizes.begin(),
 						output_sizes.end(),
@@ -447,6 +457,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_lca_counting,nv_lca)(benchmark::S
         }
         auto end = std::chrono::high_resolution_clock::now();
         state.counters["seconds"]= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
+        state.counters["num_queries"]= experiment_settings::nq;
         // @see https://github.com/google/benchmark#user-guide
         // end of the code that gets measured
     }
@@ -465,6 +476,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,tree_ext_ptr_counting,tree_ext_ptr)(
         }
         auto end = std::chrono::high_resolution_clock::now();
         state.counters["seconds"]= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
+        state.counters["num_queries"]= experiment_settings::nq;
         // @see https://github.com/google/benchmark#user-guide
         // end of the code that gets measured
     }
@@ -487,6 +499,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,wt_hpd_ptr_counting,wt_hp_ptr)(bench
         }
         auto end = std::chrono::high_resolution_clock::now();
         state.counters["seconds"]= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
+        state.counters["num_queries"]= experiment_settings::nq;
 		double mean= state.counters["avgNumSegments"]= std::accumulate(
 						decomposition_lengths.begin(),
 						decomposition_lengths.end(),
@@ -516,6 +529,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,tree_ext_sct_rrr_counting,tree_ext_s
         }
         auto end = std::chrono::high_resolution_clock::now();
         state.counters["seconds"]= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
+        state.counters["num_queries"]= experiment_settings::nq;
         // @see https://github.com/google/benchmark#user-guide
         // end of the code that gets measured
     }
@@ -534,6 +548,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,tree_ext_sct_un_counting,tree_ext_sc
         }
         auto end = std::chrono::high_resolution_clock::now();
         state.counters["seconds"]= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
+        state.counters["num_queries"]= experiment_settings::nq;
         // @see https://github.com/google/benchmark#user-guide
         // end of the code that gets measured
     }
@@ -552,6 +567,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,wt_hpd_rrr_counting,wt_hpd_rrr)(benc
         }
         auto end = std::chrono::high_resolution_clock::now();
         state.counters["seconds"]= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
+        state.counters["num_queries"]= experiment_settings::nq;
         // @see https://github.com/google/benchmark#user-guide
         // end of the code that gets measured
     }
@@ -570,6 +586,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,wt_hpd_un_counting,wt_hpd_un)(benchm
         }
         auto end = std::chrono::high_resolution_clock::now();
         state.counters["seconds"]= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
+        state.counters["num_queries"]= experiment_settings::nq;
         // @see https://github.com/google/benchmark#user-guide
         // end of the code that gets measured
     }
@@ -588,6 +605,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_sct_counting,nv_sct)(benchmark::S
         }
         auto end = std::chrono::high_resolution_clock::now();
         state.counters["seconds"]= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
+        state.counters["num_queries"]= experiment_settings::nq;
         // @see https://github.com/google/benchmark#user-guide
         // end of the code that gets measured
     }
@@ -609,6 +627,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_reporting,nv)(benchmark::State &s
         }
         auto end = std::chrono::high_resolution_clock::now();
         state.counters["seconds"]= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
+        state.counters["num_queries"]= experiment_settings::nq;
         // @see https://github.com/google/benchmark#user-guide
         // end of the code that gets measured
     }
@@ -633,7 +652,8 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,nv_lca_reporting,nv_lca)(benchmark::
         }
         auto end = std::chrono::high_resolution_clock::now();
         state.counters["seconds"]= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
-		double mean= state.counters["avgOutputSize"]= 
+        state.counters["num_queries"]= experiment_settings::nq;
+		double mean= state.counters["avgOutputSize"]=
 				std::accumulate(
 						output_sizes.begin(),
 						output_sizes.end(),
@@ -662,6 +682,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,tree_ext_ptr_reporting,tree_ext_ptr)
         }
         auto end = std::chrono::high_resolution_clock::now();
         state.counters["seconds"]= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
+        state.counters["num_queries"]= experiment_settings::nq;
         // @see https://github.com/google/benchmark#user-guide
         // end of the code that gets measured
     }
@@ -681,6 +702,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,wt_hpd_ptr_reporting,wt_hp_ptr)(benc
         }
         auto end = std::chrono::high_resolution_clock::now();
         state.counters["seconds"]= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
+        state.counters["num_queries"]= experiment_settings::nq;
         // @see https://github.com/google/benchmark#user-guide
         // end of the code that gets measured
     }
@@ -701,6 +723,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,tree_ext_sct_rrr_reporting,tree_ext_
         }
         auto end = std::chrono::high_resolution_clock::now();
         state.counters["seconds"]= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
+        state.counters["num_queries"]= experiment_settings::nq;
         // @see https://github.com/google/benchmark#user-guide
         // end of the code that gets measured
     }
@@ -721,6 +744,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,tree_ext_sct_un_reporting,tree_ext_s
         }
         auto end = std::chrono::high_resolution_clock::now();
         state.counters["seconds"]= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
+        state.counters["num_queries"]= experiment_settings::nq;
         // @see https://github.com/google/benchmark#user-guide
         // end of the code that gets measured
     }
@@ -741,6 +765,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,wt_hpd_rrr_reporting,wt_hpd_rrr)(ben
         }
         auto end = std::chrono::high_resolution_clock::now();
         state.counters["seconds"]= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
+        state.counters["num_queries"]= experiment_settings::nq;
         // @see https://github.com/google/benchmark#user-guide
         // end of the code that gets measured
     }
@@ -761,6 +786,7 @@ BENCHMARK_TEMPLATE_F(path_queries_benchmark,wt_hpd_un_reporting,wt_hpd_un)(bench
         }
         auto end = std::chrono::high_resolution_clock::now();
         state.counters["seconds"]= std::chrono::duration_cast<std::chrono::seconds>(end-start).count();
+        state.counters["num_queries"]= experiment_settings::nq;
         // @see https://github.com/google/benchmark#user-guide
         // end of the code that gets measured
     }

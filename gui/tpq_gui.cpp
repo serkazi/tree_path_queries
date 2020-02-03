@@ -3,7 +3,7 @@
 //
 
 #include "tpq_gui.h"
-#include "suites.cpp"
+#include "suites_modified_weights.cpp"
 
 tpq_gui::tpq_gui( QWidget *parent ): QWidget(parent) {
     textEdit= new QTextEdit;
@@ -343,6 +343,9 @@ QCustomPlot *tpq_gui::plot_histogram_( std::string pth ) {
     QVector<double> ticks;
     QVector<double> data;
     QVector<double> tops;
+    int num_queries= static_cast<int>(
+            strtol(numQueriesQLineEdit->text().toStdString().c_str(),nullptr,10)
+    );
     for ( auto i= 0; i < arr.size(); ++i ) {
         const auto &a= arr[i];
         std::string dsname= [&a]()->std::string {
@@ -356,9 +359,9 @@ QCustomPlot *tpq_gui::plot_histogram_( std::string pth ) {
             return text;
         }();
         ticks << i;
-        data.push_back(static_cast<double>(a["seconds"]));
+        data.push_back(static_cast<double>(a["real_time"])/(1e+3)/num_queries);
         labels << tr(dsname.c_str());
-        tops.push_back(static_cast<double>(a["seconds"]));
+        tops.push_back(static_cast<double>(a["real_time"])/(1e+3)/num_queries);
     }
 
     QFont fnt("Monospace");
@@ -387,7 +390,7 @@ QCustomPlot *tpq_gui::plot_histogram_( std::string pth ) {
     customPlot->yAxis->setPadding(5); // a bit more space to the left border
     customPlot->yAxis->setNumberFormat(tr("gb"));
     // customPlot->yAxis->setTickLabelRotation(60);
-    customPlot->yAxis->setLabel("Seconds to complete");
+    customPlot->yAxis->setLabel("Average query time (microsec.)");
     customPlot->yAxis->setBasePen(QPen(Qt::black));
     customPlot->yAxis->setTickPen(QPen(Qt::black));
     customPlot->yAxis->setSubTickPen(QPen(Qt::black));
@@ -543,8 +546,11 @@ QCustomPlot *tpq_gui::plot_histogram_2( std::string pth ) {
     QVector<double> ticks;
     QVector<double> data;
     QVector<double> tops;
+
     for ( auto i= 0; i < arr.size(); ++i ) {
         const auto &a= arr[i];
+        auto num_queries=
+                static_cast<size_t>(a["num_queries"]);
         std::string dsname= [&a]()->std::string {
             std::string text= a["name"];
             auto pos= text.find('/');
@@ -556,11 +562,11 @@ QCustomPlot *tpq_gui::plot_histogram_2( std::string pth ) {
             return text;
         }();
         ticks << i+1;
-        data.push_back(static_cast<double>(a["seconds"]));
+        data.push_back(static_cast<double>(a["real_time"])/(1e+3)/num_queries);
         // labels << tr(dsname.c_str());
         ticklabels << tr(dsname.c_str());
         labels.push_back(QString::number(i+1));
-        tops.push_back(static_cast<double>(a["seconds"]));
+        tops.push_back(static_cast<double>(a["real_time"])/(1e+3)/num_queries);
     }
 
     QFont fnt("Monospace");
@@ -769,6 +775,7 @@ QCustomPlot *tpq_gui::plot_histogram_2( std::string pth ) {
     textElement->setFont(titleFont);
     customPlot->plotLayout()->addElement(0,0,textElement);
     // customPlot->axisRect(0)->insetLayout()->addElement(textElement, Qt::AlignTop|Qt::AlignLeft);
+    /*
     {
         int num_queries= static_cast<int>(
                 strtol(numQueriesQLineEdit->text().toStdString().c_str(),nullptr,10)
@@ -783,6 +790,7 @@ QCustomPlot *tpq_gui::plot_histogram_2( std::string pth ) {
         subtitleTextElement->setFont(subTitleFont);
         customPlot->plotLayout()->addElement(1, 0, subtitleTextElement);
     }
+    */
     return customPlot;
 }
 
@@ -895,6 +903,7 @@ void tpq_gui::plot_bars_group( QStringList filenames ) {
     textElement->setFont(titleFont);
     customPlot->plotLayout()->addElement(0,0,textElement);
     // customPlot->axisRect(0)->insetLayout()->addElement(textElement, Qt::AlignTop|Qt::AlignLeft);
+    /*
     {
         int num_queries= static_cast<int>(
                 strtol(numQueriesQLineEdit->text().toStdString().c_str(),nullptr,10)
@@ -909,6 +918,7 @@ void tpq_gui::plot_bars_group( QStringList filenames ) {
         subtitleTextElement->setFont(subTitleFont);
         customPlot->plotLayout()->addElement(1, 0, subtitleTextElement);
     }
+    */
 
     auto *w= new QWidget();
     auto *grid= new QGridLayout();
@@ -932,8 +942,10 @@ QCPBars *tpq_gui::prepareBars( QString filename, QCustomPlot *customPlot ) {
     QVector<double> ticks;
     QVector<double> data;
     QVector<double> tops;
+
     for ( auto i= 0; i < arr.size(); ++i ) {
         const auto &a= arr[i];
+        auto num_queries= static_cast<size_t>(a["num_queries"]);
         std::string dsname= [&a]()->std::string {
             std::string text= a["name"];
             auto pos= text.find('/');
@@ -945,11 +957,11 @@ QCPBars *tpq_gui::prepareBars( QString filename, QCustomPlot *customPlot ) {
             return text;
         }();
         ticks << i+1;
-        data.push_back(static_cast<double>(a["seconds"]));
+        data.push_back(static_cast<double>(a["real_time"])/num_queries/(1e+3));
         // labels << tr(dsname.c_str());
         ticklabels << tr(dsname.c_str());
         labels.push_back(QString::number(i+1));
-        tops.push_back(static_cast<double>(a["seconds"]));
+        tops.push_back(static_cast<double>(a["real_time"])/num_queries/(1e+3));
     }
 
     QFont fnt("Monospace");

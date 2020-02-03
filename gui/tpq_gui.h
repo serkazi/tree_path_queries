@@ -32,7 +32,7 @@ private:
     QVector<QRadioButton *> queryTypeButtons;
     QVector<QRadioButton *> querySizeButtons;
     QVector<QCheckBox *> boxes;
-    const std::vector<std::string> ds= {"nv","nv_lca","nv_sct","hybrid",
+    const std::vector<std::string> ds= {"nv","nv_lca","nv_sct","wt_hpd_ptr",
                                         "tree_ext_ptr","wt_hpd_un","wt_hpd_rrr",
                                         "tree_ext_sct_un","tree_ext_sct_rrr"};
     QColor Red = QColor(0xE3,0x12,0x0B),

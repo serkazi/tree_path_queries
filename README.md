@@ -47,7 +47,7 @@ where
 	* `<output_file_name>` is a `json` filename to store the results
 		- note however that specifying the output filename does not suppress `stdout`
 
-### Commandline interface
+### <a name="cli">Commandline interface</a>
 To get a quick idea about the performance of a _single_ data structure,
 on a given dataset, and for the given type of query (and again,
 when applicable, for given `K`), one can also build
@@ -165,11 +165,42 @@ See the README file in the directory for details.
 
 Benchmarks
 ----------
+## <a name="median">Path median queries</a>
 
-To ensure the library runs efficiently on your system we suggest you run our
-[benchmark suite](benchmark). The benchmark suite recreates a
-popular [experimental study](http://arxiv.org/abs/0712.3360) which you can
-directly compare to the results of your benchmark run.
+### Running the random query-set
+In order to recreate the experiment, build `mgui` target first.
+Then,
+1. Launch `mgui`
+2. `File->Open` and load the dataset
+3. Choose the query type `median`
+4. Select the data structures in checkboxes
+5. Enter the number of queries
+6. Press `Execute`
+	- Select which file to put the results into (`*.json`)
+
+### <a name="medvis">Visualizing the results</a>
+In order to plot a histogram for the `path median`,
+select `File->Plot` and then pick the resulting (`*.json`).
+One should get an image such as ![image info](./examples/images/hist01.png)
+
+## Path counting queries
+Everything works the way it does for [path median queries](#median),
+except for that in step 3, one chooses `counting` and can optionally
+choose the configuration (i.e. the `K` parameter discussed e.g. when
+describing [the commandline interface](#cli).
+
+### Group bars
+In addition to to visualizing as in the [path median experiment](#medvis),
+one can also draw a plot to observe the query-time dynamics as we change
+the configuration. For that, one needs to have run the experiment with
+all the structures of interest for all `K` (see the `Configuration` panel of the GUI).
+The one selects `Fil->Group bars` and then using `Ctrl` selects
+the files pertaining to the different values of `K`. Let's say we have run
+an experiment on counting queries, using a certain dataset, and put
+the results in `resultK001.json`, `resultK010.json`, and `resultK100.json`.
+Then selecting these would result in an image with group bars, breaking down
+the performance of each data structure by the configuration.
+
 
 Bug Reporting
 ------------

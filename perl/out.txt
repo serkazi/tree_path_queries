@@ -1,5 +1,326 @@
-[32mmatch: rnd.1bln.sqrt.puu
-[0mbitmask = 8
-path: /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/rnd.1bln.sqrt.puu
-[31mRunning the command: ../cmake-build-debug/src/tests/experiments/observe_memusage /users/grad/kazi/CLionProjects/tree_path_queries/data/datasets/rnd.1bln.sqrt.puu 8
-[0m
+reqlen= 2
+eu.mst.osm
+tree_ext_sct_rrr_median 6.9000000000000000e+01
+tree_ext_sct_un_median 3.9000000000000000e+01
+wt_hpd_rrr_median 2.8000000000000000e+01
+wt_hpd_un_median 1.3000000000000000e+01
+reqlen= 3
+eu.mst.osm
+tree_ext_sct_rrr_median 7.8000000000000000e+01
+tree_ext_sct_un_median 4.6000000000000000e+01
+wt_hpd_rrr_median 4.4000000000000000e+01
+wt_hpd_un_median 2.2000000000000000e+01
+reqlen= 4
+eu.mst.osm
+tree_ext_sct_rrr_median 8.4000000000000000e+01
+tree_ext_sct_un_median 5.2000000000000000e+01
+wt_hpd_rrr_median 5.6000000000000000e+01
+wt_hpd_un_median 2.8000000000000000e+01
+reqlen= 5
+eu.mst.osm
+tree_ext_sct_rrr_median 8.5000000000000000e+01
+tree_ext_sct_un_median 5.3000000000000000e+01
+wt_hpd_rrr_median 6.7000000000000000e+01
+wt_hpd_un_median 3.2000000000000000e+01
+reqlen= 6
+eu.mst.osm
+tree_ext_sct_rrr_median 8.5000000000000000e+01
+tree_ext_sct_un_median 5.3000000000000000e+01
+wt_hpd_rrr_median 7.7000000000000000e+01
+wt_hpd_un_median 3.7000000000000000e+01
+reqlen= 7
+eu.mst.osm
+tree_ext_sct_rrr_median 8.5000000000000000e+01
+tree_ext_sct_un_median 5.2000000000000000e+01
+wt_hpd_rrr_median 8.7000000000000000e+01
+wt_hpd_un_median 4.1000000000000000e+01
+reqlen= 8
+eu.mst.osm
+tree_ext_sct_rrr_median 8.4000000000000000e+01
+tree_ext_sct_un_median 5.1000000000000000e+01
+wt_hpd_rrr_median 9.6000000000000000e+01
+wt_hpd_un_median 4.4000000000000000e+01
+reqlen= 9
+eu.mst.osm
+tree_ext_sct_rrr_median 8.4000000000000000e+01
+tree_ext_sct_un_median 5.1000000000000000e+01
+wt_hpd_rrr_median 1.0600000000000000e+02
+wt_hpd_un_median 4.8000000000000000e+01
+reqlen= 10
+eu.mst.osm
+tree_ext_sct_rrr_median 8.3000000000000000e+01
+tree_ext_sct_un_median 5.0000000000000000e+01
+wt_hpd_rrr_median 1.1500000000000000e+02
+wt_hpd_un_median 5.2000000000000000e+01
+reqlen= 11
+eu.mst.osm
+tree_ext_sct_rrr_median 8.3000000000000000e+01
+tree_ext_sct_un_median 4.9000000000000000e+01
+wt_hpd_rrr_median 1.2300000000000000e+02
+wt_hpd_un_median 5.5000000000000000e+01
+reqlen= 12
+eu.mst.osm
+tree_ext_sct_rrr_median 8.2000000000000000e+01
+tree_ext_sct_un_median 4.8000000000000000e+01
+wt_hpd_rrr_median 1.3200000000000000e+02
+wt_hpd_un_median 5.8000000000000000e+01
+reqlen= 13
+eu.mst.osm
+tree_ext_sct_rrr_median 8.1000000000000000e+01
+tree_ext_sct_un_median 4.8000000000000000e+01
+wt_hpd_rrr_median 1.4100000000000000e+02
+wt_hpd_un_median 6.2000000000000000e+01
+reqlen= 14
+eu.mst.osm
+tree_ext_sct_rrr_median 8.0000000000000000e+01
+tree_ext_sct_un_median 4.6000000000000000e+01
+wt_hpd_rrr_median 1.4800000000000000e+02
+wt_hpd_un_median 6.3000000000000000e+01
+reqlen= 15
+eu.mst.osm
+tree_ext_sct_rrr_median 7.9000000000000000e+01
+tree_ext_sct_un_median 4.5000000000000000e+01
+wt_hpd_rrr_median 1.5600000000000000e+02
+wt_hpd_un_median 6.5000000000000000e+01
+reqlen= 16
+eu.mst.osm
+tree_ext_sct_rrr_median 7.7000000000000000e+01
+tree_ext_sct_un_median 4.3000000000000000e+01
+wt_hpd_rrr_median 1.6300000000000000e+02
+wt_hpd_un_median 6.7000000000000000e+01
+reqlen= 17
+eu.mst.osm
+tree_ext_sct_rrr_median 7.6000000000000000e+01
+tree_ext_sct_un_median 4.1000000000000000e+01
+wt_hpd_rrr_median 1.7200000000000000e+02
+wt_hpd_un_median 6.8000000000000000e+01
+reqlen= 18
+eu.mst.osm
+tree_ext_sct_rrr_median 7.5000000000000000e+01
+tree_ext_sct_un_median 4.0000000000000000e+01
+wt_hpd_rrr_median 1.7800000000000000e+02
+wt_hpd_un_median 7.0000000000000000e+01
+reqlen= 19
+eu.mst.osm
+tree_ext_sct_rrr_median 7.0000000000000000e+01
+tree_ext_sct_un_median 3.6000000000000000e+01
+wt_hpd_rrr_median 1.8400000000000000e+02
+wt_hpd_un_median 7.0000000000000000e+01
+reqlen= 2
+eu.d.mst.dimacs
+tree_ext_sct_rrr_median 6.8000000000000000e+01
+tree_ext_sct_un_median 4.0000000000000000e+01
+wt_hpd_rrr_median 3.1000000000000000e+01
+wt_hpd_un_median 1.3000000000000000e+01
+reqlen= 3
+eu.d.mst.dimacs
+tree_ext_sct_rrr_median 7.5000000000000000e+01
+tree_ext_sct_un_median 4.6000000000000000e+01
+wt_hpd_rrr_median 4.8000000000000000e+01
+wt_hpd_un_median 2.3000000000000000e+01
+reqlen= 4
+eu.d.mst.dimacs
+tree_ext_sct_rrr_median 8.2000000000000000e+01
+tree_ext_sct_un_median 5.3000000000000000e+01
+wt_hpd_rrr_median 6.0000000000000000e+01
+wt_hpd_un_median 2.8000000000000000e+01
+reqlen= 5
+eu.d.mst.dimacs
+tree_ext_sct_rrr_median 8.4000000000000000e+01
+tree_ext_sct_un_median 5.5000000000000000e+01
+wt_hpd_rrr_median 7.3000000000000000e+01
+wt_hpd_un_median 3.3000000000000000e+01
+reqlen= 6
+eu.d.mst.dimacs
+tree_ext_sct_rrr_median 8.5000000000000000e+01
+tree_ext_sct_un_median 5.5000000000000000e+01
+wt_hpd_rrr_median 8.4000000000000000e+01
+wt_hpd_un_median 3.8000000000000000e+01
+reqlen= 7
+eu.d.mst.dimacs
+tree_ext_sct_rrr_median 8.6000000000000000e+01
+tree_ext_sct_un_median 5.5000000000000000e+01
+wt_hpd_rrr_median 9.5000000000000000e+01
+wt_hpd_un_median 4.3000000000000000e+01
+reqlen= 8
+eu.d.mst.dimacs
+tree_ext_sct_rrr_median 8.5000000000000000e+01
+tree_ext_sct_un_median 5.5000000000000000e+01
+wt_hpd_rrr_median 1.0600000000000000e+02
+wt_hpd_un_median 4.7000000000000000e+01
+reqlen= 9
+eu.d.mst.dimacs
+tree_ext_sct_rrr_median 8.4000000000000000e+01
+tree_ext_sct_un_median 5.3000000000000000e+01
+wt_hpd_rrr_median 1.1700000000000000e+02
+wt_hpd_un_median 5.1000000000000000e+01
+reqlen= 10
+eu.d.mst.dimacs
+tree_ext_sct_rrr_median 8.3000000000000000e+01
+tree_ext_sct_un_median 5.3000000000000000e+01
+wt_hpd_rrr_median 1.2700000000000000e+02
+wt_hpd_un_median 5.5000000000000000e+01
+reqlen= 11
+eu.d.mst.dimacs
+tree_ext_sct_rrr_median 8.2000000000000000e+01
+tree_ext_sct_un_median 5.1000000000000000e+01
+wt_hpd_rrr_median 1.3600000000000000e+02
+wt_hpd_un_median 5.8000000000000000e+01
+reqlen= 12
+eu.d.mst.dimacs
+tree_ext_sct_rrr_median 8.1000000000000000e+01
+tree_ext_sct_un_median 5.0000000000000000e+01
+wt_hpd_rrr_median 1.4500000000000000e+02
+wt_hpd_un_median 6.2000000000000000e+01
+reqlen= 13
+eu.d.mst.dimacs
+tree_ext_sct_rrr_median 7.9000000000000000e+01
+tree_ext_sct_un_median 4.9000000000000000e+01
+wt_hpd_rrr_median 1.5500000000000000e+02
+wt_hpd_un_median 6.5000000000000000e+01
+reqlen= 14
+eu.d.mst.dimacs
+tree_ext_sct_rrr_median 7.8000000000000000e+01
+tree_ext_sct_un_median 4.7000000000000000e+01
+wt_hpd_rrr_median 1.6400000000000000e+02
+wt_hpd_un_median 6.7000000000000000e+01
+reqlen= 15
+eu.d.mst.dimacs
+tree_ext_sct_rrr_median 7.6000000000000000e+01
+tree_ext_sct_un_median 4.5000000000000000e+01
+wt_hpd_rrr_median 1.7200000000000000e+02
+wt_hpd_un_median 7.0000000000000000e+01
+reqlen= 16
+eu.d.mst.dimacs
+tree_ext_sct_rrr_median 7.3000000000000000e+01
+tree_ext_sct_un_median 4.1000000000000000e+01
+wt_hpd_rrr_median 1.8000000000000000e+02
+wt_hpd_un_median 7.1000000000000000e+01
+reqlen= 17
+eu.d.mst.dimacs
+tree_ext_sct_rrr_median 7.2000000000000000e+01
+tree_ext_sct_un_median 4.0000000000000000e+01
+wt_hpd_rrr_median 1.8900000000000000e+02
+wt_hpd_un_median 7.3000000000000000e+01
+reqlen= 18
+eu.d.mst.dimacs
+tree_ext_sct_rrr_median 6.9000000000000000e+01
+tree_ext_sct_un_median 3.7000000000000000e+01
+wt_hpd_rrr_median 1.9400000000000000e+02
+wt_hpd_un_median 7.4000000000000000e+01
+reqlen= 19
+eu.d.mst.dimacs
+tree_ext_sct_rrr_median 6.4000000000000000e+01
+tree_ext_sct_un_median 3.1000000000000000e+01
+wt_hpd_rrr_median 2.0200000000000000e+02
+wt_hpd_un_median 7.2000000000000000e+01
+reqlen= 2
+eu.emst.dem
+tree_ext_sct_rrr_median 7.6000000000000000e+01
+tree_ext_sct_un_median 5.0000000000000000e+01
+wt_hpd_rrr_median 2.6000000000000000e+01
+wt_hpd_un_median 1.3000000000000000e+01
+reqlen= 3
+eu.emst.dem
+tree_ext_sct_rrr_median 8.7000000000000000e+01
+tree_ext_sct_un_median 6.1000000000000000e+01
+wt_hpd_rrr_median 3.9000000000000000e+01
+wt_hpd_un_median 2.1000000000000000e+01
+reqlen= 4
+eu.emst.dem
+tree_ext_sct_rrr_median 9.6000000000000000e+01
+tree_ext_sct_un_median 7.2000000000000000e+01
+wt_hpd_rrr_median 4.8000000000000000e+01
+wt_hpd_un_median 2.7000000000000000e+01
+reqlen= 5
+eu.emst.dem
+tree_ext_sct_rrr_median 1.0000000000000000e+02
+tree_ext_sct_un_median 7.7000000000000000e+01
+wt_hpd_rrr_median 5.7000000000000000e+01
+wt_hpd_un_median 3.2000000000000000e+01
+reqlen= 6
+eu.emst.dem
+tree_ext_sct_rrr_median 1.0200000000000000e+02
+tree_ext_sct_un_median 7.9000000000000000e+01
+wt_hpd_rrr_median 6.5000000000000000e+01
+wt_hpd_un_median 3.7000000000000000e+01
+reqlen= 7
+eu.emst.dem
+tree_ext_sct_rrr_median 1.0400000000000000e+02
+tree_ext_sct_un_median 8.0000000000000000e+01
+wt_hpd_rrr_median 7.3000000000000000e+01
+wt_hpd_un_median 4.1000000000000000e+01
+reqlen= 8
+eu.emst.dem
+tree_ext_sct_rrr_median 1.0400000000000000e+02
+tree_ext_sct_un_median 8.1000000000000000e+01
+wt_hpd_rrr_median 8.0000000000000000e+01
+wt_hpd_un_median 4.5000000000000000e+01
+reqlen= 9
+eu.emst.dem
+tree_ext_sct_rrr_median 1.0500000000000000e+02
+tree_ext_sct_un_median 8.1000000000000000e+01
+wt_hpd_rrr_median 8.8000000000000000e+01
+wt_hpd_un_median 4.9000000000000000e+01
+reqlen= 10
+eu.emst.dem
+tree_ext_sct_rrr_median 1.0500000000000000e+02
+tree_ext_sct_un_median 8.1000000000000000e+01
+wt_hpd_rrr_median 9.5000000000000000e+01
+wt_hpd_un_median 5.3000000000000000e+01
+reqlen= 11
+eu.emst.dem
+tree_ext_sct_rrr_median 1.0500000000000000e+02
+tree_ext_sct_un_median 8.0000000000000000e+01
+wt_hpd_rrr_median 1.0100000000000000e+02
+wt_hpd_un_median 5.6000000000000000e+01
+reqlen= 12
+eu.emst.dem
+tree_ext_sct_rrr_median 1.0400000000000000e+02
+tree_ext_sct_un_median 8.0000000000000000e+01
+wt_hpd_rrr_median 1.0800000000000000e+02
+wt_hpd_un_median 6.0000000000000000e+01
+reqlen= 13
+eu.emst.dem
+tree_ext_sct_rrr_median 1.0400000000000000e+02
+tree_ext_sct_un_median 7.9000000000000000e+01
+wt_hpd_rrr_median 1.1400000000000000e+02
+wt_hpd_un_median 6.3000000000000000e+01
+reqlen= 14
+eu.emst.dem
+tree_ext_sct_rrr_median 1.0300000000000000e+02
+tree_ext_sct_un_median 7.8000000000000000e+01
+wt_hpd_rrr_median 1.2000000000000000e+02
+wt_hpd_un_median 6.5000000000000000e+01
+reqlen= 15
+eu.emst.dem
+tree_ext_sct_rrr_median 1.0200000000000000e+02
+tree_ext_sct_un_median 7.7000000000000000e+01
+wt_hpd_rrr_median 1.2600000000000000e+02
+wt_hpd_un_median 6.8000000000000000e+01
+reqlen= 16
+eu.emst.dem
+tree_ext_sct_rrr_median 1.0100000000000000e+02
+tree_ext_sct_un_median 7.5000000000000000e+01
+wt_hpd_rrr_median 1.3100000000000000e+02
+wt_hpd_un_median 7.0000000000000000e+01
+reqlen= 17
+eu.emst.dem
+tree_ext_sct_rrr_median 9.8000000000000000e+01
+tree_ext_sct_un_median 7.2000000000000000e+01
+wt_hpd_rrr_median 1.3600000000000000e+02
+wt_hpd_un_median 7.1000000000000000e+01
+reqlen= 18
+eu.emst.dem
+tree_ext_sct_rrr_median 9.7000000000000000e+01
+tree_ext_sct_un_median 6.9000000000000000e+01
+wt_hpd_rrr_median 1.4000000000000000e+02
+wt_hpd_un_median 7.2000000000000000e+01
+reqlen= 19
+eu.emst.dem
+tree_ext_sct_rrr_median 9.6000000000000000e+01
+tree_ext_sct_un_median 6.7000000000000000e+01
+wt_hpd_rrr_median 1.4400000000000000e+02
+wt_hpd_un_median 7.4000000000000000e+01
+reqlen= 2
+mars.emst.dem
