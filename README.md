@@ -143,6 +143,8 @@ int main() {
 ```
 
 ### Generating a tree, uniformly at random
+Sometimes, generating a binary tree uniformly at random comes in handy. For that, there is a target `gentree`
+based on [this paper][GENTREE].
 The syntax is as follows:
 ```sh
 ./gentree -n=42 -a=1 -b=10
@@ -183,23 +185,25 @@ In order to plot a histogram for the `path median`,
 select `File->Plot` and then pick the resulting (`*.json`).
 One should get an image such as ![image info](./examples/images/hist01.png)
 
-## Path counting queries
+## Path counting amd reporting queries
 Everything works the way it does for [path median queries](#median),
 except for that in step 3, one chooses `counting` and can optionally
-choose the configuration (i.e. the `K` parameter discussed e.g. when
+choose the configurationbinary  (i.e. the `K` parameter discussed e.g. when
 describing [the commandline interface](#cli).
 
 ### Group bars
 In addition to to visualizing as in the [path median experiment](#medvis),
-one can also draw a plot to observe the query-time dynamics as we change
-the configuration. For that, one needs to have run the experiment with
-all the structures of interest for all `K` (see the `Configuration` panel of the GUI).
+one can also draw a plot to observe the query-time dynamics as the 
+configuration changes. For that, one needs to have run the experiment with
+all the structures of interest, for all `K` (see the `Configuration` panel of the GUI).
 The one selects `Fil->Group bars` and then using `Ctrl` selects
 the files pertaining to the different values of `K`. Let's say we have run
 an experiment on counting queries, using a certain dataset, and put
 the results in `resultK001.json`, `resultK010.json`, and `resultK100.json`.
-Then selecting these would result in an image with group bars, breaking down
+Then selecting these (with `Ctrl` pressed) would result in an image with group bars, breaking down
 the performance of each data structure by the configuration.
+One should get an image such as
+ ![image info](./examples/images/hist02.png)
 
 
 Bug Reporting
@@ -286,3 +290,4 @@ to building `gtest` as an external project and use `cmake`'s `find_packge/find_l
 [SDSL]: https://github.com/simongog/sdsl-lite "sdsl-lite"
 [GLFAGS]: https://github.com/gflags/gflags "glfags"
 [JSON]: https://github.com/nlohmann/json "JSON for Modern C++"
+[GENTREE]: http://www.cs.otago.ac.nz/staffpriv/mike/Papers/RandomGeneration/RandomBinaryTrees.pdf "Generating binary trees at random"

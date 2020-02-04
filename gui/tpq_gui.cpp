@@ -165,9 +165,9 @@ void tpq_gui::clickedSlot() {
             if ( querySizeButtons[i]->isChecked() )
                 break ;
         assert( i < querySizeButtons.size() );
-        std::regex r("(\\d+)");
+        std::regex r(R"(([0-9]+))");
         std::smatch m;
-        std::string text= queryTypeButtons[i]->text().toStdString();
+        std::string text= querySizeButtons[i]->text().toStdString();
         if ( std::regex_search(text,m,r) ) {
             return strtol(m[1].str().c_str(),nullptr,10);
         }
@@ -831,19 +831,29 @@ void tpq_gui::plot_bars_group( QStringList filenames ) {
     auto *group = new QCPBarsGroup(customPlot);
     QVector<Qt::BrushStyle> styles= {Qt::SolidPattern,Qt::Dense1Pattern,Qt::Dense2Pattern,Qt::Dense3Pattern};
     QVector<QString> qnames= {QString(tr("large")),QString(tr("medium")),QString(tr("small"))};
+    //FIXME: this assumes the files come in correct order;
+    // we need to find out on the basis of the files themselves which one contains which K
+    std::vector<QCPBars *> brs(filenames.size());
     for ( auto i= 0; i < filenames.size(); ++i ) {
-        auto *bar= prepareBars(filenames[i], customPlot);
+        int kk;
+        auto *bar= prepareBars(filenames[i],customPlot,&kk);
+        int idx= kk==1?0:(kk==10?1:2);
         auto qcprng= bar->dataValueRange(0);
         low= std::min(low,qcprng.lower);
         high= std::max(high,qcprng.upper);
         bar->setWidth(0.15);
-        QBrush brush(EconBlue,styles[i]);
-        bar->setName(qnames[i]);
+        QBrush brush(EconBlue,styles[idx]);
+        bar->setName(qnames[idx]);
         bar->setBrush(brush);
-        group->append(bar);
+        //group->append(bar);
+        brs[idx]= bar;
         key_max= std::max(key_max, bar->dataCount()+0.00);
         // customPlot->addGraph();
     }
+    std::cerr << high << std::endl;
+    customPlot->yAxis->setRangeUpper(300);
+    for ( auto &br: brs )
+        group->append(br);
 
     QVector<QString> labels;
     QVector<double> ticks;
@@ -875,7 +885,7 @@ void tpq_gui::plot_bars_group( QStringList filenames ) {
     textTicker->addTicks(ticks, labels);
     customPlot->xAxis->setTicker(textTicker);
 
-    customPlot->yAxis->setRange(0.00,high*1.13);
+    // customPlot->yAxis->setRange(0.00,high*1.13);
     customPlot->yAxis->setLabelFont(xLabelsFont);
     customPlot->legend->setVisible(true);
     customPlot->legend->setFont(xLabelsFont);
@@ -929,7 +939,7 @@ void tpq_gui::plot_bars_group( QStringList filenames ) {
     w->show();
 }
 
-QCPBars *tpq_gui::prepareBars( QString filename, QCustomPlot *customPlot ) {
+QCPBars *tpq_gui::prepareBars( QString filename, QCustomPlot *customPlot, int *kk ) {
     QCPTextElement *titleElement= nullptr;
 
     std::ifstream input(filename.toStdString());
@@ -946,6 +956,7 @@ QCPBars *tpq_gui::prepareBars( QString filename, QCustomPlot *customPlot ) {
     for ( auto i= 0; i < arr.size(); ++i ) {
         const auto &a= arr[i];
         auto num_queries= static_cast<size_t>(a["num_queries"]);
+        if ( kk ) *kk= static_cast<int>(a["K"]);
         std::string dsname= [&a]()->std::string {
             std::string text= a["name"];
             auto pos= text.find('/');
