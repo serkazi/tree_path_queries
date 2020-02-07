@@ -30,7 +30,7 @@ and then
 make aggregate_bench
 ```
 ### Perl script for running a benchmark
-A wrapper around `aggregate_bench` is a Perl sctip `complete_queryset_benchmark.pl`.
+A wrapper around `aggregate_bench` is a Perl script `complete_queryset_benchmark.pl`.
 ```sh
 perl complete_queryset_benchmark.pl <regex> <dataset_path> <num_of_queries> <K> <output_file_name>
 ```
@@ -183,7 +183,7 @@ Then,
 ### <a name="medvis">Visualizing the results</a>
 In order to plot a histogram for the `path median`,
 select `File->Plot` and then pick the resulting (`*.json`).
-One should get an image such as ![image info](./examples/images/hist01.png)
+One should get an image such as ![image info](./examples/images/hist01.png){:height="50%" width="50%"}
 
 ## Path counting amd reporting queries
 Everything works the way it does for [path median queries](#median),
@@ -226,18 +226,24 @@ A preliminary version of the paper this code primarily used in is available [her
 ## External Resources used in the library
 
 We use the 
+
 	* [sdsl][SDSL] for our succinct data structures
 	* [googletest][GTEST] framework to provide unit tests
 	* [google-benchmark][GBENCH] for time measurements
 	* [malloc\_count][MCNT] for measuring space occupancy
 	* [gflags][GLFAGS] to define and handle commandline flags for CLI interface
+
 For optional functionality, we also use
+
 	* [json][JSON] for ease of reporting
 	* [sha512][SHA512] to facilitate the sanity check of the data structures
 		- by creating a hash of the answers to the queries in the query set
+
 In addition, we have GUI based on 
+
 	* [Qt][QT]; and
 	* [QCustomPlot][QCUSTOMPLOT] library for plotting
+
 The GUI functionality is currently work in progress.
 
 Authors
@@ -258,7 +264,8 @@ Feel free to contact any of the authors or create an issue on the
 
 Caveats
 ------------
-[sdsl-lite][SDSL] comes with its own version of [gtest][GTEST], which can be way too old
+[sdsl-lite][SDSL] stable version that is recommended for
+academic purposes (such as this project) comes with its own version of [gtest][GTEST], which can be way too old
 for our tests, which use newest (as of time of writing) features of the latter.
 (Such as e.g. value-parametrized tests).
 This may result in problems when trying to test data structures depending on
