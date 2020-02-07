@@ -3,8 +3,10 @@
 
 What is it?
 -----------
-This library realizes the theoretical findings in published reasearch on path queries in weighted trees. It implements both
-plain pointer-based as well as succinct data structures.
+This library realizes the theoretical findings in published reasearch (see [[1]](#1) [[3]](#3)) on path queries in weighted trees.
+It implements both plain pointer-based as well as succinct data structures, the latter using [[3]](#3).
+The library presents a few implementations of certain `path_query_processor` interface,
+which preprocesses a given weighted tree to answer on-line path median, path counting, and path reporting queries.
 
 Requirements
 ------------
@@ -230,11 +232,13 @@ We use the
 * [google-benchmark][GBENCH] for time measurements
 * [malloc\_count][MCNT] for measuring space occupancy
 * [gflags][GLFAGS] to define and handle commandline flags for CLI interface
+
 For optional functionality, we also use
 * [json][JSON] for ease of reporting
 * [sha512][SHA512] to facilitate the sanity check of the data structures
 	- by creating a hash of the answers to the queries in the query set
-In addition, we have GUI based on 
+
+In addition, we have a GUI based on 
 * [Qt][QT]; and
 * [QCustomPlot][QCUSTOMPLOT] library for plotting
 
@@ -268,6 +272,19 @@ This may result in problems when trying to test data structures depending on
 distribution. Essentially, one can to comment-out the lines pertaining
 to building `gtest` as an external project and use `cmake`'s `find_packge/find_library` instead
 (pointing to your `gtest` distribution if necessary).
+
+
+References
+----------
+<a id="1">[1]</a> 
+Manish Patil, Rahul Shah, Sharma V. Thankachan:
+Succinct representations of weighted trees supporting path queries. J. Discrete Algorithms 17: 103-108 (2012)
+<a id="2">[2]</a> 
+Simon Gog, Timo Beller, Alistair Moffat, Matthias Petri:
+From Theory to Practice: Plug and Play with Succinct Data Structures. SEA 2014: 326-337
+<a id="3">[3]</a> 
+Meng He, J. Ian Munro, Gelin Zhou:
+Data Structures for Path Queries. ACM Trans. Algorithms 12(4): 53:1-53:32 (2016)
 
 
 [STL]: http://www.sgi.com/tech/stl/ "Standard Template Library"
