@@ -276,16 +276,9 @@ to building `gtest` as an external project and use `cmake`'s `find_packge/find_l
 
 References
 ----------
-<a id="1">[1]</a> 
-Manish Patil, Rahul Shah, Sharma V. Thankachan:
-Succinct representations of weighted trees supporting path queries. J. Discrete Algorithms 17: 103-108 (2012)
-<a id="2">[2]</a> 
-Simon Gog, Timo Beller, Alistair Moffat, Matthias Petri:
-From Theory to Practice: Plug and Play with Succinct Data Structures. SEA 2014: 326-337
-<a id="3">[3]</a> 
-Meng He, J. Ian Munro, Gelin Zhou:
-Data Structures for Path Queries. ACM Trans. Algorithms 12(4): 53:1-53:32 (2016)
-
+* <a id="1">[1]</a> Manish Patil, Rahul Shah, Sharma V. Thankachan: Succinct representations of weighted trees supporting path queries. J. Discrete Algorithms 17: 103-108 (2012)
+* <a id="2">[2]</a> Simon Gog, Timo Beller, Alistair Moffat, Matthias Petri: From Theory to Practice: Plug and Play with Succinct Data Structures. SEA 2014: 326-337
+* <a id="3">[3]</a> Meng He, J. Ian Munro, Gelin Zhou: Data Structures for Path Queries. ACM Trans. Algorithms 12(4): 53:1-53:32 (2016)
 
 [STL]: http://www.sgi.com/tech/stl/ "Standard Template Library"
 [cmake]: http://www.cmake.org/ "CMake tool"
