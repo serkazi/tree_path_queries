@@ -11,3 +11,10 @@ target_link_libraries(
 	PUBLIC
 	gflags
 )
+
+add_executable(bin2ordinal bin2ordered.cpp)
+target_link_libraries(
+	bin2ordinal
+	PUBLIC
+	gflags
+)

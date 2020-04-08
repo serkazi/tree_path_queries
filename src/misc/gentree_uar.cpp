@@ -2,6 +2,7 @@
  *
  */
 #include <iostream>
+#include <fstream>
 #include <memory>
 #include <random>
 #include <string>
@@ -102,22 +103,34 @@ DEFINE_uint64(b,0,"b: the right bound of the [a,b] range of weights");
 // DEFINE_string(query_type,"median","type of query: median, counting, reporting");
 // DEFINE_string(data_structure,"nv","data structure: one of 'nv', 'nv_lca', 'nv_sct', 'ext_ptr', 'whp_ptr', 'ext_sct_un', 'ext_sct_rrr', 'whp_un', 'whp_rrr'");
 // DEFINE_string(output_format,"json","format of output: csv, json");
-// DEFINE_string(output_file,"","output file path");
+DEFINE_string(output_file,"","output file path");
+
+void output_weights( std::ostream &os ) {
+	std::default_random_engine generator;
+    std::uniform_int_distribution<std::uint64_t> distribution(FLAGS_a,FLAGS_b);
+	for ( auto i= 0; i < FLAGS_n; ++i ) 
+		os << distribution(generator) << " ";
+	os << std::endl;
+}
 
 int main( int argc, char **argv ) {
-
 	gflags::ParseCommandLineFlags(&argc,&argv,true);
 	std::unique_ptr<gen_rand_topology> ptr= std::make_unique<gen_rand_topology>();
 	auto res= (*ptr)(FLAGS_n);
-	std::cout << res << std::endl;
-	if ( FLAGS_a < FLAGS_b ) {
-		std::default_random_engine generator;
-	    std::uniform_int_distribution<std::uint64_t> distribution(FLAGS_a,FLAGS_b);
-		for ( auto i= 0; i < FLAGS_n; ++i ) 
-			std::cout << distribution(generator) << " ";
-		std::cout << std::endl;
+	if ( FLAGS_output_file != "" ) {
+		std::ofstream os;
+		os.open(FLAGS_output_file);
+		os << res << std::endl;
+		if ( FLAGS_a < FLAGS_b ) 
+			output_weights(os);
+		os.close();
 	}
-
+	else {
+		std::ostream &os= std::cout;
+		os << res << std::endl;
+		if ( FLAGS_a < FLAGS_b ) 
+			output_weights(os);
+	}
 	return 0;
 }
 
