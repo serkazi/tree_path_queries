@@ -96,7 +96,7 @@ target_include_directories(
 )
 
 # adding library for HPD
-find_library(${SIMPLE_TREE} REQUIRED)
+# find_library(${SIMPLE_TREE} REQUIRED)
 set(LIB_SRC ${PROJECT_SOURCE_DIR}/include/data_structures/hpd/heavy_path_decomp.hpp)
 set(HPD hpd)
 add_library(${HPD} ${LIB_SRC})
@@ -206,6 +206,21 @@ target_include_directories(
 )
 target_link_directories(wt_hpd PUBLIC ${SDSL_LIBRARY})
 target_link_libraries(wt_hpd PUBLIC sdsl)
+
+#adding the library for two_wt
+add_library(two_wt ${PROJECT_SOURCE_DIR}/include/data_structures/succinct/two_wt.hpp)
+set_target_properties(two_wt PROPERTIES LINKER_LANGUAGE CXX)
+target_include_directories(
+        two_wt
+        PUBLIC
+        ${SDSL_INCLUDE_DIR}
+        ${PROJECT_SOURCE_DIR}/include/data_structures/succinct
+        ${PROJECT_SOURCE_DIR}/include/wrappers
+        ${PROJECT_SOURCE_DIR}/include/interfaces
+        ${PROJECT_SOURCE_DIR}/src/misc
+)
+target_link_directories(two_wt PUBLIC ${SDSL_LIBRARY})
+target_link_libraries(two_wt PUBLIC sdsl)
 
 #adding succinct tree implementations based on balaced parens stuff
 add_library(

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15)
 
 set(CMAKE_CXX_STANDARD 17)
-find_library(GTest REQUIRED)
+# find_library(GTest REQUIRED)
 find_package(Threads REQUIRED)
 
 add_executable(test_wt_hpd test_wt_hpd.cpp)
@@ -33,3 +33,13 @@ target_include_directories(
         ${PROJECT_SOURCE_DIR}/src/misc
 )
 target_link_libraries(test_nsrs PUBLIC naive raw_processor pthread gtest)
+
+add_executable(test_two_wt test_two_wt.cpp)
+target_include_directories(test_two_wt
+        PUBLIC
+        ${PROJECT_SOURCE_DIR}/src/tests/data_structures/succinct
+        ${PROJECT_SOURCE_DIR}/include/data_structures/succinct
+        ${PROJECT_SOURCE_DIR}/src/misc
+        ${PROJECT_SOURCE_DIR}/include/wrappers
+)
+target_link_libraries(test_two_wt PUBLIC two_wt raw_processor gtest pthread)

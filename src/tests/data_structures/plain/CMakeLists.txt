@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15)
 
 set(CMAKE_CXX_STANDARD 17)
-find_library(GTest REQUIRED)
+# find_library(GTest REQUIRED)
 find_package(Threads REQUIRED)
 
 set(execs test_ext_ptr test_nv_lca test_nv test_wt_hpd_ptr)
