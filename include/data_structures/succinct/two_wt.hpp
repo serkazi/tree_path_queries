@@ -155,22 +155,126 @@ private:
     }
 
     /**
-     * @brief Binary search over weight space for the k-th smallest on a path.
-     * O(lg^2 sigma) — binary search over [lo..hi], each step calls count_on_path.
+     * @brief Lockstep WT descent for the k-th smallest on a path.
+     * O(lg sigma) — descends both wavelet trees level-by-level,
+     * computing the path-left count at each level from 6 prefix ranges.
+     *
+     * At each level, we maintain prefix ranges in wt_pre and wt_exit
+     * for nodes x, y, z. The left-count on the path is:
+     *   anc_left(v) = size(left(rp_v)) - size(left(re_v))
+     *   path_left = anc_left(x) + anc_left(y) - 2*anc_left(z) + z_goes_left
      */
     value_type _select(node_type x, node_type y, node_type z,
-                       size_type k, value_type lo, value_type hi) const {
-        while (lo < hi) {
-            value_type mid = lo + (hi - lo) / 2;
-            size_type left_count = count_on_path(x, y, z, lo, mid);
-            if (k < left_count) {
-                hi = mid;
+                       size_type k) const {
+        using wt_node = typename sdsl::wt_int<>::node_type;
+        using range_t = sdsl::range_type;
+
+        // Compute prefix endpoints for the 6 ranges.
+        // wt_pre range [0, v+S-1]: ancestors(v) ∪ subtree(v) ∪ left-non-ancestors
+        // wt_exit range [0, er_v-1]: left-non-ancestors ∪ proper-descendants(v)
+        size_type ep_x = static_cast<size_type>(x) + subtree_size(x);
+        size_type ep_y = static_cast<size_type>(y) + subtree_size(y);
+        size_type ep_z = static_cast<size_type>(z) + subtree_size(z);
+        size_type ee_x = exit_rank(x);
+        size_type ee_y = exit_rank(y);
+        size_type ee_z = exit_rank(z);
+
+        bool dbg = (m_n == 7 && x == 6 && y == 5);
+        if (dbg) {
+            std::cerr << "[DBG] _select x=" << x << " y=" << y << " z=" << z << " k=" << k << "\n";
+            std::cerr << "[DBG] ep_x=" << ep_x << " ep_y=" << ep_y << " ep_z=" << ep_z << "\n";
+            std::cerr << "[DBG] ee_x=" << ee_x << " ee_y=" << ee_y << " ee_z=" << ee_z << "\n";
+            std::cerr << "[DBG] weights: z=" << m_weights[z] << " x=" << m_weights[x] << " y=" << m_weights[y] << "\n";
+            // Also print all weights and preorder/exit-order
+            std::cerr << "[DBG] All weights (preorder):";
+            for (size_type i = 0; i < m_n; ++i) std::cerr << " " << m_weights[i];
+            std::cerr << "\n";
+            std::cerr << "[DBG] subtree_size: x=" << subtree_size(x) << " y=" << subtree_size(y) << " z=" << subtree_size(z) << "\n";
+        }
+
+        // Build inclusive range [0, ep-1]; if ep==0, produce empty range.
+        auto make_range = [](size_type ep) -> range_t {
+            if (ep == 0) return range_t{1, 0};
+            return range_t{0, ep - 1};
+        };
+
+        range_t rp_x = make_range(ep_x), rp_y = make_range(ep_y), rp_z = make_range(ep_z);
+        range_t re_x = make_range(ee_x), re_y = make_range(ee_y), re_z = make_range(ee_z);
+
+        wt_node vp = wt_pre->root();
+        wt_node ve = wt_exit->root();
+        uint32_t max_lev = wt_pre->max_level;
+
+        if (dbg) std::cerr << "[DBG] max_lev=" << max_lev << "\n";
+
+        for (uint32_t lev = 0; lev < max_lev; ++lev) {
+            // Expand WT nodes to get left/right child nodes
+            auto cp = wt_pre->expand(vp);   // [left_child, right_child]
+            auto ce = wt_exit->expand(ve);
+
+            // Expand a prefix range, guarding against empty ranges.
+            // sdsl::expand computes r[1]-r[0]+1 which underflows for empty ranges.
+            // We use size()==0 as the emptiness check rather than sdsl::empty(),
+            // because expand() can produce {0, UINT64_MAX} (wrapping) which
+            // sdsl::empty() incorrectly considers non-empty.
+            auto range_is_empty = [](const range_t& r) -> bool {
+                return sdsl::size(r) == 0;
+            };
+            auto safe_expand = [&range_is_empty](const sdsl::wt_int<>& wt,
+                                  const wt_node& v, const range_t& r)
+                -> std::array<range_t, 2> {
+                if (range_is_empty(r)) return {range_t{1, 0}, range_t{1, 0}};
+                auto result = wt.expand(v, r);
+                // Guard outputs too: expand can produce wrapped ranges
+                if (range_is_empty(result[0])) result[0] = range_t{1, 0};
+                if (range_is_empty(result[1])) result[1] = range_t{1, 0};
+                return result;
+            };
+
+            auto exp_rp_x = safe_expand(*wt_pre, vp, rp_x);
+            auto exp_rp_y = safe_expand(*wt_pre, vp, rp_y);
+            auto exp_rp_z = safe_expand(*wt_pre, vp, rp_z);
+            auto exp_re_x = safe_expand(*wt_exit, ve, re_x);
+            auto exp_re_y = safe_expand(*wt_exit, ve, re_y);
+            auto exp_re_z = safe_expand(*wt_exit, ve, re_z);
+
+            auto sz = [&range_is_empty](const range_t& r) -> size_type {
+                return range_is_empty(r) ? 0 : sdsl::size(r);
+            };
+
+            size_type anc_left_x = sz(exp_rp_x[0]) - sz(exp_re_x[0]);
+            size_type anc_left_y = sz(exp_rp_y[0]) - sz(exp_re_y[0]);
+            size_type anc_left_z = sz(exp_rp_z[0]) - sz(exp_re_z[0]);
+            bool z_left = ((m_weights[z] >> (max_lev - 1 - lev)) & 1) == 0;
+            size_type path_left = anc_left_x + anc_left_y
+                                - 2 * anc_left_z + (z_left ? 1 : 0);
+
+            if (dbg) {
+                std::cerr << "[DBG] lev=" << lev << " k=" << k
+                          << " anc_left: x=" << anc_left_x << " y=" << anc_left_y << " z=" << anc_left_z
+                          << " z_left=" << z_left << " path_left=" << path_left
+                          << " => " << (k < path_left ? "LEFT" : "RIGHT") << "\n";
+                std::cerr << "[DBG]   rp_x=[" << rp_x[0] << "," << rp_x[1] << "] rp_y=[" << rp_y[0] << "," << rp_y[1] << "] rp_z=[" << rp_z[0] << "," << rp_z[1] << "]\n";
+                std::cerr << "[DBG]   re_x=[" << re_x[0] << "," << re_x[1] << "] re_y=[" << re_y[0] << "," << re_y[1] << "] re_z=[" << re_z[0] << "," << re_z[1] << "]\n";
+                std::cerr << "[DBG]   sz lp: rpx=" << sz(exp_rp_x[0]) << " rpy=" << sz(exp_rp_y[0]) << " rpz=" << sz(exp_rp_z[0]) << "\n";
+                std::cerr << "[DBG]   sz le: rex=" << sz(exp_re_x[0]) << " rey=" << sz(exp_re_y[0]) << " rez=" << sz(exp_re_z[0]) << "\n";
+            }
+
+            if (k < path_left) {
+                // Go left
+                vp = cp[0]; ve = ce[0];
+                rp_x = exp_rp_x[0]; rp_y = exp_rp_y[0]; rp_z = exp_rp_z[0];
+                re_x = exp_re_x[0]; re_y = exp_re_y[0]; re_z = exp_re_z[0];
             } else {
-                k -= left_count;
-                lo = mid + 1;
+                // Go right
+                k -= path_left;
+                vp = cp[1]; ve = ce[1];
+                rp_x = exp_rp_x[1]; rp_y = exp_rp_y[1]; rp_z = exp_rp_z[1];
+                re_x = exp_re_x[1]; re_y = exp_re_y[1]; re_z = exp_re_z[1];
             }
         }
-        return lo;
+
+        return wt_pre->sym(vp);
     }
 
 public:
@@ -239,7 +343,7 @@ public:
     value_type query(node_type x, node_type y) const override {
         auto z = lca(x, y);
         size_type path_len = depth(x) + depth(y) - 2 * depth(z) + 1;
-        return _select(x, y, z, path_len / 2, 0, this->m_sigma - 1);
+        return _select(x, y, z, path_len / 2);
     }
 
     /**
@@ -248,7 +352,7 @@ public:
     value_type selection(node_type x, node_type y, size_type qntl) const override {
         auto z = lca(x, y);
         size_type path_len = depth(x) + depth(y) - 2 * depth(z) + 1;
-        return _select(x, y, z, this->qntl2rnk(path_len, qntl), 0, this->m_sigma - 1);
+        return _select(x, y, z, this->qntl2rnk(path_len, qntl));
     }
 
     /**
