@@ -130,7 +130,10 @@ node_type tree<node_type, size_type, value_type>::lca(node_type x, node_type y) 
         return x;
     for ( size_type k= K-1; k; --k ) {
         assert( anc[x][k] == anc[y][k] ); //both exist or nullopts
-        assert( *anc[x][k] == *anc[y][k] );
+        // Skip levels where (k-1)-th ancestor doesn't exist for either
+        // node (both are within 2^(k-1) of the root, so they agree).
+        if ( !anc[x][k-1] || !anc[y][k-1] )
+            continue;
         if ( *anc[x][k-1] != *anc[y][k-1] )
             x= *anc[x][k-1], y= *anc[y][k-1];
     }
