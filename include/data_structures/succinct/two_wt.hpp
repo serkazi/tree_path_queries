@@ -179,18 +179,9 @@ private:
         size_type ee_y = exit_rank(y);
         size_type ee_z = exit_rank(z);
 
-        bool dbg = (m_n == 7 && x == 6 && y == 5);
-        if (dbg) {
-            std::cerr << "[DBG] _select x=" << x << " y=" << y << " z=" << z << " k=" << k << "\n";
-            std::cerr << "[DBG] ep_x=" << ep_x << " ep_y=" << ep_y << " ep_z=" << ep_z << "\n";
-            std::cerr << "[DBG] ee_x=" << ee_x << " ee_y=" << ee_y << " ee_z=" << ee_z << "\n";
-            std::cerr << "[DBG] weights: z=" << m_weights[z] << " x=" << m_weights[x] << " y=" << m_weights[y] << "\n";
-            // Also print all weights and preorder/exit-order
-            std::cerr << "[DBG] All weights (preorder):";
-            for (size_type i = 0; i < m_n; ++i) std::cerr << " " << m_weights[i];
-            std::cerr << "\n";
-            std::cerr << "[DBG] subtree_size: x=" << subtree_size(x) << " y=" << subtree_size(y) << " z=" << subtree_size(z) << "\n";
-        }
+        // Track whether z is still in the current WT subtree.
+        // Once z's bit diverges from the descent direction, z_active = false.
+        bool z_active = true;
 
         // Build inclusive range [0, ep-1]; if ep==0, produce empty range.
         auto make_range = [](size_type ep) -> range_t {
@@ -204,8 +195,6 @@ private:
         wt_node vp = wt_pre->root();
         wt_node ve = wt_exit->root();
         uint32_t max_lev = wt_pre->max_level;
-
-        if (dbg) std::cerr << "[DBG] max_lev=" << max_lev << "\n";
 
         for (uint32_t lev = 0; lev < max_lev; ++lev) {
             // Expand WT nodes to get left/right child nodes
@@ -242,35 +231,32 @@ private:
                 return range_is_empty(r) ? 0 : sdsl::size(r);
             };
 
-            size_type anc_left_x = sz(exp_rp_x[0]) - sz(exp_re_x[0]);
-            size_type anc_left_y = sz(exp_rp_y[0]) - sz(exp_re_y[0]);
-            size_type anc_left_z = sz(exp_rp_z[0]) - sz(exp_re_z[0]);
+            // Use signed arithmetic to avoid underflow when ranges
+            // don't perfectly cancel (possible during WT descent).
+            auto ssz = [&range_is_empty](const range_t& r) -> int64_t {
+                return range_is_empty(r) ? 0 : static_cast<int64_t>(sdsl::size(r));
+            };
+            int64_t anc_left_x = ssz(exp_rp_x[0]) - ssz(exp_re_x[0]);
+            int64_t anc_left_y = ssz(exp_rp_y[0]) - ssz(exp_re_y[0]);
+            int64_t anc_left_z = ssz(exp_rp_z[0]) - ssz(exp_re_z[0]);
             bool z_left = ((m_weights[z] >> (max_lev - 1 - lev)) & 1) == 0;
-            size_type path_left = anc_left_x + anc_left_y
-                                - 2 * anc_left_z + (z_left ? 1 : 0);
+            int64_t path_left = anc_left_x + anc_left_y
+                              - 2 * anc_left_z
+                              + (z_active && z_left ? 1 : 0);
 
-            if (dbg) {
-                std::cerr << "[DBG] lev=" << lev << " k=" << k
-                          << " anc_left: x=" << anc_left_x << " y=" << anc_left_y << " z=" << anc_left_z
-                          << " z_left=" << z_left << " path_left=" << path_left
-                          << " => " << (k < path_left ? "LEFT" : "RIGHT") << "\n";
-                std::cerr << "[DBG]   rp_x=[" << rp_x[0] << "," << rp_x[1] << "] rp_y=[" << rp_y[0] << "," << rp_y[1] << "] rp_z=[" << rp_z[0] << "," << rp_z[1] << "]\n";
-                std::cerr << "[DBG]   re_x=[" << re_x[0] << "," << re_x[1] << "] re_y=[" << re_y[0] << "," << re_y[1] << "] re_z=[" << re_z[0] << "," << re_z[1] << "]\n";
-                std::cerr << "[DBG]   sz lp: rpx=" << sz(exp_rp_x[0]) << " rpy=" << sz(exp_rp_y[0]) << " rpz=" << sz(exp_rp_z[0]) << "\n";
-                std::cerr << "[DBG]   sz le: rex=" << sz(exp_re_x[0]) << " rey=" << sz(exp_re_y[0]) << " rez=" << sz(exp_re_z[0]) << "\n";
-            }
-
-            if (k < path_left) {
+            if (static_cast<int64_t>(k) < path_left) {
                 // Go left
                 vp = cp[0]; ve = ce[0];
                 rp_x = exp_rp_x[0]; rp_y = exp_rp_y[0]; rp_z = exp_rp_z[0];
                 re_x = exp_re_x[0]; re_y = exp_re_y[0]; re_z = exp_re_z[0];
+                if (!z_left) z_active = false;
             } else {
                 // Go right
-                k -= path_left;
+                k -= static_cast<size_type>(path_left);
                 vp = cp[1]; ve = ce[1];
                 rp_x = exp_rp_x[1]; rp_y = exp_rp_y[1]; rp_z = exp_rp_z[1];
                 re_x = exp_re_x[1]; re_y = exp_re_y[1]; re_z = exp_re_z[1];
+                if (z_left) z_active = false;
             }
         }
 
